@@ -18,9 +18,14 @@
 \**********************************************************/
 library hprose.rpc;
 
+import "dart:async";
 import "dart:core";
+import "dart:math";
+import "dart:mirrors";
 import "dart:typed_data";
+import "io.dart";
 
-part 'rpc/context.dart';
-part 'rpc/filter.dart';
-part 'rpc/result_mode.dart';
+part 'src/rpc/context.dart';
+part 'src/rpc/filter.dart';
+part 'src/rpc/resultmode.dart';
+part 'src/rpc/client.dart';

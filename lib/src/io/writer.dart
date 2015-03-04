@@ -111,7 +111,11 @@ class Writer {
       case double: writeDouble(value); return;
       case bool: writeBool(value); return;
       case DateTime: writeDateTimeWithRef(value); return;
+      case Symbol:
       case String:
+        if (value is Symbol) {
+          value = MirrorSystem.getName(value);
+        }
         switch (value.length) {
           case 0:
             _bytes.writeByte(TagEmpty);

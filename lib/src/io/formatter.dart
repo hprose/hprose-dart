@@ -18,31 +18,22 @@
 \**********************************************************/
 part of hprose.io;
 
-BytesIO serialize(dynamic value, [bool simple = false]) {
-  BytesIO bytes = new BytesIO();
-  Writer writer = new Writer(bytes, simple);
-  writer.serialize(value);
-  return bytes;
-}
-
-dynamic unserialize(BytesIO bytes, [bool simple = false]) {
-  return new Reader(bytes, simple).unserialize();
-}
-
-BytesIO _serialize(dynamic value, [bool simple = false]) {
-  return serialize(value, simple);
-}
-
-dynamic _unserialize(BytesIO bytes, [bool simple = false]) {
-  return unserialize(bytes, simple);
-}
-
 abstract class Formatter {
-  static Uint8List serialize(dynamic value, [bool simple = false]) {
-    return _serialize(value, simple).takeBytes();
+  static BytesIO serialize(dynamic value, [bool simple = false]) {
+    BytesIO bytes = new BytesIO();
+    Writer writer = new Writer(bytes, simple);
+    writer.serialize(value);
+    return bytes;
   }
-  static dynamic unserialize(Uint8List bytes, [bool simple = false]) {
-    return _unserialize(new BytesIO(bytes), simple);
+
+  static dynamic unserialize(BytesIO bytes, [bool simple = false]) {
+    return new Reader(bytes, simple).unserialize();
   }
 }
 
+Uint8List serialize(dynamic value, [bool simple = false]) {
+  return Formatter.serialize(value, simple).bytes;
+}
+dynamic unserialize(Uint8List bytes, [bool simple = false]) {
+  return Formatter.unserialize(new BytesIO(bytes), simple);
+}

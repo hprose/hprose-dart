@@ -26,21 +26,21 @@ abstract class _ReaderRefer {
   void reset();
 }
 
-void unexpectedTag(int tag, [List<int> expectTags = null]) {
+Exception unexpectedTag(int tag, [List<int> expectTags = null]) {
   if (tag != -1 && expectTags != null) {
     String expectTagStr = new String.fromCharCodes(expectTags);
-    throw new Exception("Tag '${expectTagStr}' expected, but '${new String.fromCharCode(tag)}}' found in stream");
-  } else if (tag != -1) {
-    throw new Exception("Unexpected serialize tag '${new String.fromCharCode(tag)}' in stream");
-  } else {
-    throw new Exception('No byte found in stream');
+    return new Exception("Tag '${expectTagStr}' expected, but '${new String.fromCharCode(tag)}}' found in stream");
   }
+  if (tag != -1) {
+    return new Exception("Unexpected serialize tag '${new String.fromCharCode(tag)}' in stream");
+  }
+  return new Exception('No byte found in stream');
 }
 
 class _FakeReaderRefer implements _ReaderRefer {
   void set(dynamic obj) {}
 
-  dynamic read(int index) { unexpectedTag(TagRef); }
+  dynamic read(int index) { throw unexpectedTag(TagRef); }
 
   void reset() {}
 }
@@ -133,7 +133,7 @@ class RawReader {
         readRawTo(bytes);
         break;
       default:
-        unexpectedTag(tag);
+        throw unexpectedTag(tag);
         break;
     }
   }
@@ -155,7 +155,7 @@ class RawReader {
   }
 
   void _readUTF8CharRaw(BytesIO bytes) {
-    bytes.writeString(_bytes.readUTF8String(1));
+    bytes.writeString(_bytes.readString(1));
   }
 
   void _readBytesRaw(BytesIO bytes) {
@@ -179,7 +179,7 @@ class RawReader {
       tag = _bytes.readByte();
       bytes.writeByte(tag);
     } while (tag != TagQuote);
-    bytes.writeString(_bytes.readUTF8String(count + 1));
+    bytes.writeString(_bytes.readString(count + 1));
   }
 
   void _readGuidRaw(BytesIO bytes) {
@@ -209,13 +209,13 @@ class Reader extends RawReader {
 
   void checkTag(int expectTag, [int tag = null]) {
     if (tag == null) tag = _bytes.readByte();
-    if (tag != expectTag) unexpectedTag(tag, [expectTag]);
+    if (tag != expectTag) throw unexpectedTag(tag, [expectTag]);
   }
 
   int checkTags(List<int> expectTags, [int tag = null]) {
     if (tag == null) tag = _bytes.readByte();
     if (expectTags.indexOf(tag) >= 0) return tag;
-    unexpectedTag(tag, expectTags);
+    throw unexpectedTag(tag, expectTags);
   }
 
   int _readInt(int tag) {
@@ -251,7 +251,7 @@ class Reader extends RawReader {
       case TagDate: return readDateWithoutTag();
       case TagTime: return readTimeWithoutTag();
       case TagBytes: return readBytesWithoutTag();
-      case TagUTF8Char: return _bytes.readUTF8String(1);
+      case TagUTF8Char: return _bytes.readString(1);
       case TagString: return readStringWithoutTag();
       case TagGuid: return readGuidWithoutTag();
       case TagList: return readListWithoutTag();
@@ -260,7 +260,7 @@ class Reader extends RawReader {
       case TagObject: return readObjectWithoutTag();
       case TagRef: return _readRef();
       case TagError: throw new Exception(readString());
-      default: unexpectedTag(tag);
+      default: throw unexpectedTag(tag);
     }
   }
 
@@ -283,7 +283,7 @@ class Reader extends RawReader {
       case 0x39: return 9;
       case TagInteger:
       case TagLong: return readIntWithoutTag();
-      default: unexpectedTag(tag);
+      default: throw unexpectedTag(tag);
     }
   }
 
@@ -311,7 +311,7 @@ class Reader extends RawReader {
       case TagInfinity: return (_bytes.readByte() == TagPos ?
                                 double.INFINITY :
                                 double.NEGATIVE_INFINITY);
-      default: unexpectedTag(tag);
+      default: throw unexpectedTag(tag);
     }
   }
 
@@ -320,7 +320,7 @@ class Reader extends RawReader {
     switch (tag) {
       case TagTrue: return true;
       case TagFalse: return false;
-      default: unexpectedTag(tag);
+      default: throw unexpectedTag(tag);
     }
   }
 
@@ -396,7 +396,7 @@ class Reader extends RawReader {
       case TagDate: return readDateWithoutTag();
       case TagTime: return readTimeWithoutTag();
       case TagRef: return _readRef();
-      default: unexpectedTag(tag);
+      default: throw unexpectedTag(tag);
     }
   }
 
@@ -411,6 +411,7 @@ class Reader extends RawReader {
   Uint8List readBytes() {
     int tag = _bytes.readByte();
     switch (tag) {
+      case TagUTF8Char: return _stringToBytes(_bytes.readString(1));
       case TagString: return _stringToBytes(readStringWithoutTag());
       case TagBytes: return readBytesWithoutTag();
       case TagRef:
@@ -419,7 +420,7 @@ class Reader extends RawReader {
         if (r is String) return _stringToBytes(r);
         if (r is List<int>) return _intListToBytes(r);
         return _stringToBytes(r.toString());
-      default: unexpectedTag(tag);
+      default: throw unexpectedTag(tag);
     }
   }
 
@@ -434,7 +435,7 @@ class Reader extends RawReader {
 
   String _readStringWithoutTag() {
     int length = _readInt(TagQuote);
-    String str = _bytes.readUTF8String(length);
+    String str = _bytes.readString(length);
     _bytes.skip(1);
     return str;
   }
@@ -448,9 +449,10 @@ class Reader extends RawReader {
   String readString() {
     int tag = _bytes.readByte();
     switch (tag) {
+      case TagUTF8Char: return _bytes.readString(1);
       case TagString: return readStringWithoutTag();
       case TagRef: return _readRef().toString();
-      default: unexpectedTag(tag);
+      default: throw unexpectedTag(tag);
     }
   }
 
@@ -467,7 +469,7 @@ class Reader extends RawReader {
     switch (tag) {
       case TagGuid: return readGuidWithoutTag();
       case TagRef: return _readRef();
-      default: unexpectedTag(tag);
+      default: throw unexpectedTag(tag);
     }
   }
 
@@ -487,7 +489,7 @@ class Reader extends RawReader {
     switch (tag) {
       case TagList: return readListWithoutTag();
       case TagRef: return _readRef();
-      default: unexpectedTag(tag);
+      default: throw unexpectedTag(tag);
     }
   }
 
@@ -509,7 +511,7 @@ class Reader extends RawReader {
     switch (tag) {
       case TagMap: return readMapWithoutTag();
       case TagRef: return _readRef();
-      default: unexpectedTag(tag);
+      default: throw unexpectedTag(tag);
     }
   }
 

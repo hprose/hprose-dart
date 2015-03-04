@@ -25,9 +25,9 @@ import "dart:math";
 import "dart:mirrors";
 import "dart:typed_data";
 
-part 'io/bytes_io.dart';
-part 'io/class_manager.dart';
-part 'io/formatter.dart';
-part 'io/reader.dart';
-part 'io/writer.dart';
-part 'io/tags.dart';
+part 'src/io/bytes.dart';
+part 'src/io/classmanager.dart';
+part 'src/io/formatter.dart';
+part 'src/io/reader.dart';
+part 'src/io/writer.dart';
+part 'src/io/tags.dart';
