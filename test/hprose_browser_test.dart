@@ -1,5 +1,4 @@
 library hprose_browser_tests;
-import 'dart:html';
 import 'package:unittest/unittest.dart';
 import 'package:hprose/browser.dart';
 
@@ -13,7 +12,7 @@ void main() {
     List<dynamic> args = [m];
     client.invoke('swapKeyAndValue', args, true, Serialized, true).then((result) {
       expect(args, equals([{"A":"a", "B":"b"}]));
-      expect(new BytesIO(result).toString(), equals("m2{uAuauBub}"));
+      expect(Formatter.serialize(Formatter.unserialize(result)).toString(), equals("m2{uAuauBub}"));
     });
   });
 }
