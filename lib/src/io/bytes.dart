@@ -12,7 +12,7 @@
  *                                                        *
  * hprose bytes io for Dart.                              *
  *                                                        *
- * LastModified: Mar 4, 2015                              *
+ * LastModified: Feb 13, 2016                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -109,7 +109,7 @@ class BytesIO {
       } else if (codeUnit < 0x800) {
         _bytes[_length++] = 0xC0 | (codeUnit >> 6);
         _bytes[_length++] = 0x80 | (codeUnit & 0x3F);
-      } else if (codeUnit < 0xD800 || codeUnit > 0xDfff) {
+      } else if (codeUnit < 0xD800 || codeUnit > 0xDFFF) {
         _bytes[_length++] = 0xE0 | (codeUnit >> 12);
         _bytes[_length++] = 0x80 | ((codeUnit >> 6) & 0x3F);
         _bytes[_length++] = 0x80 | (codeUnit & 0x3F);
@@ -117,7 +117,7 @@ class BytesIO {
         if (i + 1 < n) {
           int nextCodeUnit = string.codeUnitAt(i + 1);
           if (codeUnit < 0xDC00 && 0xDC00 <= nextCodeUnit && nextCodeUnit <= 0xDFFF) {
-            int rune = (((codeUnit & 0xDC00) << 10) | (nextCodeUnit & 0x03FF)) + 0x010000;
+            int rune = (((codeUnit & 0x03FF) << 10) | (nextCodeUnit & 0x03FF)) + 0x010000;
             _bytes[_length++] = 0xF0 | ((rune >> 18) & 0x3F);
             _bytes[_length++] = 0x80 | ((rune >> 12) & 0x3F);
             _bytes[_length++] = 0x80 | ((rune >> 6) & 0x3F);
@@ -229,7 +229,7 @@ class BytesIO {
           break;
         case 15:
           if (_off + 2 < _length) {
-            int rune = ((unit & 0x07) << 18) | ((_bytes[_off++] & 0x3F) << 12) | ((_bytes[_off++] & 0x3F) << 6) | (_bytes[_off++] & 0x3F) - 0x10000;
+            int rune = (((unit & 0x07) << 18) | ((_bytes[_off++] & 0x3F) << 12) | ((_bytes[_off++] & 0x3F) << 6) | (_bytes[_off++] & 0x3F)) - 0x10000;
             if (0 <= rune && rune <= 0xFFFFF) {
               charCodes[i++] = (((rune >> 10) & 0x03FF) | 0xD800);
               charCodes[i] = ((rune & 0x03FF) | 0xDC00);
