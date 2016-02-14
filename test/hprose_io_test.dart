@@ -29,6 +29,7 @@ void main() {
     expect(Formatter.serialize("c").toString(), equals("uc"));
     expect(Formatter.serialize("我").toString(), equals("u我"));
     expect(Formatter.serialize("我爱你").toString(), equals('s3"我爱你"'));
+    expect(Formatter.serialize("我爱五星红旗🇨🇳").toString(), equals('s10"我爱五星红旗🇨🇳"'));
     expect(Formatter.serialize([1, 2, 3, 4, 5]).toString(), equals("a5{12345}"));
     expect(Formatter.serialize(["Jan", "Feb", "Mar", "Mar"]).toString(), equals('a4{s3"Jan"s3"Feb"s3"Mar"r3;}'));
     expect(
@@ -84,6 +85,7 @@ void main() {
     expect(Formatter.unserialize(Formatter.serialize("c")), equals("c"));
     expect(Formatter.unserialize(Formatter.serialize("我")), equals("我"));
     expect(Formatter.unserialize(Formatter.serialize("我爱你")), equals('我爱你'));
+    expect(Formatter.unserialize(Formatter.serialize("我爱五星红旗🇨🇳")), equals('我爱五星红旗🇨🇳'));
     expect(Formatter.unserialize(Formatter.serialize([1, 2, 3, 4, 5])), equals([1, 2, 3, 4, 5]));
     expect(
         Formatter.unserialize(Formatter.serialize(["Jan", "Feb", "Mar", "Mar"])), equals(["Jan", "Feb", "Mar", "Mar"]));
