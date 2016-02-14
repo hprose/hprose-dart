@@ -4,4 +4,4 @@ author: Ma Bingyao <mabingyao@gmail.com>
 description: Hprose for Dart
 homepage: https://github.com/hprose/hprose-dart
 dev_dependencies:
-  unittest: '>=0.9.0 <0.10.0'
+  test: 'any'

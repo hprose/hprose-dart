@@ -1,5 +1,5 @@
 library hprose_browser_tests;
-import 'package:unittest/unittest.dart';
+import 'package:test/test.dart';
 import 'package:hprose/browser.dart';
 
 void main() {

@@ -1,6 +1,6 @@
 library hprose_io_tests;
 import 'dart:typed_data';
-import 'package:unittest/unittest.dart';
+import 'package:test/test.dart';
 import 'package:hprose/io.dart';
 
 class User {
