@@ -1,6 +1,8 @@
 # Hprose for Dart
 
 [![Join the chat at https://gitter.im/hprose/hprose-dart](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/hprose/hprose-dart?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Build Status](https://travis-ci.org/hprose/hprose-dart.svg?branch=master)](https://travis-ci.org/hprose/hprose-dart)
+[![Pub](https://img.shields.io/pub/v/hprose.svg)](https://pub.dartlang.org/packages/hprose)
 
 *Hprose* is a High Performance Remote Object Service Engine.
 
