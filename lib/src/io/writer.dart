@@ -12,7 +12,7 @@
  *                                                        *
  * hprose writer for Dart.                                *
  *                                                        *
- * LastModified: Mar 3, 2015                              *
+ * LastModified: Feb 14, 2016                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -77,10 +77,12 @@ Map<String, Symbol> _getFieldsFromCache(ClassMirror cm) {
         if (properties[name] != null) {
           if (e.isSetter) {
             fields[name] = properties[name];
-          } else {
+          }
+          else {
             fields[name] = e.simpleName;
           }
-        } else {
+        }
+        else {
           properties[name] = e.simpleName;
         }
       }
@@ -102,56 +104,67 @@ class Writer {
 
   void serialize(dynamic value) {
     if (value == null || value is Function) {
-      _bytes.writeByte(TagNull);
+      _bytes.writeByte(TagNull); return;
+    }
+    if (value is int) {
+      writeInt(value); return;
+    }
+    switch (value.runtimeType.toString()) {
+      case "Int32":
+      case "Int64": writeInt(value.toInt()); return;
+    }
+    if (value is double) {
+      writeDouble(value); return;
+    }
+    if (value is bool) {
+       writeBool(value); return;
+    }
+    if (value is DateTime) {
+       writeDateTimeWithRef(value); return;
+    }
+    if (value is Symbol) {
+      value = MirrorSystem.getName(value);
+    }
+    if (value is String) {
+      switch (value.length) {
+        case 0:
+          _bytes.writeByte(TagEmpty);
+          return;
+        case 1:
+          _bytes.writeByte(TagUTF8Char);
+          _bytes.writeString(value);
+          return;
+      }
+      writeStringWithRef(value);
       return;
     }
-    Type type = value.runtimeType;
-    switch (type) {
-      case int: writeInt(value); return;
-      case double: writeDouble(value); return;
-      case bool: writeBool(value); return;
-      case DateTime: writeDateTimeWithRef(value); return;
-      case Symbol:
-      case String:
-        if (value is Symbol) {
-          value = MirrorSystem.getName(value);
-        }
-        switch (value.length) {
-          case 0:
-            _bytes.writeByte(TagEmpty);
-            return;
-          case 1:
-            _bytes.writeByte(TagUTF8Char);
-            _bytes.writeString(value);
-            return;
-        }
-        writeStringWithRef(value);
-        return;
-      default:
-        switch (type.toString()) {
-          case "Int32":
-          case "Int64": writeInt(value.toInt()); return;
-        }
-        if (value is Uint8List) {
-          writeBytesWithRef(value); return;
-        } else if (value is List) {
-          writeListWithRef(value); return;
-        } else if (value is Map) {
-          writeMapWithRef(value); return;
-        } else {
-          writeObjectWithRef(value); return;
-        }
-        break;
+    if (value is Uint8List) {
+      writeBytesWithRef(value); return;
+    }
+    if (value is List) {
+      writeListWithRef(value); return;
+    }
+    if (value is Map) {
+      writeMapWithRef(value); return;
+    }
+    else {
+      writeObjectWithRef(value); return;
     }
   }
 
   void writeInt(int value) {
     if ( 0 <= value && value <= 9) {
       _bytes.writeByte(value + 0x30);
-    } else {
+    }
+    else if (value.isInfinite) {
+      _bytes.writeByte(TagInfinity);
+      _bytes.writeByte(value.isNegative ? TagNeg : TagPos);
+    }
+    else {
       if (value < -2147483648 || value > 2147483647) {
         _bytes.writeByte(TagLong);
-      } else {
+      }
+      else {
         _bytes.writeByte(TagInteger);
       }
       _bytes.writeString(value.toString());
@@ -161,15 +174,17 @@ class Writer {
 
   void writeDouble(double value) {
     if (value.isNaN) {
-      _bytes.writeByte(TagNaN);
-    } else if (value.isInfinite) {
-      _bytes.writeByte(TagInfinity);
-      _bytes.writeByte(value.isNegative ? TagNeg : TagPos);
-    } else {
-      _bytes.writeByte(TagDouble);
-      _bytes.writeString(value.toString());
-      _bytes.writeByte(TagSemicolon);
-    }
+     _bytes.writeByte(TagNaN);
+   }
+   else if (value.isInfinite) {
+     _bytes.writeByte(TagInfinity);
+     _bytes.writeByte(value.isNegative ? TagNeg : TagPos);
+   }
+   else {
+     _bytes.writeByte(TagDouble);
+     _bytes.writeString(value.toString());
+     _bytes.writeByte(TagSemicolon);
+   }
   }
 
   void writeBool(bool value) {
@@ -201,7 +216,8 @@ class Writer {
     time[6] = 0x30 + (second % 10);
     if (millisecond == 0) {
       time = new Uint8List.view(time.buffer, 0, 7);
-    } else {
+    }
+    else {
       time[7] = TagPoint;
       time[8] = 0x30 + (millisecond ~/ 100 % 10);
       time[9] = 0x30 + (millisecond ~/ 10 % 10);
@@ -223,10 +239,12 @@ class Writer {
     if (hour == 0 && minute == 0 && second == 0 && millisecond == 0) {
       _bytes.write(_formatDate(year, month, day));
       _bytes.writeByte(tag);
-    } else if (year == 1970 && month == 1 && day == 1) {
+    }
+    else if (year == 1970 && month == 1 && day == 1) {
       _bytes.write(_formatTime(hour, minute, second, millisecond));
       _bytes.writeByte(tag);
-    } else {
+    }
+    else {
       _bytes.write(_formatDate(year, month, day));
       _bytes.write(_formatTime(hour, minute, second, millisecond));
       _bytes.writeByte(tag);
@@ -284,10 +302,12 @@ class Writer {
         value is Uint32List ||
         value is Uint64List) {
         _writeList(value, writeInt);
-    } else if (value is Float32List ||
+    }
+    else if (value is Float32List ||
                value is Float64List) {
       _writeList(value, writeDouble);
-    } else {
+    }
+    else {
       _writeList(value, serialize);
     }
   }
@@ -325,7 +345,8 @@ class Writer {
     Map<String, Symbol> fields;
     if (index != null) {
       fields = _fieldsref[index];
-    } else {
+    }
+    else {
       fields = _getFieldsFromCache(cm);
       index = _writeClass(className, fields);
     }
@@ -364,4 +385,3 @@ class Writer {
     _refer.reset();
   }
 }
-

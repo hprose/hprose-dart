@@ -12,7 +12,7 @@
  *                                                        *
  * hprose formatter for Dart.                             *
  *                                                        *
- * LastModified: Mar 3, 2015                              *
+ * LastModified: Feb 14, 2016                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -26,7 +26,10 @@ abstract class Formatter {
     return bytes;
   }
 
-  static dynamic unserialize(BytesIO bytes, [bool simple = false]) {
+  static dynamic unserialize(dynamic bytes, [bool simple = false]) {
+    if (bytes is! BytesIO) {
+      bytes = new BytesIO(bytes);
+    }
     return new Reader(bytes, simple).unserialize();
   }
 }
@@ -34,6 +37,6 @@ abstract class Formatter {
 Uint8List serialize(dynamic value, [bool simple = false]) {
   return Formatter.serialize(value, simple).bytes;
 }
-dynamic unserialize(Uint8List bytes, [bool simple = false]) {
-  return Formatter.unserialize(new BytesIO(bytes), simple);
+dynamic unserialize(dynamic bytes, [bool simple = false]) {
+  return Formatter.unserialize(bytes, simple);
 }

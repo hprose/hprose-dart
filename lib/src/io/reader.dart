@@ -12,7 +12,7 @@
  *                                                        *
  * hprose reader for Dart.                                *
  *                                                        *
- * LastModified: Mar 3, 2015                              *
+ * LastModified: Feb 14, 2016                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -547,7 +547,7 @@ class Reader extends RawReader {
     if (!_CtorCache.containsKey(cm)) {
       _CtorCache[cm] = cm.declarations.values.where((value) {
         if (value is MethodMirror) {
-          return value.isGenerativeConstructor;
+          return value.isConstructor;
         }
         return false;
       }).first;

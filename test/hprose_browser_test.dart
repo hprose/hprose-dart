@@ -1,3 +1,4 @@
+@TestOn("browser")
 library hprose_browser_tests;
 import 'package:test/test.dart';
 import 'package:hprose/browser.dart';
