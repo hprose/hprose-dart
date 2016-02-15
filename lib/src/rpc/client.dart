@@ -12,7 +12,7 @@
  *                                                        *
  * hprose context class for Dart.                         *
  *                                                        *
- * LastModified: Mar 3, 2015                              *
+ * LastModified: Feb 15, 2016                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -67,6 +67,7 @@ abstract class Client {
     filters.forEach((filter) => request = filter.outputFilter(request, context));
     return request;
   }
+
   dynamic _doInput(Uint8List response, List<dynamic> args, int mode, Context context) {
     filters.reversed.forEach((filter) => response = filter.inputFilter(response, context));
     if (mode == RawWithEndTag) {
@@ -79,13 +80,12 @@ abstract class Client {
     Reader reader = new Reader(bytes);
     dynamic result;
     int tag;
-    while((tag = bytes.readByte()) != TagEnd) {
-      switch(tag) {
+    while ((tag = bytes.readByte()) != TagEnd) {
+      switch (tag) {
         case TagResult:
           if (mode == Serialized) {
             result = reader.readRaw();
-          }
-          else {
+          } else {
             reader.reset();
             result = reader.unserialize();
           }
@@ -106,6 +106,7 @@ abstract class Client {
     bytes.clear();
     return result;
   }
+
   Client([this._uri = '']);
   Proxy useService([String uri = '', String namespace = '']) {
     if (uri != '') {
@@ -113,31 +114,28 @@ abstract class Client {
     }
     return new Proxy(this, namespace);
   }
-  Future<dynamic> invoke(String name, List<dynamic> args, [bool byref = false, int mode = Normal, bool simple = false]) {
-    Completer<dynamic> completor = new Completer<dynamic>();
+
+  Future<dynamic> invoke(String name, List<dynamic> args,
+      [bool byref = false, int mode = Normal, bool simple = false]) async {
     Context context = new Context();
     Uint8List request = _doOutput(name, args, byref, simple, context);
-    sendAndReceive(request).then((response) {
-      try {
-        completor.complete(_doInput(response, args, mode, context));
-      }
-      catch(e) {
-        completor.completeError(e);
-      }
-    })..catchError((e) {
-      completor.completeError(e);
-    });
-    return completor.future;
+    try {
+      Uint8List response = await sendAndReceive(request);
+      return _doInput(response, args, mode, context);
+    } catch (e) {
+      throw e;
+    }
   }
+
   @override
   noSuchMethod(Invocation mirror) {
-      String name = MirrorSystem.getName(mirror.memberName);
-      if (mirror.isGetter) {
-        return new Proxy(this, name);
-      }
-      if (mirror.isMethod) {
-        return invoke(name, mirror.positionalArguments);
-      }
-      super.noSuchMethod(mirror);
+    String name = MirrorSystem.getName(mirror.memberName);
+    if (mirror.isGetter) {
+      return new Proxy(this, name);
     }
+    if (mirror.isMethod) {
+      return invoke(name, mirror.positionalArguments);
+    }
+    super.noSuchMethod(mirror);
+  }
 }

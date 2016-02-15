@@ -12,7 +12,7 @@
  *                                                        *
  * hprose for Dart on browser.                            *
  *                                                        *
- * LastModified: Mar 3, 2015                              *
+ * LastModified: Feb 15, 2015                             *
  * Author: Ma Bingyao <andot@hprose.com>                  *
  *                                                        *
 \**********************************************************/
@@ -40,25 +40,23 @@ class HttpClient extends Client {
   HttpClient([String uri = '']) : super(uri);
 
   @override
-  Future<Uint8List> sendAndReceive(Uint8List data) {
-    Completer<Uint8List> completor = new Completer<Uint8List>();
-    HttpRequest.request(uri,
-      method: 'POST',
-      withCredentials: window.location.protocol != 'file:',
-      responseType: 'arraybuffer',
-      requestHeaders:  _headers,
-      sendData: data,
-      onProgress: _onProgress).then((HttpRequest request) {
-      if (request.status == 200) {
-        completor.complete(new Uint8List.view(request.response));
-      }
-      else if (request.status != 0) {
-        String error = request.status.toString() + ':' + request.statusText;
-        completor.completeError(new Exception(error));
-      }
-    })..catchError((e) {
-      completor.completeError(e);
-    });
-    return completor.future;
+  Future<Uint8List> sendAndReceive(Uint8List data) async {
+    HttpRequest request;
+    try {
+      request = await HttpRequest.request(uri,
+          method: 'POST',
+          withCredentials: window.location.protocol != 'file:',
+          responseType: 'arraybuffer',
+          requestHeaders: _headers,
+          sendData: data,
+          onProgress: _onProgress);
+    } catch (e) {
+      throw e;
+    }
+    if (request.status != 200 && request.status != 304) {
+      String error = request.status.toString() + ':' + request.statusText;
+      throw new Exception(error);
+    }
+    return new Uint8List.view(request.response);
   }
 }
