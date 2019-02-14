@@ -4,7 +4,7 @@
 |                                                          |
 | Official WebSite: https://hprose.com                     |
 |                                                          |
-| type_info.ts                                             |
+| type_info.dart                                           |
 |                                                          |
 | hprose TypeInfo for Dart.                                |
 |                                                          |
