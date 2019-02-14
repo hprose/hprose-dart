@@ -73,7 +73,7 @@ class ByteStream {
     n = _size + n;
     if (n > capacity) {
       if (capacity > 0) {
-        final Uint8List buf = new Uint8List(_pow2roundup(n));
+        final buf = new Uint8List(_pow2roundup(n));
         buf.setAll(0, _buffer);
         _buffer = buf;
       } else {
@@ -202,11 +202,11 @@ class ByteStream {
   ///
   /// @param data to be written to this stream.
   void write(dynamic data) {
-    final int n = (data is ByteBuffer) ? data.lengthInBytes : data.length;
+    final n = (data is ByteBuffer) ? data.lengthInBytes : data.length;
     if (n == 0) return;
     _grow(n);
-    final Uint8List bytes = _buffer;
-    final int offset = _size;
+    final bytes = _buffer;
+    final offset = _size;
     if (data is ByteStream) {
       bytes.setAll(offset, data.bytes);
     } else if (data is ByteBuffer) {
@@ -222,7 +222,7 @@ class ByteStream {
   /// @param str to be written to this stream.
   void writeAsciiString(String str) {
     if (str.isEmpty) return;
-    final int n = str.length;
+    final n = str.length;
     _grow(n);
     _buffer.setAll(_size, str.codeUnits);
     _size += n;
@@ -234,7 +234,7 @@ class ByteStream {
   void writeString(String str) {
     if (str.isEmpty) return;
     final utf8List = utf8.encode(str);
-    final int n = utf8List.length;
+    final n = utf8List.length;
     _grow(n);
     _buffer.setAll(_size, utf8List);
     _size += n;
@@ -252,7 +252,7 @@ class ByteStream {
   ///
   /// If the remaining data is less than 4 bytes, Error('EOF') will be throw.
   int readInt32BE() {
-    final result = this.readUInt32BE();
+    final result = readUInt32BE();
     if (result <= 0x7FFFFFFF) return result;
     return result - 0x100000000;
   }
@@ -262,11 +262,11 @@ class ByteStream {
   /// If the remaining data is less than 4 bytes, Error('EOF') will be throw.
   int readUInt32BE() {
     final bytes = _buffer;
-    int offset = _offset;
+    var offset = _offset;
     if (offset + 3 >= _size) {
       throw new Exception('EOF');
     }
-    final int result = bytes[offset++] << 24 |
+    final result = bytes[offset++] << 24 |
         bytes[offset++] << 16 |
         bytes[offset++] << 8 |
         bytes[offset++];
@@ -278,7 +278,7 @@ class ByteStream {
   ///
   /// If the remaining data is less than 4 bytes, Error('EOF') will be throw.
   int readInt32LE() {
-    final result = this.readUInt32LE();
+    final result = readUInt32LE();
     if (result <= 0x7FFFFFFF) return result;
     return result - 0x100000000;
   }
@@ -288,11 +288,11 @@ class ByteStream {
   /// If the remaining data is less than 4 bytes, Error('EOF') will be throw.
   int readUInt32LE() {
     final bytes = _buffer;
-    int offset = _offset;
+    var offset = _offset;
     if (offset + 3 >= _size) {
       throw new Exception('EOF');
     }
-    final int result = bytes[offset++] |
+    final result = bytes[offset++] |
         bytes[offset++] << 8 |
         bytes[offset++] << 16 |
         bytes[offset++] << 24;
@@ -332,7 +332,7 @@ class ByteStream {
   /// After this method is called, The new position is after the delimiter.
   /// @param delimiter a byte, which represents the end of reading data.
   Uint8List readBytes(int delimiter) {
-    final int pos = _buffer.indexOf(delimiter, _offset);
+    final pos = _buffer.indexOf(delimiter, _offset);
     Uint8List result;
     if (pos == -1) {
       result = _buffer.sublist(_offset, _size);
@@ -350,8 +350,8 @@ class ByteStream {
   /// After this method is called, the new position is after the delimiter.
   /// @param delimiter a byte, which represents the end of reading data.
   String readUntil(int delimiter) {
-    final int pos = _buffer.indexOf(delimiter, _offset);
-    String result = '';
+    final pos = _buffer.indexOf(delimiter, _offset);
+    var result = '';
     if (pos == _offset) {
       _offset++;
     } else if (pos == -1) {
@@ -368,7 +368,7 @@ class ByteStream {
   ///
   /// If n is negative, reads to the end of this stream.
   /// @param n The maximum number of bytes to read.
-  String readAsciiString(int n) => String.fromCharCodes(read(n));
+  String readAsciiString(int n) => new String.fromCharCodes(read(n));
 
   /// Returns a Uint8Array containing a string of length n.
   ///
@@ -376,14 +376,14 @@ class ByteStream {
   /// @param n is the string(UTF16) length.
   Uint8List readStringAsBytes(int n) {
     if (n == 0) return _emptyList;
-    final Uint8List bytes = _buffer.sublist(_offset, _size);
+    final bytes = _buffer.sublist(_offset, _size);
     if (n < 0) {
       _offset = _size;
       return bytes;
     }
-    int offset = 0;
-    for (int i = 0, length = bytes.length; i < n && offset < length; ++i) {
-      final int unit = bytes[offset++];
+    var offset = 0;
+    for (var i = 0, length = bytes.length; i < n && offset < length; ++i) {
+      final unit = bytes[offset++];
       switch (unit >> 4) {
         case 0:
         case 1:
@@ -409,7 +409,7 @@ class ByteStream {
           throw new Exception('Unfinished UTF-8 octet sequence');
         case 15:
           if (offset + 2 < length) {
-            final int rune = (((unit & 0x07) << 18) |
+            final rune = (((unit & 0x07) << 18) |
                     ((bytes[offset++] & 0x3F) << 12) |
                     ((bytes[offset++] & 0x3F) << 6) |
                     (bytes[offset++] & 0x3F)) -
@@ -438,19 +438,19 @@ class ByteStream {
 
   /// Returns a view of the the internal buffer and clears `this`.
   Uint8List takeBytes() {
-    final Uint8List bytes = this.bytes;
+    final bytes = this.bytes;
     clear();
     return bytes;
   }
 
   /// Returns a copy of the current contents and leaves `this` intact.
-  Uint8List toBytes() => Uint8List.fromList(bytes);
+  Uint8List toBytes() => new Uint8List.fromList(bytes);
 
   /// Returns a string representation of this stream.
   String toString() => utf8.decode(bytes);
 
   /// Creates an exact copy of this stream.
-  ByteStream clone() => ByteStream.fromByteStream(this);
+  ByteStream clone() => new ByteStream.fromByteStream(this);
 
   /// Truncates this stream, only leaves the unread data.
   ///
