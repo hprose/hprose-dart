@@ -13,6 +13,8 @@
 |                                                          |
 \*________________________________________________________*/
 
+part of hprose.io;
+
 /* Serialize Tags */
 /* 'i' */ const int TagInteger = 0x69;
 /* 'l' */ const int TagLong = 0x6C;
