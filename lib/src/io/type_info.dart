@@ -4,22 +4,19 @@
 |                                                          |
 | Official WebSite: https://hprose.com                     |
 |                                                          |
-| io.dart                                                  |
+| type_info.ts                                             |
 |                                                          |
-| hprose.io library for Dart.                              |
+| hprose TypeInfo for Dart.                                |
 |                                                          |
-| LastModified: Feb 13, 2019                               |
+| LastModified: Feb 14, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-library hprose.io;
+part of hprose.io;
 
-import 'dart:core';
-import 'dart:math';
-import 'dart:convert';
-import 'dart:typed_data';
-
-part 'src/io/byte_stream.dart';
-part 'src/io/tags.dart';
-part 'src/io/type_info.dart';
+class TypeInfo {
+    String name;
+    List<String> names;
+    Function type;
+}
