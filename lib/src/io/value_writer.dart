@@ -15,8 +15,8 @@
 
 part of hprose.io;
 
-final BigInt _zero = BigInt.zero;
-final BigInt _nine = new BigInt.from(9);
+final _zero = BigInt.zero;
+final _nine = new BigInt.from(9);
 
 void writeInteger(ByteStream stream, int value) {
   if (0 <= value && value <= 9) {
@@ -56,7 +56,7 @@ void writeBigInt(ByteStream stream, BigInt value) {
 }
 
 void writeStringBody(ByteStream stream, String value) {
-  final int n = value.length;
+  final n = value.length;
   if (n > 0) stream.writeAsciiString(n.toString());
   stream.writeByte(TagQuote);
   stream.writeString(value);
@@ -64,14 +64,14 @@ void writeStringBody(ByteStream stream, String value) {
 }
 
 void writeDateTime(ByteStream stream, DateTime value) {
-  final int year = value.year;
-  final int month = value.month;
-  final int day = value.day;
-  final int hour = value.hour;
-  final int minute = value.minute;
-  final int second = value.second;
-  final int millisecond = value.millisecond;
-  final int microsecond = value.microsecond;
+  final year = value.year;
+  final month = value.month;
+  final day = value.day;
+  final hour = value.hour;
+  final minute = value.minute;
+  final second = value.second;
+  final millisecond = value.millisecond;
+  final microsecond = value.microsecond;
   if ((hour == 0) &&
       (minute == 0) &&
       (second == 0) &&
@@ -88,7 +88,7 @@ void writeDateTime(ByteStream stream, DateTime value) {
 }
 
 void _writeDate(ByteStream stream, int year, int month, int day) {
-  Uint8List date = new Uint8List(9);
+  final date = new Uint8List(9);
   date[0] = TagDate;
   date[1] = 0x30 + (year ~/ 1000 % 10);
   date[2] = 0x30 + (year ~/ 100 % 10);
@@ -103,7 +103,7 @@ void _writeDate(ByteStream stream, int year, int month, int day) {
 
 void _writeTime(ByteStream stream, int hour, int minute, int second,
     int millisecond, int microsecond) {
-  Uint8List time = new Uint8List(14);
+  var time = new Uint8List(14);
   time[0] = TagTime;
   time[1] = 0x30 + (hour ~/ 10 % 10);
   time[2] = 0x30 + (hour % 10);
