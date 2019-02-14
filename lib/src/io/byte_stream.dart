@@ -159,7 +159,7 @@ class ByteStream {
       throw new RangeError.range(value, -2147483648, 2147483647, 'value');
     }
     _grow(4);
-    _size = _writeUInt32BE(_buffer, _size, value & 0xFFFFFFFF);
+    _size = _writeUInt32BE(_buffer, _size, value);
   }
 
   /// Writes value to this stream with big endian format.
@@ -183,7 +183,7 @@ class ByteStream {
       throw new RangeError.range(value, -2147483648, 2147483647, 'value');
     }
     _grow(4);
-    _size = _writeUInt32LE(_buffer, _size, value & 0xFFFFFFFF);
+    _size = _writeUInt32LE(_buffer, _size, value);
   }
 
   /// Writes value to this stream with little endian format.
@@ -252,9 +252,7 @@ class ByteStream {
   ///
   /// If the remaining data is less than 4 bytes, Error('EOF') will be throw.
   int readInt32BE() {
-    final result = readUInt32BE();
-    if (result <= 0x7FFFFFFF) return result;
-    return result - 0x100000000;
+    return readUInt32BE().toSigned(32);
   }
 
   /// Reads an unsigned 32-bit integer from this stream with the big endian format.
@@ -278,9 +276,7 @@ class ByteStream {
   ///
   /// If the remaining data is less than 4 bytes, Error('EOF') will be throw.
   int readInt32LE() {
-    final result = readUInt32LE();
-    if (result <= 0x7FFFFFFF) return result;
-    return result - 0x100000000;
+    return readUInt32LE().toSigned(32);
   }
 
   /// Reads an unsigned 32-bit integer from this stream with the little endian format.
