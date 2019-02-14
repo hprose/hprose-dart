@@ -1,33 +1,23 @@
-/**********************************************************\
+/*--------------------------------------------------------*\
 |                                                          |
 |                          hprose                          |
 |                                                          |
-| Official WebSite: http://www.hprose.com/                 |
-|                   http://www.hprose.org/                 |
+| Official WebSite: https://hprose.com                     |
 |                                                          |
-\**********************************************************/
-/**********************************************************\
- *                                                        *
- * io.dart                                                *
- *                                                        *
- * hprose IO for Dart.                                    *
- *                                                        *
- * LastModified: Mar 3, 2015                              *
- * Author: Ma Bingyao <andot@hprose.com>                  *
- *                                                        *
-\**********************************************************/
+| io.dart                                                  |
+|                                                          |
+| hprose.io library for Dart.                              |
+|                                                          |
+| LastModified: Feb 13, 2019                               |
+| Author: Ma Bingyao <andot@hprose.com>                    |
+|                                                          |
+\*________________________________________________________*/
+
 library hprose.io;
 
-import "dart:collection";
-import "dart:convert";
-import "dart:core";
-import "dart:math";
-import "dart:mirrors";
-import "dart:typed_data";
+import 'dart:core';
+import 'dart:math';
+import 'dart:convert';
+import 'dart:typed_data';
 
-part 'src/io/bytes.dart';
-part 'src/io/classmanager.dart';
-part 'src/io/formatter.dart';
-part 'src/io/reader.dart';
-part 'src/io/writer.dart';
-part 'src/io/tags.dart';
+part 'src/io/byte_stream.dart';

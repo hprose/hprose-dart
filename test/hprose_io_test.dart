@@ -1,9 +1,83 @@
 library hprose_io_tests;
 
-import 'dart:typed_data';
 import 'package:test/test.dart';
 import 'package:hprose/io.dart';
 
+void main() {
+  test('test writeByte & readAsciiString', () {
+    final stream = new ByteStream();
+    List<int> array = [];
+    for (var i = 0; i < 256; ++i) {
+      stream.writeByte(i);
+      array.add(i);
+    }
+    expect(stream.readAsciiString(256), equals(String.fromCharCodes(array)));
+  });
+
+  test('test writeString & toString', () {
+    final stream = new ByteStream();
+    stream.writeString('你好🌏');
+    expect(stream.toString(), equals('你好🌏'));
+  });
+
+  test('test writeInt32BE & readInt32BE', () {
+    final stream = new ByteStream();
+    stream.writeInt32BE(2147483647);
+    stream.writeInt32BE(-2147483648);
+    stream.writeInt32BE(-123456);
+    stream.writeInt32BE(0);
+    stream.writeInt32BE(1);
+    stream.writeInt32BE(-1);
+    expect(stream.readInt32BE(), equals(2147483647));
+    expect(stream.readInt32BE(), equals(-2147483648));
+    expect(stream.readInt32BE(), equals(-123456));
+    expect(stream.readInt32BE(), equals(0));
+    expect(stream.readInt32BE(), equals(1));
+    expect(stream.readInt32BE(), equals(-1));
+  });
+
+  test('test writeInt32LE & readInt32LE', () {
+    final stream = new ByteStream();
+    stream.writeInt32LE(2147483647);
+    stream.writeInt32LE(-2147483648);
+    stream.writeInt32LE(-123456);
+    stream.writeInt32LE(0);
+    stream.writeInt32LE(1);
+    stream.writeInt32LE(-1);
+    
+    expect(stream.readInt32LE(), equals(2147483647));
+    expect(stream.readInt32LE(), equals(-2147483648));
+    expect(stream.readInt32LE(), equals(-123456));
+    expect(stream.readInt32LE(), equals(0));
+    expect(stream.readInt32LE(), equals(1));
+    expect(stream.readInt32LE(), equals(-1));
+  });
+
+  test('test writeUInt32BE & readUInt32BE', () {
+    final stream = new ByteStream();
+    stream.writeUInt32BE(2 ^ 31);
+    stream.writeUInt32BE(2 ^ 32 - 1);
+    stream.writeUInt32BE(0);
+    stream.writeUInt32BE(1);
+    expect(stream.readUInt32BE(), equals(2 ^ 31));
+    expect(stream.readUInt32BE(), equals(2 ^ 32 - 1));
+    expect(stream.readUInt32BE(), equals(0));
+    expect(stream.readUInt32BE(), equals(1));
+  });
+
+  test('test writeUInt32LE & readUInt32LE', () {
+    final stream = new ByteStream();
+    stream.writeUInt32LE(2 ^ 31);
+    stream.writeUInt32LE(2 ^ 32 - 1);
+    stream.writeUInt32LE(0);
+    stream.writeUInt32LE(1);
+    expect(stream.readUInt32LE(), equals(2 ^ 31));
+    expect(stream.readUInt32LE(), equals(2 ^ 32 - 1));
+    expect(stream.readUInt32LE(), equals(0));
+    expect(stream.readUInt32LE(), equals(1));
+  });
+}
+/*
 class User {
   String name;
   int age;
@@ -21,9 +95,9 @@ void main() {
     expect(Formatter.serialize(1234567890987654).toString(), equals("l1234567890987654;"));
     expect(Formatter.serialize(-42).toString(), equals("i-42;"));
     expect(Formatter.serialize(3.14).toString(), equals("d3.14;"));
-    expect(Formatter.serialize(double.NAN).toString(), equals("N"));
-    expect(Formatter.serialize(double.INFINITY).toString(), equals("I+"));
-    expect(Formatter.serialize(double.NEGATIVE_INFINITY).toString(), equals("I-"));
+    expect(Formatter.serialize(double.nan).toString(), equals("N"));
+    expect(Formatter.serialize(double.infinity).toString(), equals("I+"));
+    expect(Formatter.serialize(double.negativeInfinity).toString(), equals("I-"));
     expect(Formatter.serialize(null).toString(), equals("n"));
     expect(Formatter.serialize("").toString(), equals("e"));
     expect(Formatter.serialize("c").toString(), equals("uc"));
@@ -77,9 +151,9 @@ void main() {
     expect(Formatter.unserialize(Formatter.serialize(-42)), equals(-42));
     expect(Formatter.unserialize(Formatter.serialize(3.14)), equals(3.14));
     expect(Formatter.unserialize(Formatter.serialize(0.0)), equals(0.0));
-    expect(Formatter.unserialize(Formatter.serialize(double.NAN)).isNaN, equals(true));
-    expect(Formatter.unserialize(Formatter.serialize(double.INFINITY)), equals(double.INFINITY));
-    expect(Formatter.unserialize(Formatter.serialize(double.NEGATIVE_INFINITY)), equals(double.NEGATIVE_INFINITY));
+    expect(Formatter.unserialize(Formatter.serialize(double.nan)).isNaN, equals(true));
+    expect(Formatter.unserialize(Formatter.serialize(double.infinity)), equals(double.infinity));
+    expect(Formatter.unserialize(Formatter.serialize(double.negativeInfinity)), equals(double.negativeInfinity));
     expect(Formatter.unserialize(Formatter.serialize(null)), equals(null));
     expect(Formatter.unserialize(Formatter.serialize("")), equals(""));
     expect(Formatter.unserialize(Formatter.serialize("c")), equals("c"));
@@ -132,3 +206,4 @@ void main() {
         equals(Formatter.serialize(userList, true).toString()));
   });
 }
+*/
