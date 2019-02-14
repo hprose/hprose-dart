@@ -15,7 +15,7 @@
 
 part of hprose.io;
 
-class TypeInfo {
+class _TypeInfo {
     String name;
     List<String> names;
     Function type;
