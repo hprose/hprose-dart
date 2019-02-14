@@ -23,3 +23,4 @@ import 'dart:typed_data';
 part 'src/io/byte_stream.dart';
 part 'src/io/tags.dart';
 part 'src/io/type_info.dart';
+part 'src/io/value_reader.dart';
