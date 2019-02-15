@@ -33,12 +33,12 @@ void writeInteger(ByteStream stream, int value) {
 }
 
 void writeDouble(ByteStream stream, double value) {
-  if (value.isNaN) {
-    stream.writeByte(TagNaN);
-  } else if (value.isFinite) {
+  if (value.isFinite) {
     stream.writeByte(TagDouble);
     stream.writeAsciiString(value.toString());
     stream.writeByte(TagSemicolon);
+  } else if (value.isNaN) {
+    stream.writeByte(TagNaN);
   } else {
     stream.writeByte(TagInfinity);
     stream.writeByte((value > 0) ? TagPos : TagNeg);

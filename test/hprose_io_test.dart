@@ -1,5 +1,7 @@
 library hprose_io_tests;
 
+import 'dart:collection';
+import 'dart:convert';
 import 'package:test/test.dart';
 import 'package:hprose/io.dart';
 
@@ -76,17 +78,39 @@ void main() {
     expect(stream.readUInt32LE(), equals(0));
     expect(stream.readUInt32LE(), equals(1));
   });
-}
-/*
-class User {
-  String name;
-  int age;
-  bool _male;
-  Function func;
-  set male(bool value) => _male = value;
-  bool get male => _male;
+
+  test('test serialize iterable', () {
+    final byteList = HashSet<int>.from(<int>[1,2,3]);
+    final doubleList = <double>[1.2, 3.4, 5.6];
+    final list = [0, 1.2, 3.4, 5.6, "hello", byteList, doubleList];
+    final stream = new ByteStream();
+    final writer = new Writer(stream);
+    writer.serialize<DynamicObject>(null);
+    writer.serialize(byteList);
+    writer.serialize(doubleList);
+    writer.serialize(list);
+    print(stream.toString());
+  });
+
+  test('test serialize dynamic object', () {
+    dynamic user = new DynamicObject('User');
+    user.name = '张三';
+    user.age = 18;
+    user.male = true;
+    dynamic user2 = new DynamicObject('User');
+    user2.name = '李四';
+    user2.age = 20;
+    user2.male = false;
+    print(json.encode([user, user2]));
+    final stream = new ByteStream();
+    final writer = new Writer(stream);
+    writer.serialize([user, user2]);
+    print(stream.toString());
+  });
 }
 
+
+/*
 void main() {
   test('Serialize', () {
     expect(Formatter.serialize(0).toString(), equals("0"));
