@@ -101,11 +101,9 @@ class _Serializer {
     if (serializer == null) {
       if (value is Map) {
         return MapSerializer.instance;
-      }
-      if (value is Iterable) {
+      } else if (value is Iterable) {
         return IterableSerializer.instance;
-      }
-      if (value is Error || value is Exception) {
+      } else if (value is Error || value is Exception) {
         return ErrorSerializer.instance;
       }
     }

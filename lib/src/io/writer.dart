@@ -16,15 +16,11 @@
 part of hprose.io;
 
 class _WriterRefer {
-  final Map<dynamic, int> _ref = <dynamic, int>{};
+  final Map<dynamic, int> _ref = {};
   int _last = 0;
-  void addCount(int count) {
-    _last += count;
-  }
+  void addCount(int count) => _last += count;
 
-  void setReference(value) {
-    _ref[value] = _last++;
-  }
+  void setReference(value) => _ref[value] = _last++;
 
   bool writeReference(ByteStream stream, value) {
     final index = _ref[value];
@@ -45,14 +41,14 @@ class _WriterRefer {
 
 class Writer {
   _WriterRefer _refer;
-  final Map<dynamic, int> _ref = <dynamic, int>{};
+  final Map<dynamic, int> _ref = {};
   int _last = 0;
   final ByteStream stream;
   Writer(this.stream, {bool simple = false}) {
     this.simple = simple;
   }
   bool get simple => _refer == null;
-  set simple(bool value) => _refer = value ? null : new _WriterRefer();
+  set simple(bool value) => _refer = (value ? null : new _WriterRefer());
   void serialize<T>(T value) {
     if (value == null) {
       stream.writeByte(TagNull);
@@ -69,20 +65,15 @@ class Writer {
     }
   }
 
-  bool writeReference(value) {
-    return simple ? false : _refer.writeReference(stream, value);
-  }
+  bool writeReference(value) =>
+      simple ? false : _refer.writeReference(stream, value);
 
-  void setReference(value) {
-    if (!simple) _refer.setReference(value);
-  }
+  void setReference(value) => _refer?.setReference(value);
 
-  void addReferenceCount(int count) {
-    if (!simple) _refer.addCount(count);
-  }
+  void addReferenceCount(int count) => _refer?.addCount(count);
 
   void reset() {
-    if (!simple) _refer.reset();
+    _refer?.reset();
     _ref.clear();
     _last = 0;
   }
