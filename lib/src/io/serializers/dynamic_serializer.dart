@@ -17,6 +17,7 @@ part of hprose.io;
 
 class DynamicSerializer extends AbstractSerializer {
   static final AbstractSerializer instance = new DynamicSerializer();
+  @override
   void write(Writer writer, dynamic value) {
     if (value == null) {
       writer.stream.writeByte(TagNull);
@@ -24,6 +25,8 @@ class DynamicSerializer extends AbstractSerializer {
       Serializer.getInstance(value.runtimeType, value).write(writer, value);
     }
   }
+
+  @override
   void serialize(Writer writer, dynamic value) {
     if (value == null) {
       writer.stream.writeByte(TagNull);

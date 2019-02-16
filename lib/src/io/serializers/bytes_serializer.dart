@@ -17,6 +17,7 @@ part of hprose.io;
 
 class BytesSerializer extends ReferenceSerializer<dynamic> {
   static final AbstractSerializer instance = new BytesSerializer();
+  @override
   void write(Writer writer, dynamic value) {
     super.write(writer, value);
     final stream = writer.stream;

@@ -17,6 +17,7 @@ part of hprose.io;
 
 class IterableSerializer<E> extends ReferenceSerializer<Iterable<E>> {
   static final AbstractSerializer instance = new IterableSerializer();
+  @override
   void write(Writer writer, Iterable<E> value) {
     super.write(writer, value);
     final stream = writer.stream;

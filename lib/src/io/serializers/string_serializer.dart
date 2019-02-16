@@ -17,6 +17,7 @@ part of hprose.io;
 
 class StringSerializer extends ReferenceSerializer<String> {
   static final AbstractSerializer<String> instance = new StringSerializer();
+  @override
   void write(Writer writer, String value) {
     super.write(writer, value);
     final stream = writer.stream;
@@ -24,6 +25,7 @@ class StringSerializer extends ReferenceSerializer<String> {
     writeStringBody(stream, value);
   }
 
+  @override
   void serialize(Writer writer, String value) {
     final stream = writer.stream;
     switch (value.length) {

@@ -17,6 +17,8 @@ part of hprose.io;
 
 class BaseSerializer<T> implements AbstractSerializer<T> {
   static final AbstractSerializer instance = new BaseSerializer();
+  @override
   void write(Writer writer, T value) => writer.stream.writeByte(TagNull);
+  @override
   void serialize(Writer writer, T value) => write(writer, value);
 }

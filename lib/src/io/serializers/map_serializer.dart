@@ -17,6 +17,7 @@ part of hprose.io;
 
 class MapSerializer<K, V> extends ReferenceSerializer<Map<K, V>> {
   static final AbstractSerializer instance = new MapSerializer();
+  @override
   void write(Writer writer, Map<K, V> value) {
     super.write(writer, value);
     final stream = writer.stream;
@@ -24,8 +25,10 @@ class MapSerializer<K, V> extends ReferenceSerializer<Map<K, V>> {
     final n = value.length;
     if (n > 0) stream.writeAsciiString(n.toString());
     stream.writeByte(TagOpenbrace);
-    AbstractSerializer keySerializer = Serializer.getInstance(K, value.keys.first);
-    AbstractSerializer valueSerializer = Serializer.getInstance(V, value.values.first);
+    AbstractSerializer keySerializer =
+        Serializer.getInstance(K, value.keys.first);
+    AbstractSerializer valueSerializer =
+        Serializer.getInstance(V, value.values.first);
     for (final entry in value.entries) {
       keySerializer.serialize(writer, entry.key);
       valueSerializer.serialize(writer, entry.value);

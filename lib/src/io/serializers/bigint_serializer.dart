@@ -17,5 +17,6 @@ part of hprose.io;
 
 class BigIntSerializer extends BaseSerializer<BigInt> {
   static final AbstractSerializer<BigInt> instance = new BigIntSerializer();
+  @override
   void write(Writer writer, BigInt value) => writeBigInt(writer.stream, value);
 }

@@ -17,6 +17,7 @@ part of hprose.io;
 
 class ErrorSerializer extends ReferenceSerializer<dynamic> {
   static final AbstractSerializer instance = new ErrorSerializer();
+  @override
   void write(Writer writer, dynamic value) {
     // No reference to Error
     writer.addReferenceCount(1);

@@ -16,7 +16,9 @@
 part of hprose.io;
 
 class ReferenceSerializer<T> extends BaseSerializer<T> {
+  @override
   void write(Writer writer, T value) => writer.setReference(value);
+  @override
   void serialize(Writer writer, T value) {
     if (!writer.writeReference(value)) write(writer, value);
   }
