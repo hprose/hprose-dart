@@ -24,6 +24,30 @@ class _Serializer {
   final Map<Type, AbstractSerializer> _serializers = {};
 
   _Serializer() {
+    register<dynamic>(DynamicSerializer.instance);
+    register<Null>(BaseSerializer.instance);
+    register<Function>(BaseSerializer.instance);
+    register<num>(NumSerializer.instance);
+    register<int>(IntSerializer.instance);
+    register<double>(DoubleSerializer.instance);
+    register<BigInt>(BigIntSerializer.instance);
+    register<bool>(BoolSerializer.instance);
+    register<String>(StringSerializer.instance);
+    register<DateTime>(DateTimeSerializer.instance);
+    register<DynamicObject>(DynamicObjectSerializer.instance);
+    register<Map>(MapSerializer.instance);
+    register<List>(IterableSerializer.instance);
+    register<Set>(IterableSerializer.instance);
+    register<Iterable>(IterableSerializer.instance);
+    register<ByteBuffer>(BytesSerializer.instance);
+    register<Uint8List>(BytesSerializer.instance);
+    register<Uint8ClampedList>(BytesSerializer.instance);
+    register<ByteStream>(BytesSerializer.instance);
+    register<Int32x4>(Int32x4Serializer.instance);
+    register<Float32x4>(Float32x4Serializer.instance);
+    register<Float64x2>(Float64x2Serializer.instance);
+    register<Error>(ErrorSerializer.instance);
+    register<Exception>(ErrorSerializer.instance);
     final intIterableSerializer = new IterableSerializer<int>();
     final doubleIterableSerializer = new IterableSerializer<double>();
     final numIterableSerializer = new IterableSerializer<num>();
@@ -73,59 +97,17 @@ class _Serializer {
   }
 
   AbstractSerializer getInstance(Type type, dynamic value) {
-    switch (type) {
-      case dynamic:
-        return DynamicSerializer.instance;
-      case Null:
-      case Function:
-        return BaseSerializer.instance;
-      case num:
-        return NumSerializer.instance;
-      case int:
-        return IntSerializer.instance;
-      case double:
-        return DoubleSerializer.instance;
-      case BigInt:
-        return BigIntSerializer.instance;
-      case bool:
-        return BoolSerializer.instance;
-      case String:
-        return StringSerializer.instance;
-      case DateTime:
-        return DateTimeSerializer.instance;
-      case DynamicObject:
-        return DynamicObjectSerializer.instance;
-      case Map:
-        return MapSerializer.instance;
-      case List:
-      case Set:
-      case Iterable:
-        return IterableSerializer.instance;
-      case ByteBuffer:
-      case Uint8List:
-      case Uint8ClampedList:
-      case ByteStream:
-        return BytesSerializer.instance;
-      case Int32x4:
-        return Int32x4Serializer.instance;
-      case Float32x4:
-        return Float32x4Serializer.instance;
-      case Float64x2:
-        return Float64x2Serializer.instance;
-      case Error:
-      case Exception:
-        return ErrorSerializer.instance;
-    }
     final serializer = _serializers[type];
-    if (serializer != null) return serializer;
-    if (value is Map) {
-      return MapSerializer.instance;
-    }
-    if (value is Iterable) {
-      return IterableSerializer.instance;
-    }
-    if (value is Error || value is Exception) {
-      return ErrorSerializer.instance;
+    if (serializer == null) {
+      if (value is Map) {
+        return MapSerializer.instance;
+      }
+      if (value is Iterable) {
+        return IterableSerializer.instance;
+      }
+      if (value is Error || value is Exception) {
+        return ErrorSerializer.instance;
+      }
     }
     return serializer;
   }
