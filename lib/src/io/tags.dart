@@ -51,3 +51,40 @@ part of hprose.io;
 /* 'R' */ const int TagResult = 0x52;
 /* 'E' */ const int TagError = 0x45;
 /* 'z' */ const int TagEnd = 0x7A;
+
+String tagToString(int tag) {
+    switch (tag) {
+        case 0x30:
+        case 0x31:
+        case 0x32:
+        case 0x33:
+        case 0x34:
+        case 0x35:
+        case 0x36:
+        case 0x37:
+        case 0x38:
+        case 0x39:
+        case TagInteger: return 'int32 number';
+        case TagLong: return 'long number';
+        case TagDouble: return 'double number';
+        case TagNull: return 'null';
+        case TagEmpty: return 'empty string';
+        case TagTrue: return 'true';
+        case TagFalse: return 'false';
+        case TagNaN: return 'NaN';
+        case TagInfinity: return 'Infinity';
+        case TagDate:
+        case TagTime: return 'DateTime';
+        case TagBytes: return 'Uint8List';
+        case TagUTF8Char:
+        case TagString: return 'String';
+        case TagGuid: return 'guid String';
+        case TagList: return 'List';
+        case TagMap: return 'Map';
+        case TagClass: return 'class';
+        case TagObject: return 'DynamicObject';
+        case TagRef: return 'Reference';
+        case TagError: return 'Error | Exception';
+        default: throw new Exception('Unexpected Tag: 0x${(tag & 0xFF).toRadixString(16)}');
+    }
+}
