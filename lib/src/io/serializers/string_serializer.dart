@@ -22,7 +22,7 @@ class StringSerializer extends ReferenceSerializer<String> {
     super.write(writer, value);
     final stream = writer.stream;
     stream.writeByte(TagString);
-    writeStringBody(stream, value);
+    ValueWriter.writeStringBody(stream, value);
   }
 
   @override

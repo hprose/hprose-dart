@@ -4,22 +4,28 @@
 |                                                          |
 | Official WebSite: https://hprose.com                     |
 |                                                          |
-| datetime_serializer.ts                                   |
+| dynamic_object_deserializer.dart                         |
 |                                                          |
-| hprose DateTime Serializer for Dart.                     |
+| hprose DynamicObjectDeserializer for Dart.               |
 |                                                          |
-| LastModified: Feb 14, 2019                               |
+| LastModified: Feb 17, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
 part of hprose.io;
 
-class DateTimeSerializer extends ReferenceSerializer<DateTime> {
-  static final AbstractSerializer<DateTime> instance = new DateTimeSerializer();
+class DynamicObjectDeserializer extends BaseDeserializer<DynamicObject> {
+  static final AbstractDeserializer instance = new DynamicObjectDeserializer();
   @override
-  void write(Writer writer, DateTime value) {
-    super.write(writer, value);
-    ValueWriter.writeDateTime(writer.stream, value);
+  DynamicObject read(Reader reader, int tag) {
+    switch (tag) {
+      case TagMap:
+        return ReferenceReader.readMapAsObject(reader);
+      case TagObject:
+        return ReferenceReader.readObject(reader);
+      default:
+        return super.read(reader, tag);
+    }
   }
 }

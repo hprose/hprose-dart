@@ -4,22 +4,31 @@
 |                                                          |
 | Official WebSite: https://hprose.com                     |
 |                                                          |
-| datetime_serializer.ts                                   |
+| type_manager.dart                                        |
 |                                                          |
-| hprose DateTime Serializer for Dart.                     |
+| hprose TypeManager for Dart.                             |
 |                                                          |
-| LastModified: Feb 14, 2019                               |
+| LastModified: Feb 16, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
 part of hprose.io;
 
-class DateTimeSerializer extends ReferenceSerializer<DateTime> {
-  static final AbstractSerializer<DateTime> instance = new DateTimeSerializer();
-  @override
-  void write(Writer writer, DateTime value) {
-    super.write(writer, value);
-    ValueWriter.writeDateTime(writer.stream, value);
+class _TypeManager {
+  final Map<String, Map<String, Type>> _types = {};
+  final Map<String, Type> _emptyType = {};
+  void register(String name, Map<String, Type> fields) {
+    _types[name] = fields;
+  }
+
+  bool isRegister(String name) {
+    return _types.containsKey(name);
+  }
+
+  Map<String, Type> getType(String name) {
+    return isRegister(name) ? _types[name] : _emptyType;
   }
 }
+
+final TypeManager = new _TypeManager();

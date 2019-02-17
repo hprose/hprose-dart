@@ -21,7 +21,7 @@ abstract class AbstractSerializer<T> {
 }
 
 class _Serializer {
-  final Map<Type, AbstractSerializer> _serializers = {};
+  final Map<String, AbstractSerializer> _serializers = {};
 
   _Serializer() {
     register<dynamic>(DynamicSerializer.instance);
@@ -93,11 +93,11 @@ class _Serializer {
   }
 
   void register<T>(AbstractSerializer serializer) {
-    _serializers[T] = serializer;
+    _serializers[T.toString()] = serializer;
   }
 
   AbstractSerializer getInstance(Type type, dynamic value) {
-    final serializer = _serializers[type];
+    final serializer = _serializers[type.toString()];
     if (serializer == null) {
       if (value is Map) {
         return MapSerializer.instance;

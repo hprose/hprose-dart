@@ -25,12 +25,12 @@ class DynamicObjectSerializer extends ReferenceSerializer<DynamicObject> {
     final name = value.getName();
     final r = writer.writeClass(name, () {
       stream.writeByte(TagClass);
-      writeStringBody(stream, name);
+      ValueWriter.writeStringBody(stream, name);
       if (n > 0) stream.writeAsciiString(n.toString());
       stream.writeByte(TagOpenbrace);
       for (final k in value.keys) {
         stream.writeByte(TagString);
-        writeStringBody(stream, k);
+        ValueWriter.writeStringBody(stream, k);
       }
       stream.writeByte(TagClosebrace);
       writer.addReferenceCount(n);

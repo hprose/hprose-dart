@@ -8,15 +8,16 @@
 |                                                          |
 | hprose TypeInfo for Dart.                                |
 |                                                          |
-| LastModified: Feb 14, 2019                               |
+| LastModified: Feb 16, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
 part of hprose.io;
 
-class _TypeInfo {
-    String name;
-    List<String> names;
-    Function type;
+class TypeInfo {
+    final String name;
+    final List<String> names;
+    final List<Type> types;
+    TypeInfo(this.name, this.names, this.types);
 }

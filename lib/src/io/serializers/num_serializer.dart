@@ -19,6 +19,6 @@ class NumSerializer extends BaseSerializer<num> {
   static final AbstractSerializer<num> instance = new NumSerializer();
   @override
   void write(Writer writer, num value) => value is int
-      ? writeInteger(writer.stream, value)
-      : writeDouble(writer.stream, value);
+      ? ValueWriter.writeInteger(writer.stream, value)
+      : ValueWriter.writeDouble(writer.stream, value);
 }

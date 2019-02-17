@@ -24,6 +24,6 @@ class ErrorSerializer extends ReferenceSerializer<dynamic> {
     final stream = writer.stream;
     stream.writeByte(TagError);
     stream.writeByte(TagString);
-    writeStringBody(stream, value.toString());
+    ValueWriter.writeStringBody(stream, value.toString());
   }
 }

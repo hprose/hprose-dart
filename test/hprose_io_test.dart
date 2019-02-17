@@ -90,6 +90,15 @@ void main() {
     writer.serialize(doubleList);
     writer.serialize(list);
     print(stream.toString());
+    final reader = new Reader(stream);
+    final n = reader.deserialize<List>();
+    final list1 = reader.deserialize<List<int>>();
+    final list2 = reader.deserialize<List<double>>();
+    final list3 = reader.deserialize<List>();
+    print(n);
+    print(list1);
+    print(list2);
+    print(list3);
   });
 
   test('test serialize dynamic object', () {
@@ -106,7 +115,12 @@ void main() {
     final writer = new Writer(stream);
     writer.serialize([user, user2]);
     print(stream.toString());
+    final reader = new Reader(stream);
+    final users = reader.deserialize();
+    print(json.encode(users));
   });
+
+
 }
 
 

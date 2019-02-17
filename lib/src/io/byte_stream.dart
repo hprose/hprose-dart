@@ -49,6 +49,11 @@ class ByteStream {
     mark();
   }
 
+  ByteStream.fromString(String str) {
+    writeString(str);
+    mark();
+  }
+
   ByteStream.fromUint8List(Uint8List list) {
     _buffer = (list == null) ? _emptyList : list;
     _size = _buffer.length;
