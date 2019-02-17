@@ -32,6 +32,7 @@ part 'src/io/writer.dart';
 part 'src/io/serializer.dart';
 part 'src/io/reader.dart';
 part 'src/io/deserializer.dart';
+part 'src/io/formatter.dart';
 
 part 'src/io/serializers/base_serializer.dart';
 part 'src/io/serializers/dynamic_serializer.dart';
