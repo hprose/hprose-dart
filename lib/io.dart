@@ -64,5 +64,6 @@ part 'src/io/deserializers/function_deserializer.dart';
 part 'src/io/deserializers/typed_data_deserializer.dart';
 part 'src/io/deserializers/byte_stream_deserializer.dart';
 part 'src/io/deserializers/list_deserializer.dart';
+part 'src/io/deserializers/set_deserializer.dart';
 part 'src/io/deserializers/map_deserializer.dart';
 part 'src/io/deserializers/dynamic_object_deserializer.dart';

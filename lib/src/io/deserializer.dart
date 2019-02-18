@@ -75,6 +75,11 @@ class _Deserializer {
         new ListDeserializer<List<Map<String, dynamic>>>());
     register<List<List<Map<int, dynamic>>>>(
         new ListDeserializer<List<Map<int, dynamic>>>());
+    register<Set>(SetDeserializer.instance);
+    register<Set<num>>(new SetDeserializer<num>());
+    register<Set<int>>(new SetDeserializer<int>());
+    register<Set<double>>(new SetDeserializer<double>());
+    register<Set<String>>(new SetDeserializer<String>());
     register<Map>(MapDeserializer.instance);
     register<Map<int, dynamic>>(new MapDeserializer<int, dynamic>());
     register<Map<String, dynamic>>(new MapDeserializer<String, dynamic>());
