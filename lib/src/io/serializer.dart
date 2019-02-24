@@ -97,7 +97,17 @@ class _Serializer {
   }
 
   AbstractSerializer getInstance(Type type, dynamic value) {
-    final serializer = _serializers[type.toString()];
+    if (type == null) {
+      return DynamicSerializer.instance;
+    }
+    return get(type.toString(), value);
+  }
+
+  AbstractSerializer get(String type, dynamic value) {
+    if (type == null || type.isEmpty) {
+      return DynamicSerializer.instance;
+    }
+    final serializer = _serializers[type];
     if (serializer == null) {
       if (value is Map) {
         return MapSerializer.instance;
