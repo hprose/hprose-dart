@@ -96,6 +96,14 @@ class _Deserializer {
     }
     return _deserializers[type.toString()];
   }
+
+  AbstractDeserializer get(String type) {
+    if (type == null || type.isEmpty) {
+      return DynamicDeserializer.instance;
+    }
+    return _deserializers[type];
+  }
+
 }
 
 final _Deserializer Deserializer = _Deserializer();
