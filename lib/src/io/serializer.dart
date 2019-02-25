@@ -8,7 +8,7 @@
 |                                                          |
 | hprose Serializer for Dart.                              |
 |                                                          |
-| LastModified: Feb 14, 2019                               |
+| LastModified: Feb 25, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -116,6 +116,7 @@ class _Serializer {
       } else if (value is Error || value is Exception) {
         return ErrorSerializer.instance;
       }
+      return JsonObjectSerializer.instance;
     }
     return serializer;
   }
