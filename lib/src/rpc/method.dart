@@ -21,7 +21,7 @@ class Method {
   List<String> positionalParameterTypes;
   Map<String, String> namedParameterTypes;
   bool missing;
-  Method(this.method, {this.fullname, this.missing}) {
+  Method(this.method, [this.fullname, this.missing]) {
     if (fullname == null || fullname.isEmpty) {
       fullname = _getFunctionName(method);
     }
