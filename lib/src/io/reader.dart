@@ -38,6 +38,7 @@ class Reader {
   set simple(bool value) => _refer = (value ? null : new _ReaderRefer());
 
   T deserialize<T>() {
+    print(T.toString());
     return Deserializer.getInstance(T).deserialize(this);
   }
 
