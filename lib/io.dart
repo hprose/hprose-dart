@@ -49,7 +49,7 @@ part 'src/io/serializers/map_serializer.dart';
 part 'src/io/serializers/iterable_serializer.dart';
 part 'src/io/serializers/bytes_serializer.dart';
 part 'src/io/serializers/dynamic_object_serializer.dart';
-part 'src/io/serializers/json_object_serializer.dart';
+part 'src/io/serializers/object_serializer.dart';
 part 'src/io/serializers/error_serializer.dart';
 
 part 'src/io/deserializers/base_deserializer.dart';
@@ -68,3 +68,4 @@ part 'src/io/deserializers/list_deserializer.dart';
 part 'src/io/deserializers/set_deserializer.dart';
 part 'src/io/deserializers/map_deserializer.dart';
 part 'src/io/deserializers/dynamic_object_deserializer.dart';
+part 'src/io/deserializers/object_deserializer.dart';
