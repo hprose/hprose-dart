@@ -20,7 +20,7 @@ import 'dart:async';
 import 'dart:math';
 import 'dart:convert';
 import 'dart:typed_data';
-import 'package:hprose/io.dart';
+import 'io.dart';
 
 part 'src/rpc/core/context.dart';
 part 'src/rpc/core/handler_manager.dart';
