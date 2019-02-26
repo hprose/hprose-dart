@@ -106,9 +106,9 @@ class ReferenceReader {
     return obj;
   }
 
-  static dynamic readObject(Reader reader, String name) {
+  static dynamic readObject(Reader reader, String type) {
     final obj = readDynamicObject(reader);
-    final constructor = TypeManager.getConstructor(name);
+    final constructor = TypeManager.getConstructor(type);
     return constructor(obj);
   }
 
@@ -126,9 +126,9 @@ class ReferenceReader {
     return obj;
   }
 
-  static dynamic readMapAsObject(Reader reader, String name) {
+  static dynamic readMapAsObject(Reader reader, String type) {
     final obj = readMapAsDynamicObject(reader);
-    final constructor = TypeManager.getConstructor(name);
+    final constructor = TypeManager.getConstructor(type);
     return constructor(obj);
   }
 }
