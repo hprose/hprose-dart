@@ -5,8 +5,12 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:test/test.dart';
 import 'package:hprose/io.dart';
+import 'package:hprose/rpc.dart';
 
 void main() {
+  TypeManager.register((data) => User.fromJson(data),
+      {'name': String, 'age': int, 'male': bool});
+
   test('test writeByte & readAsciiString', () {
     final stream = new ByteStream();
     List<int> array = [];
@@ -103,7 +107,7 @@ void main() {
   });
 
   test('test serialize dynamic object', () {
-    dynamic user = new DynamicObject('User');
+    dynamic user = new User();
     user.name = '张三';
     user.age = 18;
     user.male = true;
@@ -118,7 +122,7 @@ void main() {
     print(json.encode(users));
   });
 
-  test('Serialize', () {
+  test('serialize', () {
     expect(utf8.decode(Formatter.serialize(0)), equals("0"));
     expect(utf8.decode(Formatter.serialize(1)), equals("1"));
     expect(utf8.decode(Formatter.serialize(11)), equals("i11;"));
@@ -128,8 +132,8 @@ void main() {
     expect(utf8.decode(Formatter.serialize(3.14)), equals("d3.14;"));
     expect(utf8.decode(Formatter.serialize(double.nan)), equals("N"));
     expect(utf8.decode(Formatter.serialize(double.infinity)), equals("I+"));
-    expect(
-        utf8.decode(Formatter.serialize(double.negativeInfinity)), equals("I-"));
+    expect(utf8.decode(Formatter.serialize(double.negativeInfinity)),
+        equals("I-"));
     expect(utf8.decode(Formatter.serialize(null)), equals("n"));
     expect(utf8.decode(Formatter.serialize("")), equals("e"));
     expect(utf8.decode(Formatter.serialize("c")), equals("uc"));
@@ -142,7 +146,8 @@ void main() {
     expect(utf8.decode(Formatter.serialize(["Jan", "Feb", "Mar", "Mar"])),
         equals('a4{s3"Jan"s3"Feb"s3"Mar"r3;}'));
     expect(
-        utf8.decode(Formatter.serialize(["Jan", "Feb", "Mar", "Mar"], simple: true)),
+        utf8.decode(
+            Formatter.serialize(["Jan", "Feb", "Mar", "Mar"], simple: true)),
         equals('a4{s3"Jan"s3"Feb"s3"Mar"s3"Mar"}'));
     Int32List int32List = new Int32List.fromList([1, 2, 3, 4, 5]);
     expect(utf8.decode(Formatter.serialize(int32List)), equals('a5{12345}'));
@@ -164,13 +169,13 @@ void main() {
         utf8.decode(Formatter.serialize(mapList, simple: true)),
         equals(
             'a3{m2{s4"name"s2"张三"s3"age"i28;}m2{s4"name"s2"李四"s3"age"i29;}m2{s4"name"s4"王二麻子"s3"age"i30;}}'));
-    dynamic user = new DynamicObject('User');
+    dynamic user = new User();
     user.name = "张三";
     user.age = 28;
     user.male = true;
     expect(utf8.decode(Formatter.serialize(user)),
         equals('c4"User"3{s4"name"s3"age"s4"male"}o0{s2"张三"i28;t}'));
-    dynamic user2 = new DynamicObject('User');
+    dynamic user2 = new User();
     user2.name = "李四";
     user2.age = 29;
     user2.male = true;
@@ -247,7 +252,7 @@ void main() {
         Formatter.deserialize(Formatter.serialize(mapList, simple: true),
             simple: true),
         equals(mapList));
-    dynamic user = new DynamicObject('User');
+    dynamic user = new User();
     user.name = "张三";
     user.age = 28;
     user.male = true;
@@ -255,20 +260,20 @@ void main() {
     expect(user1.name, equals(user.name));
     expect(user1.age, equals(user.age));
     expect(user1.male, equals(user.male));
-    dynamic user2 = new DynamicObject('User');
+    dynamic user2 = new User();
     user2.name = "李四";
     user2.age = 29;
     user2.male = true;
-    dynamic user3 = new DynamicObject('User');
+    dynamic user3 = new User();
     user3.name = "王二麻子";
     user3.age = 30;
     user3.male = false;
-    List userList = [user, user2, user3, user];
+    List userList = [user, user2, user3];
     expect(
-        Formatter.serialize(
-                Formatter.deserialize(Formatter.serialize(userList)))
-            .toString(),
-        equals(Formatter.serialize(userList).toString()));
+        utf8.decode(Formatter.serialize(
+                Formatter.deserialize(Formatter.serialize(userList))))
+            ,
+        equals(utf8.decode(Formatter.serialize(userList))));
     expect(
         Formatter.serialize(
                 Formatter.deserialize(
@@ -285,4 +290,27 @@ void main() {
             .toString(),
         equals(Formatter.serialize(userList, simple: true).toString()));
   });
+
+  test('method', () {
+    var stream = new ByteStream();
+    print(List);
+    print(new Method(stream.takeBytes).positionalParameterTypes);
+    print(new Method(Formatter.serialize).namedParameterTypes);
+    print(new Method(
+            <T>(Map<String, T> a1, int i, {List<Map<T, T>> a2, List a3}) => 10,
+            'x')
+        .namedParameterTypes);
+  });
+}
+
+class User {
+  String name;
+  int age;
+  bool male;
+  User([this.name, this.age, this.male]);
+  factory User.fromJson(Map<String, dynamic> json) {
+    return new User(json['name'], json['age'], json['male']);
+  }
+  Map<String, dynamic> toJson() =>
+      {'name': this.name, 'age': this.age, 'male': this.male};
 }
