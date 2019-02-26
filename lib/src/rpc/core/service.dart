@@ -4,13 +4,17 @@
 |                                                          |
 | Official WebSite: https://hprose.com                     |
 |                                                          |
-| service_context.dart                                     |
+| service.dart                                             |
 |                                                          |
-| ServiceContext for Dart.                                 |
+| hprose Service for Dart.                                 |
 |                                                          |
 | LastModified: Feb 23, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-part of hprose.rpc;
+part of hprose.rpc.core;
+
+class Service {
+  
+}

@@ -13,7 +13,7 @@
 |                                                          |
 \*________________________________________________________*/
 
-part of hprose.rpc;
+part of hprose.rpc.core;
 
 typedef Future<Uint8List> NextIOHandler(Uint8List request, Context context);
 typedef Future<Uint8List> IOHandler(

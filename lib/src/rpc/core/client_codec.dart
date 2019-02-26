@@ -13,7 +13,7 @@
 |                                                          |
 \*________________________________________________________*/
 
-part of hprose.rpc;
+part of hprose.rpc.core;
 
 abstract class ClientCodec {
   Uint8List encode(String name, List args, ClientContext context);

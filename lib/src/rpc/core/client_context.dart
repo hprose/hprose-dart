@@ -13,7 +13,7 @@
 |                                                          |
 \*________________________________________________________*/
 
-part of hprose.rpc;
+part of hprose.rpc.core;
 
 class ClientContext extends Context {
   Client client;

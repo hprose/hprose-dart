@@ -13,7 +13,7 @@
 |                                                          |
 \*________________________________________________________*/
 
-part of hprose.rpc;
+part of hprose.rpc.core;
 
 typedef Future NextInvokeHandler(String name, List args, Context context);
 typedef Future InvokeHandler(

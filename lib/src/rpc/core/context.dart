@@ -13,7 +13,7 @@
 |                                                          |
 \*________________________________________________________*/
 
-part of hprose.rpc;
+part of hprose.rpc.core;
 
 class Context {
   final Map<String, dynamic> Items = <String, dynamic>{};

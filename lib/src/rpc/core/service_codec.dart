@@ -4,13 +4,13 @@
 |                                                          |
 | Official WebSite: https://hprose.com                     |
 |                                                          |
-| service.dart                                             |
+| service_codec.dart                                       |
 |                                                          |
-| hprose Service for Dart.                                 |
+| ServiceCodec for Dart.                                   |
 |                                                          |
 | LastModified: Feb 23, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-part of hprose.rpc;
+part of hprose.rpc.core;

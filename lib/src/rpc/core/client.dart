@@ -13,7 +13,7 @@
 |                                                          |
 \*________________________________________________________*/
 
-part of hprose.rpc;
+part of hprose.rpc.core;
 
 abstract class Transport {
   Future<Uint8List> transport(Uint8List request, Context context);

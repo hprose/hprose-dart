@@ -13,7 +13,7 @@
 |                                                          |
 \*________________________________________________________*/
 
-part of hprose.rpc;
+part of hprose.rpc.core;
 
 typedef dynamic MissingMethod1(String fullname, List args);
 typedef dynamic MissingMethod2(String fullname, List args, Context context);

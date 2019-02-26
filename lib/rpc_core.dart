@@ -13,7 +13,7 @@
 |                                                          |
 \*________________________________________________________*/
 
-library hprose.rpc;
+library hprose.rpc.core;
 
 import 'dart:core';
 import 'dart:async';
@@ -22,15 +22,15 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:hprose/io.dart';
 
-part 'src/rpc/context.dart';
-part 'src/rpc/handler_manager.dart';
-part 'src/rpc/io_manager.dart';
-part 'src/rpc/invoke_manager.dart';
-part 'src/rpc/client_context.dart';
-part 'src/rpc/client_codec.dart';
-part 'src/rpc/client.dart';
-part 'src/rpc/method.dart';
-part 'src/rpc/method_manager.dart';
-part 'src/rpc/service_context.dart';
-part 'src/rpc/service_codec.dart';
-part 'src/rpc/service.dart';
+part 'src/rpc/core/context.dart';
+part 'src/rpc/core/handler_manager.dart';
+part 'src/rpc/core/io_manager.dart';
+part 'src/rpc/core/invoke_manager.dart';
+part 'src/rpc/core/client_context.dart';
+part 'src/rpc/core/client_codec.dart';
+part 'src/rpc/core/client.dart';
+part 'src/rpc/core/method.dart';
+part 'src/rpc/core/method_manager.dart';
+part 'src/rpc/core/service_context.dart';
+part 'src/rpc/core/service_codec.dart';
+part 'src/rpc/core/service.dart';
