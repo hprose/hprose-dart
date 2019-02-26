@@ -5,7 +5,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:test/test.dart';
 import 'package:hprose/io.dart';
-import 'package:hprose/rpc.dart';
+import 'package:hprose/rpc_core.dart';
 
 void main() {
   TypeManager.register((data) => User.fromJson(data),
