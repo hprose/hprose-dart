@@ -33,13 +33,13 @@ class MethodManager {
     methods[method.fullname] = method;
   }
 
-  void addFunction(Function func) {
-    
+  void addFunction(Function func, [String fullname]) {
+    add(new Method(func, fullname));
   }
 
   void addMissingMethod<MissingMethod extends Function>(MissingMethod method) {
     if (method is MissingMethod1 || method is MissingMethod2) {
-      methods['*'] = new Method(method, fullname: '*', missing: true);
+      methods['*'] = new Method(method, '*', true);
     } else {
       throw new ArgumentError('method is not a missing method');
     }
