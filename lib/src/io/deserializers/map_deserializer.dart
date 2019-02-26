@@ -41,7 +41,7 @@ class MapDeserializer<K, V> extends BaseDeserializer<Map<K, V>> {
         return _readMap(reader, () => new Map<K, V>(),
             Deserializer.getInstance(K), Deserializer.getInstance(V));
       case TagObject:
-        return ReferenceReader.readObject(reader);
+        return ReferenceReader.readDynamicObject(reader);
       default:
         return super.read(reader, tag);
     }
