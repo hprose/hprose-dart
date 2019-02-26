@@ -65,7 +65,12 @@ class DynamicDeserializer extends BaseDeserializer {
       case TagMap:
         return ReferenceReader.readMap(reader);
       case TagObject:
-        return ReferenceReader.readObject(reader);
+        final DynamicObject obj = ReferenceReader.readDynamicObject(reader);
+        final constructor = TypeManager.getConstructor(obj.getName());
+        if (constructor != null) {
+          return constructor(obj);
+        }
+        return obj;
       case TagError:
         return new Exception(reader.deserialize<String>());
       default:
