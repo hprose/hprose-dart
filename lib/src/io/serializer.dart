@@ -8,7 +8,7 @@
 |                                                          |
 | hprose Serializer for Dart.                              |
 |                                                          |
-| LastModified: Feb 25, 2019                               |
+| LastModified: Feb 26, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -25,6 +25,8 @@ class _Serializer {
 
   _Serializer() {
     register<dynamic>(DynamicSerializer.instance);
+    register<Object>(DynamicSerializer.instance);
+    register<DynamicObject>(DynamicObjectSerializer.instance);
     register<Null>(BaseSerializer.instance);
     register<Function>(BaseSerializer.instance);
     register<num>(NumSerializer.instance);
@@ -34,7 +36,6 @@ class _Serializer {
     register<bool>(BoolSerializer.instance);
     register<String>(StringSerializer.instance);
     register<DateTime>(DateTimeSerializer.instance);
-    register<DynamicObject>(DynamicObjectSerializer.instance);
     register<Map>(MapSerializer.instance);
     register<List>(IterableSerializer.instance);
     register<Set>(IterableSerializer.instance);
@@ -48,10 +49,13 @@ class _Serializer {
     register<Float64x2>(Float64x2Serializer.instance);
     register<Error>(ErrorSerializer.instance);
     register<Exception>(ErrorSerializer.instance);
+    final objectIterableSerializer = new IterableSerializer<Object>();
     final intIterableSerializer = new IterableSerializer<int>();
     final doubleIterableSerializer = new IterableSerializer<double>();
     final numIterableSerializer = new IterableSerializer<num>();
     final stringIterableSerializer = new IterableSerializer<String>();
+    register<List<Object>>(objectIterableSerializer);
+    register<Set<Object>>(objectIterableSerializer);
     register<List<int>>(intIterableSerializer);
     register<Set<int>>(intIterableSerializer);
     register<Int8List>(intIterableSerializer);
@@ -116,7 +120,7 @@ class _Serializer {
       } else if (value is Error || value is Exception) {
         return ErrorSerializer.instance;
       }
-      return JsonObjectSerializer.instance;
+      return ObjectSerializer.instance;
     }
     return serializer;
   }
