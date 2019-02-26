@@ -55,6 +55,7 @@ class _Deserializer {
     register<Int32x4List>(Int32x4ListDeserializer.instance);
     register<Float32x4List>(Float32x4ListDeserializer.instance);
     register<Float64x2List>(Float64x2ListDeserializer.instance);
+    register<Exception>(ExceptionDeserializer.instance);
     register<List>(ListDeserializer.instance);
     register<List<Object>>(new ListDeserializer<Object>());
     register<List<DynamicObject>>(new ListDeserializer<DynamicObject>());
