@@ -90,7 +90,7 @@ class ReferenceReader {
     return map;
   }
 
-  static dynamic readObject(Reader reader) {
+  static dynamic readDynamicObject(Reader reader) {
     final stream = reader.stream;
     final index = ValueReader.readInt(stream, tag: TagOpenbrace);
     final typeInfo = reader.getTypeInfo(index);
@@ -106,7 +106,13 @@ class ReferenceReader {
     return obj;
   }
 
-  static dynamic readMapAsObject(Reader reader) {
+  static dynamic readObject(Reader reader, String name) {
+    final obj = readDynamicObject(reader);
+    final constructor = TypeManager.getConstructor(name);
+    return constructor(obj);
+  }
+
+  static dynamic readMapAsDynamicObject(Reader reader) {
     final stream = reader.stream;
     final count = ValueReader.readCount(stream);
     final obj = new DynamicObject();
@@ -118,5 +124,11 @@ class ReferenceReader {
     }
     stream.readByte();
     return obj;
+  }
+
+  static dynamic readMapAsObject(Reader reader, String name) {
+    final obj = readMapAsDynamicObject(reader);
+    final constructor = TypeManager.getConstructor(name);
+    return constructor(obj);
   }
 }
