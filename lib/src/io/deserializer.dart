@@ -8,7 +8,7 @@
 |                                                          |
 | hprose Deserializer for Dart.                            |
 |                                                          |
-| LastModified: Feb 16, 2019                               |
+| LastModified: Feb 26, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -27,6 +27,8 @@ class _Deserializer {
 
   _Deserializer() {
     register(DynamicDeserializer.instance);
+    register<Object>(DynamicDeserializer.instance);
+    register<DynamicObject>(DynamicObjectDeserializer.instance);
     register<num>(NumDeserializer.instance);
     register<int>(IntDeserializer.instance);
     register<double>(DoubleDeserializer.instance);
@@ -54,6 +56,8 @@ class _Deserializer {
     register<Float32x4List>(Float32x4ListDeserializer.instance);
     register<Float64x2List>(Float64x2ListDeserializer.instance);
     register<List>(ListDeserializer.instance);
+    register<List<Object>>(new ListDeserializer<Object>());
+    register<List<DynamicObject>>(new ListDeserializer<DynamicObject>());
     register<List<num>>(new ListDeserializer<num>());
     register<List<int>>(new ListDeserializer<int>());
     register<List<double>>(new ListDeserializer<double>());
@@ -63,27 +67,48 @@ class _Deserializer {
     register<List<DateTime>>(new ListDeserializer<DateTime>());
     register<List<Uint8List>>(new ListDeserializer<Uint8List>());
     register<List<List>>(new ListDeserializer<List>());
+    register<List<List<Object>>>(new ListDeserializer<List<Object>>());
     register<List<Map>>(new ListDeserializer<Map>());
-    register<List<DynamicObject>>(new ListDeserializer<DynamicObject>());
+    register<List<Map<Object, dynamic>>>(
+        new ListDeserializer<Map<Object, dynamic>>());
+    register<List<Map<Object, Object>>>(
+        new ListDeserializer<Map<Object, Object>>());
     register<List<Map<String, dynamic>>>(
         new ListDeserializer<Map<String, dynamic>>());
+    register<List<Map<String, Object>>>(
+        new ListDeserializer<Map<String, Object>>());
     register<List<Map<int, dynamic>>>(
         new ListDeserializer<Map<int, dynamic>>());
+    register<List<Map<int, Object>>>(new ListDeserializer<Map<int, Object>>());
     register<List<List<List>>>(new ListDeserializer<List<List>>());
+    register<List<List<List<Object>>>>(
+        new ListDeserializer<List<List<Object>>>());
     register<List<List<Map>>>(new ListDeserializer<List<Map>>());
+    register<List<List<Map<Object, dynamic>>>>(
+        new ListDeserializer<List<Map<Object, dynamic>>>());
+    register<List<List<Map<Object, Object>>>>(
+        new ListDeserializer<List<Map<Object, Object>>>());
     register<List<List<Map<String, dynamic>>>>(
         new ListDeserializer<List<Map<String, dynamic>>>());
+    register<List<List<Map<String, Object>>>>(
+        new ListDeserializer<List<Map<String, Object>>>());
     register<List<List<Map<int, dynamic>>>>(
         new ListDeserializer<List<Map<int, dynamic>>>());
+    register<List<List<Map<int, Object>>>>(
+        new ListDeserializer<List<Map<int, Object>>>());
     register<Set>(SetDeserializer.instance);
+    register<Set<Object>>(new SetDeserializer<Object>());
     register<Set<num>>(new SetDeserializer<num>());
     register<Set<int>>(new SetDeserializer<int>());
     register<Set<double>>(new SetDeserializer<double>());
     register<Set<String>>(new SetDeserializer<String>());
     register<Map>(MapDeserializer.instance);
-    register<Map<int, dynamic>>(new MapDeserializer<int, dynamic>());
+    register<Map<Object, dynamic>>(new MapDeserializer<Object, dynamic>());
+    register<Map<Object, Object>>(new MapDeserializer<Object, Object>());
     register<Map<String, dynamic>>(new MapDeserializer<String, dynamic>());
-    register<DynamicObject>(DynamicObjectDeserializer.instance);
+    register<Map<String, Object>>(new MapDeserializer<String, Object>());
+    register<Map<int, dynamic>>(new MapDeserializer<int, dynamic>());
+    register<Map<int, Object>>(new MapDeserializer<int, Object>());
   }
 
   void register<T>(AbstractDeserializer deserializer) {
@@ -103,7 +128,6 @@ class _Deserializer {
     }
     return _deserializers[type];
   }
-
 }
 
 final _Deserializer Deserializer = _Deserializer();
