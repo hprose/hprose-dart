@@ -8,7 +8,7 @@
 |                                                          |
 | hprose Serializer for Dart.                              |
 |                                                          |
-| LastModified: Feb 26, 2019                               |
+| LastModified: Feb 27, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -47,8 +47,8 @@ class _Serializer {
     register<Int32x4>(Int32x4Serializer.instance);
     register<Float32x4>(Float32x4Serializer.instance);
     register<Float64x2>(Float64x2Serializer.instance);
-    register<Error>(ErrorSerializer.instance);
-    register<Exception>(ErrorSerializer.instance);
+    register<Error>(ExceptionSerializer.instance);
+    register<Exception>(ExceptionSerializer.instance);
     final objectIterableSerializer = new IterableSerializer<Object>();
     final intIterableSerializer = new IterableSerializer<int>();
     final doubleIterableSerializer = new IterableSerializer<double>();
@@ -118,7 +118,7 @@ class _Serializer {
       } else if (value is Iterable) {
         return IterableSerializer.instance;
       } else if (value is Error || value is Exception) {
-        return ErrorSerializer.instance;
+        return ExceptionSerializer.instance;
       }
       return ObjectSerializer.instance;
     }
