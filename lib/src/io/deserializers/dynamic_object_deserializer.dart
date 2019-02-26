@@ -21,9 +21,9 @@ class DynamicObjectDeserializer extends BaseDeserializer<DynamicObject> {
   DynamicObject read(Reader reader, int tag) {
     switch (tag) {
       case TagMap:
-        return ReferenceReader.readMapAsObject(reader);
+        return ReferenceReader.readMapAsDynamicObject(reader);
       case TagObject:
-        return ReferenceReader.readObject(reader);
+        return ReferenceReader.readDynamicObject(reader);
       default:
         return super.read(reader, tag);
     }
