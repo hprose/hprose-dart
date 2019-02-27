@@ -34,6 +34,7 @@ class _Serializer {
     register<double>(DoubleSerializer.instance);
     register<BigInt>(BigIntSerializer.instance);
     register<bool>(BoolSerializer.instance);
+    register<Duration>(DurationSerializer.instance);
     register<String>(StringSerializer.instance);
     register<DateTime>(DateTimeSerializer.instance);
     register<Map>(MapSerializer.instance);
@@ -79,6 +80,7 @@ class _Serializer {
     register<List<BigInt>>(new IterableSerializer<BigInt>());
     register<List<bool>>(new IterableSerializer<bool>());
     register<List<DateTime>>(new IterableSerializer<DateTime>());
+    register<List<Duration>>(new IterableSerializer<Duration>());
     register<List<Uint8List>>(new IterableSerializer<Uint8List>());
     register<List<List>>(new IterableSerializer<List>());
     register<List<Map>>(new IterableSerializer<Map>());

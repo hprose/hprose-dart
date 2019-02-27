@@ -8,7 +8,7 @@
 |                                                          |
 | hprose Deserializer for Dart.                            |
 |                                                          |
-| LastModified: Feb 26, 2019                               |
+| LastModified: Feb 27, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -33,6 +33,7 @@ class _Deserializer {
     register<int>(IntDeserializer.instance);
     register<double>(DoubleDeserializer.instance);
     register<BigInt>(BigIntDeserializer.instance);
+    register<Duration>(DurationDeserializer.instance);
     register<bool>(BoolDeserializer.instance);
     register<String>(StringDeserializer.instance);
     register<DateTime>(DateTimeDeserializer.instance);
@@ -64,6 +65,7 @@ class _Deserializer {
     register<List<double>>(new ListDeserializer<double>());
     register<List<BigInt>>(new ListDeserializer<BigInt>());
     register<List<bool>>(new ListDeserializer<bool>());
+    register<List<Duration>>(new ListDeserializer<Duration>());
     register<List<String>>(new ListDeserializer<String>());
     register<List<DateTime>>(new ListDeserializer<DateTime>());
     register<List<Uint8List>>(new ListDeserializer<Uint8List>());
@@ -120,14 +122,18 @@ class _Deserializer {
     if (type == null) {
       return DynamicDeserializer.instance;
     }
-    return _deserializers[type.toString()];
+    return get(type.toString());
   }
 
   AbstractDeserializer get(String type) {
     if (type == null || type.isEmpty) {
       return DynamicDeserializer.instance;
     }
-    return _deserializers[type];
+    if (_deserializers.containsKey(type)) {
+      return _deserializers[type];
+    }
+    throw new UnsupportedError(
+        'Unsupported to deserialize $type data, because $type deserializer is not registered.');
   }
 }
 

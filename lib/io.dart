@@ -8,7 +8,7 @@
 |                                                          |
 | hprose.io library for Dart.                              |
 |                                                          |
-| LastModified: Feb 16, 2019                               |
+| LastModified: Feb 27, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -41,6 +41,7 @@ part 'src/io/serializers/int_serializer.dart';
 part 'src/io/serializers/double_serializer.dart';
 part 'src/io/serializers/bigint_serializer.dart';
 part 'src/io/serializers/bool_serializer.dart';
+part 'src/io/serializers/duration_serializer.dart';
 part 'src/io/serializers/reference_serializer.dart';
 part 'src/io/serializers/string_serializer.dart';
 part 'src/io/serializers/datetime_serializer.dart';
@@ -59,6 +60,7 @@ part 'src/io/deserializers/int_deserializer.dart';
 part 'src/io/deserializers/double_deserializer.dart';
 part 'src/io/deserializers/bigint_deserializer.dart';
 part 'src/io/deserializers/bool_deserializer.dart';
+part 'src/io/deserializers/duration_deserializer.dart';
 part 'src/io/deserializers/string_deserializer.dart';
 part 'src/io/deserializers/datetime_deserializer.dart';
 part 'src/io/deserializers/function_deserializer.dart';
