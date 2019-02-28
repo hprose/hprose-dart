@@ -15,12 +15,13 @@
 
 part of hprose.rpc.core;
 
-abstract class ServiceContext extends Context {
+class ServiceContext extends Context {
   final Service service;
   Method method;
   String host;
   int port;
   final Map<String, dynamic> requestHeaders = {};
   final Map<String, dynamic> responseHeaders = {};
+  dynamic handler;
   ServiceContext(this.service);
 }
