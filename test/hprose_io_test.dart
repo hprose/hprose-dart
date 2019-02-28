@@ -5,7 +5,6 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:test/test.dart';
 import 'package:hprose/io.dart';
-import 'package:hprose/rpc_core.dart';
 
 void main() {
   TypeManager.register((data) => User.fromJson(data),
@@ -138,7 +137,8 @@ void main() {
     expect(utf8.decode(Formatter.serialize("")), equals("e"));
     expect(utf8.decode(Formatter.serialize("c")), equals("uc"));
     expect(utf8.decode(Formatter.serialize("我")), equals("u我"));
-    expect(utf8.decode(Formatter.serialize("我爱你")), equals('s3"我爱你"'));
+    expect(
+        utf8.decode(Formatter.serialize("我爱你")), equals('s3"我爱你"'));
     expect(utf8.decode(Formatter.serialize("我爱五星红旗🇨🇳")),
         equals('s10"我爱五星红旗🇨🇳"'));
     expect(
@@ -213,8 +213,11 @@ void main() {
     expect(Formatter.deserialize(Formatter.serialize("")), equals(""));
     expect(Formatter.deserialize(Formatter.serialize("c")), equals("c"));
     expect(Formatter.deserialize(Formatter.serialize("我")), equals("我"));
-    expect(Formatter.deserialize(Formatter.serialize("我爱你")), equals('我爱你'));
-    expect(Formatter.deserialize(Formatter.serialize("我爱五星红旗🇨🇳")),
+    expect(Formatter.deserialize(Formatter.serialize("我爱你")),
+        equals('我爱你'));
+    expect(
+        Formatter.deserialize(
+            Formatter.serialize("我爱五星红旗🇨🇳")),
         equals('我爱五星红旗🇨🇳'));
     expect(Formatter.deserialize(Formatter.serialize([1, 2, 3, 4, 5])),
         equals([1, 2, 3, 4, 5]));
@@ -271,8 +274,7 @@ void main() {
     List userList = [user, user2, user3];
     expect(
         utf8.decode(Formatter.serialize(
-                Formatter.deserialize(Formatter.serialize(userList))))
-            ,
+            Formatter.deserialize(Formatter.serialize(userList)))),
         equals(utf8.decode(Formatter.serialize(userList))));
     expect(
         Formatter.serialize(
@@ -289,17 +291,6 @@ void main() {
                 simple: true)
             .toString(),
         equals(Formatter.serialize(userList, simple: true).toString()));
-  });
-
-  test('method', () {
-    var stream = new ByteStream();
-    print(List);
-    print(new Method(stream.takeBytes).positionalParameterTypes);
-    print(new Method(Formatter.serialize).namedParameterTypes);
-    print(new Method(
-            <T>(Map<String, T> a1, int i, {List<Map<T, T>> a2, List a3}) => 10,
-            'x')
-        .namedParameterTypes);
   });
 }
 
