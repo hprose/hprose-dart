@@ -8,14 +8,14 @@
 |                                                          |
 | HandlerManager for Dart.                                 |
 |                                                          |
-| LastModified: Feb 21, 2019                               |
+| LastModified: Feb 27, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
 part of hprose.rpc.core;
 
-abstract class HandlerManager<Handler, NextHandler> {
+abstract class HandlerManager<Handler extends Function, NextHandler extends Function> {
   List<Handler> _handlers = [];
   NextHandler _firstHandler;
   NextHandler _defaultHandler;
