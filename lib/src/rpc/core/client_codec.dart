@@ -61,7 +61,7 @@ class DefaultClientCodec implements ClientCodec {
     }
     switch (tag) {
       case TagResult:
-        if (context.responseHeaders['simple']) {
+        if (context.responseHeaders.containsKey('simple')) {
           reader.simple = true;
         }
         return Deserializer.getInstance(context.returnType).deserialize(reader);
