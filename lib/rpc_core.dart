@@ -33,3 +33,6 @@ part 'src/rpc/core/method_manager.dart';
 part 'src/rpc/core/service_context.dart';
 part 'src/rpc/core/service_codec.dart';
 part 'src/rpc/core/service.dart';
+part 'src/rpc/core/mock_agent.dart';
+part 'src/rpc/core/mock_handler.dart';
+part 'src/rpc/core/mock_transport.dart';
