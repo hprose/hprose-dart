@@ -25,6 +25,61 @@ abstract class TransportCreator<T extends Transport> {
   T create();
 }
 
+class _Proxy {
+  final Client _client;
+  String _namespace;
+  _Proxy(this._client, this._namespace) {
+    if (_namespace != null && _namespace.isNotEmpty) {
+      _namespace += '_';
+    } else {
+      _namespace = '';
+    }
+  }
+  String _getName(Symbol symbol) {
+    String name = symbol.toString();
+    return name.substring(8, name.length - 2);
+  }
+  noSuchMethod(Invocation mirror) {
+    String name = this._namespace + _getName(mirror.memberName);
+    if (mirror.isGetter) {
+      return new _Proxy(this._client, name);
+    }
+    if (mirror.isMethod) {
+      Type type = dynamic;
+      if (mirror.typeArguments.isNotEmpty) {
+        type = mirror.typeArguments.first;
+      }
+      ClientContext context;
+      var args = [];
+      if (mirror.positionalArguments.isNotEmpty) {
+        args.addAll(mirror.positionalArguments);
+        if (args.last is Context) {
+          context = args.removeLast();
+        }
+      }
+      if (mirror.namedArguments.isNotEmpty) {
+        var namedArgs = new Map<String, dynamic>();
+        mirror.namedArguments.forEach((name, value) {
+          namedArgs[_getName(name)] = value;
+        });
+        if (namedArgs.containsKey('context') &&
+            namedArgs['context'] is Context) {
+          context = namedArgs.remove('context');
+        }
+        if (namedArgs.isNotEmpty) {
+          args.add(namedArgs);
+        }
+      }
+      if (context == null) {
+        context = new ClientContext();
+      }
+      context.returnType = type;
+      return _client.invoke(name, args, context);
+    }
+    super.noSuchMethod(mirror);
+  }
+}
+
 class Client {
   static final Map<String, TransportCreator> _creators = {};
   static final Map<String, String> _schemes = {};
@@ -65,6 +120,10 @@ class Client {
     if (uris != null) {
       _urilist.addAll(uris.map((uri) => Uri.parse(uri)));
     }
+  }
+
+  dynamic useService([String namespace]) {
+    return new _Proxy(this, namespace);
   }
 
   void use<Handler>(Handler handler) {
