@@ -8,7 +8,7 @@
 |                                                          |
 | Method for Dart.                                         |
 |                                                          |
-| LastModified: Feb 24, 2019                               |
+| LastModified: Feb 28, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -17,10 +17,16 @@ part of hprose.rpc.core;
 
 class Method {
   final Function method;
+  final bool missing;
   String fullname;
-  List<String> positionalParameterTypes;
-  Map<String, String> namedParameterTypes;
-  bool missing;
+  final List<String> positionalParameterTypes = [];
+  final List<String> optionalParameterTypes = [];
+  final Map<String, String> namedParameterTypes = {};
+  bool passContext;
+  bool contextInPositionalArguments;
+  bool contextInNamedArguments;
+  bool hasOptionalArguments;
+  bool hasNamedArguments;
   Method(this.method, [this.fullname, this.missing]) {
     if (fullname == null || fullname.isEmpty) {
       fullname = _getFunctionName(method);
@@ -29,6 +35,21 @@ class Method {
       throw new ArgumentError.notNull('fullname');
     }
     _parseParameters(method);
+    passContext = false;
+    contextInPositionalArguments = false;
+    contextInNamedArguments = false;
+    if (!hasOptionalArguments && !hasNamedArguments) {
+      if (positionalParameterTypes.isNotEmpty &&
+          (positionalParameterTypes.last == 'Context' ||
+              positionalParameterTypes.last == 'ServiceContext')) {
+        passContext = true;
+        contextInPositionalArguments = true;
+      }
+    } else if (namedParameterTypes['context'] == 'Context' ||
+        namedParameterTypes['context'] == 'ServiceContext') {
+      passContext = true;
+      contextInNamedArguments = true;
+    }
   }
 
   String _getFunctionName(Function func) {
@@ -42,7 +63,6 @@ class Method {
   }
 
   void _parseNamedParameters(List<String> genericsArguments, String str) {
-    Map<String, String> types = {};
     int nesting = 0;
     int p = 0;
     String type;
@@ -58,15 +78,15 @@ class Method {
         }
         name = str.substring(i + 1, p);
         p = i = p + 2;
-        types[name] = type;
+        namedParameterTypes[name] = type;
       }
     }
     genericsArguments?.forEach((a) {
-      for (var type in types.entries) {
+      for (var type in namedParameterTypes.entries) {
         if (a == type.value) {
-          types[type.key] = 'dynamic';
+          namedParameterTypes[type.key] = 'dynamic';
         } else {
-          types[type.key] = type.value
+          namedParameterTypes[type.key] = type.value
               .replaceAll('<$a>', '<dynamic>')
               .replaceAll('<$a,', '<dynamic,')
               .replaceAll(', $a>', ', dynamic>')
@@ -74,7 +94,6 @@ class Method {
         }
       }
     });
-    namedParameterTypes = types;
   }
 
   void _parseParameters(Function func) {
@@ -88,13 +107,14 @@ class Method {
     str = str.substring(p + 2, str.indexOf(') => '));
     p = str.indexOf('{');
     if (p != -1) {
+      hasNamedArguments = true;
       _parseNamedParameters(
           genericsArguments, str.substring(p + 1, str.length - 1));
       str = str.substring(0, p - 2);
     }
-    List<String> types = [];
     int nesting = 0;
     p = 0;
+    var types = positionalParameterTypes;
     for (var i = 0; i < str.length; i++) {
       if (str[i] == '<') nesting++;
       if (str[i] == '>') nesting--;
@@ -102,12 +122,27 @@ class Method {
         types.add(str.substring(p, i));
         p = i = i + 2;
       }
+      if (str[i] == '[') {
+        hasOptionalArguments = true;
+        types = optionalParameterTypes;
+        p = i + 1;
+      }
+      if (str[i] == ']') {
+        types.add(str.substring(p, i));
+        break;
+      }
     }
-    if (str.length > 0) {
-      types.add(str.substring(p, str.length));
+    if (str.length > 0 && types == positionalParameterTypes) {
+      positionalParameterTypes.add(str.substring(p, str.length));
     }
-    var n = types.length;
+    _replaceGenericsArguments(genericsArguments, positionalParameterTypes);
+    _replaceGenericsArguments(genericsArguments, optionalParameterTypes);
+  }
+
+  void _replaceGenericsArguments(
+      List<String> genericsArguments, List<String> types) {
     genericsArguments?.forEach((a) {
+      var n = types.length;
       for (var i = 0; i < n; i++) {
         if (a == types[i]) {
           types[i] = 'dynamic';
@@ -120,6 +155,5 @@ class Method {
         }
       }
     });
-    positionalParameterTypes = types;
   }
 }
