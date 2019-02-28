@@ -17,17 +17,17 @@ part of hprose.rpc.core;
 
 class Method {
   final Function method;
-  final bool missing;
   String fullname;
   final List<String> positionalParameterTypes = [];
   final List<String> optionalParameterTypes = [];
   final Map<String, String> namedParameterTypes = {};
-  bool passContext;
-  bool contextInPositionalArguments;
-  bool contextInNamedArguments;
-  bool hasOptionalArguments;
-  bool hasNamedArguments;
-  Method(this.method, [this.fullname, this.missing]) {
+  final bool missing;
+  bool passContext = false;
+  bool contextInPositionalArguments = false;
+  bool contextInNamedArguments = false;
+  bool hasOptionalArguments = false;
+  bool hasNamedArguments = false;
+  Method(this.method, [this.fullname, this.missing = false]) {
     if (fullname == null || fullname.isEmpty) {
       fullname = _getFunctionName(method);
     }
@@ -35,9 +35,6 @@ class Method {
       throw new ArgumentError.notNull('fullname');
     }
     _parseParameters(method);
-    passContext = false;
-    contextInPositionalArguments = false;
-    contextInNamedArguments = false;
     if (!hasOptionalArguments && !hasNamedArguments) {
       if (positionalParameterTypes.isNotEmpty &&
           (positionalParameterTypes.last == 'Context' ||
