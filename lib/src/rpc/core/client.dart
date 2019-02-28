@@ -8,7 +8,7 @@
 |                                                          |
 | hprose Client for Dart.                                  |
 |                                                          |
-| LastModified: Feb 24, 2019                               |
+| LastModified: Feb 28, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -17,6 +17,7 @@ part of hprose.rpc.core;
 
 abstract class Transport {
   Future<Uint8List> transport(Uint8List request, Context context);
+  Future<void> abort();
 }
 
 abstract class TransportCreator<T extends Transport> {
@@ -25,12 +26,12 @@ abstract class TransportCreator<T extends Transport> {
 }
 
 class Client {
-  static final List<MapEntry<String, TransportCreator>> _creators = [];
+  static final Map<String, TransportCreator> _creators = {};
   static final Map<String, String> _schemes = {};
-  static void Register<T extends Transport>(
+  static void register<T extends Transport>(
       String name, TransportCreator<T> creator) {
     var schemes = creator.schemes;
-    _creators.add(new MapEntry(name, creator));
+    _creators[name] = creator;
     for (final scheme in schemes) {
       _schemes[scheme] = name;
     }
@@ -40,6 +41,7 @@ class Client {
   Transport operator [](String name) => _transports[name];
   final Map<String, dynamic> requestHeaders = {};
   ClientCodec codec = DefaultClientCodec.instance;
+  Duration timeout = new Duration(seconds: 30);
   List<Uri> _urilist = [];
   List<Uri> get uris => _urilist;
   set uris(List<Uri> value) {
@@ -52,10 +54,13 @@ class Client {
   InvokeManager _invokeManager;
   IOManager _ioManager;
   Client([List<String> uris]) {
+    if (!_creators.containsKey('mock')) {
+      register<MockTransport>('mock', new MockTransportCreator());
+    }
     _invokeManager = new InvokeManager(call);
     _ioManager = new IOManager(transport);
-    for (final pair in _creators) {
-      _transports[pair.key] = pair.value.create();
+    for (final entry in _creators.entries) {
+      _transports[entry.key] = entry.value.create();
     }
     if (uris != null) {
       _urilist.addAll(uris.map((uri) => Uri.parse(uri)));
@@ -83,7 +88,7 @@ class Client {
   }
 
   Future<T> invoke<T>(String fullname,
-      {List args = null, ClientContext context = null}) async {
+      [List args, ClientContext context]) async {
     if (context == null) context = new ClientContext();
     context.init(this, T);
     if (args == null) args = [];
@@ -104,5 +109,13 @@ class Client {
       return _transports[name].transport(request, context);
     }
     throw new Exception('The protocol $scheme is not supported.');
+  }
+
+  Future<void> abort() {
+    List<Future> results = [];
+    _transports.values.forEach((trans) {
+      results.add(trans.abort());
+    });
+    return Future.wait(results);
   }
 }
