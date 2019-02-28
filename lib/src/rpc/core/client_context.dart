@@ -22,6 +22,19 @@ class ClientContext extends Context {
   Duration timeout;
   final Map<String, dynamic> requestHeaders = {};
   final Map<String, dynamic> responseHeaders = {};
+  ClientContext(
+      {this.uri,
+      this.returnType,
+      this.timeout,
+      Map<String, dynamic> requestHeaders,
+      Map<String, dynamic> responseHeaders}) {
+    if (requestHeaders != null && requestHeaders.isNotEmpty) {
+      this.requestHeaders.addAll(requestHeaders);
+    }
+    if (responseHeaders != null && responseHeaders.isNotEmpty) {
+      this.responseHeaders.addAll(responseHeaders);
+    }
+  }
   void init(Client client, Type type) {
     this.client = client;
     if (client.uris.length > 0) this.uri = client.uris.first;
