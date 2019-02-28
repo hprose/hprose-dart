@@ -8,7 +8,7 @@
 |                                                          |
 | ClientCodec for Dart.                                    |
 |                                                          |
-| LastModified: Feb 24, 2019                               |
+| LastModified: Feb 28, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -50,12 +50,12 @@ class DefaultClientCodec implements ClientCodec {
   @override
   decode(Uint8List response, ClientContext context) {
     final stream = new ByteStream.fromUint8List(response);
-    final reader = new Reader(stream, simple: false);
+    final reader = new Reader(stream);
     reader.longType = longType;
     var tag = stream.readByte();
     if (tag == TagHeader) {
-      final header = reader.deserialize<Map<String, dynamic>>();
-      context.responseHeaders.addAll(header);
+      final headers = reader.deserialize<Map<String, dynamic>>();
+      context.responseHeaders.addAll(headers);
       reader.reset();
       tag = stream.readByte();
     }
