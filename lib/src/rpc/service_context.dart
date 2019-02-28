@@ -17,6 +17,5 @@ part of hprose.rpc;
 
 class ServiceContext extends core.ServiceContext {
   InternetAddress address;
-  int port;
   ServiceContext(Service service) : super(service);
 }
