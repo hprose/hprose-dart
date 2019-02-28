@@ -8,7 +8,7 @@
 |                                                          |
 | MethodManager for Dart.                                  |
 |                                                          |
-| LastModified: Feb 26, 2019                               |
+| LastModified: Feb 27, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -33,19 +33,19 @@ class MethodManager {
     methods[method.fullname] = method;
   }
 
-  void addMethod(Function func, [String fullname]) {
-    add(new Method(func, fullname));
+  void addMethod(Function method, [String fullname]) {
+    add(new Method(method, fullname));
   }
 
-  void addMethods(List<Function> funcs, [List<String> fullnames]) {
+  void addMethods(List<Function> methods, [List<String> fullnames]) {
     if (fullnames != null) {
-      for (int i = 0; i < funcs.length; ++i) {
-        add(new Method(funcs[i], fullnames[i]));
+      for (int i = 0; i < methods.length; ++i) {
+        add(new Method(methods[i], fullnames[i]));
       }
     }
     else {
-      for (int i = 0; i < funcs.length; ++i) {
-        add(new Method(funcs[i]));
+      for (int i = 0; i < methods.length; ++i) {
+        add(new Method(methods[i]));
       }
     }
   }
