@@ -15,20 +15,22 @@
 
 part of hprose.rpc.core;
 
-abstract class Handler {
-  Function handler;
-  void bind(dynamic server);
+abstract class Handler<T> {
+  void bind(T server);
 }
 
-typedef T HandlerConstructor<T extends Handler>(Service service);
+abstract class HandlerCreator<T extends Handler> {
+  List<String> serverTypes;
+  T create(Service service);
+}
 
 class Service {
-  static final Map<String, HandlerConstructor> _handlerConstructors = {};
+  static final Map<String, HandlerCreator> _creators = {};
   static final Map<String, List<String>> _serverTypes = {};
   static void register<T extends Handler>(
-      String name, HandlerConstructor<T> ctor, List<String> serverTypes) {
-    _handlerConstructors[name] = ctor;
-    serverTypes.forEach((type) {
+      String name, HandlerCreator<T> creator) {
+    _creators[name] = creator;
+    creator.serverTypes.forEach((type) {
       if (_serverTypes.containsKey(type)) {
         _serverTypes[type].add(name);
       } else {
@@ -47,9 +49,14 @@ class Service {
   Handler operator [](String name) => _handlers[name];
   void operator []=(String name, Handler value) => _handlers[name] = value;
   Service() {
+    if (!_creators.containsKey('mock')) {
+      register<MockHandler>('mock', new MockHandlerCreator());
+    }
+
     _invokeManager = new InvokeManager(execute);
     _ioManager = new IOManager(process);
-    _handlerConstructors.forEach((name, ctor) => _handlers[name] = ctor(this));
+    _creators
+        .forEach((name, creator) => _handlers[name] = creator.create(this));
     add(new Method(_methodManager.getNames, '~'));
   }
   void bind(dynamic server, [String name]) {
@@ -74,7 +81,7 @@ class Service {
     try {
       final requestInfo = codec.decode(request, context as ServiceContext);
       if (timeout > Duration.zero) {
-        var completer = new Completer<Uint8List>();
+        var completer = new Completer();
         var timer = new Timer(timeout,
             () => completer.completeError(new TimeoutException('Timeout')));
         _invokeManager
