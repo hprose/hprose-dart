@@ -1,0 +1,54 @@
+/*--------------------------------------------------------*\
+|                                                          |
+|                          hprose                          |
+|                                                          |
+| Official WebSite: https://hprose.com                     |
+|                                                          |
+| mock_handler.dart                                        |
+|                                                          |
+| MockHandler for Dart.                                    |
+|                                                          |
+| LastModified: Feb 27, 2019                               |
+| Author: Ma Bingyao <andot@hprose.com>                    |
+|                                                          |
+\*________________________________________________________*/
+
+part of hprose.rpc.core;
+
+class MockServer {
+  final String address;
+  MockServer(this.address);
+  void close() {
+    _MockAgent.cancel(address);
+  }
+}
+
+class MockHandler implements Handler<MockServer> {
+  final Service service;
+  MockHandler(this.service);
+
+  @override
+  void bind(MockServer server) {
+    _MockAgent.register(server.address, handler);
+  }
+
+  Future<Uint8List> handler(String address, Uint8List request) {
+    if (request.length > service.maxRequestLength) {
+      throw new Exception('Request entity too large');
+    }
+    final context = new ServiceContext(service);
+    context.host = address;
+    context.port = 0;
+    context.handler = this;
+    return service.handle(request, context);
+  }
+}
+
+class MockHandlerCreator implements HandlerCreator<MockHandler> {
+  @override
+  List<String> serverTypes = ['MockServer'];
+  @override
+  MockHandler create(Service service) {
+    return new MockHandler(service);
+  }
+}
