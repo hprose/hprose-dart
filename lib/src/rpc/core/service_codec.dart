@@ -27,7 +27,7 @@ abstract class ServiceCodec {
 }
 
 class DefaultServiceCodec extends ServiceCodec {
-  static ServiceCodec instance = new DefaultServiceCodec();
+  static DefaultServiceCodec instance = new DefaultServiceCodec();
   bool debug = false;
   bool simple = false;
   LongType longType = LongType.Int;
@@ -98,7 +98,7 @@ class DefaultServiceCodec extends ServiceCodec {
     if (method.hasNamedArguments) {
       n = ppl + 1;
     }
-    var args = new List(n);
+    var args = new List<dynamic>.filled(n, null, growable: true);
     if (method.contextInPositionalArguments) {
       ppl--;
       n--;
