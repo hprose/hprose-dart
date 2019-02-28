@@ -54,7 +54,9 @@ class Reader {
     final strDeserialize = Deserializer.getInstance(String);
     for (var i = 0; i < count; ++i) {
       names[i] = strDeserialize.deserialize(this);
-      types[i] = type[names[i]];
+      if (type != null) {
+        types[i] = type[names[i]];
+      }
     }
     stream.readByte();
     _ref.add(new TypeInfo(name, names, types));
