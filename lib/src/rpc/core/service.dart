@@ -39,6 +39,10 @@ class Service {
     });
   }
 
+  static bool isRegister(String name) {
+    return _creators.containsKey(name);
+  }
+
   Duration timeout = new Duration(seconds: 30);
   ServiceCodec codec = DefaultServiceCodec.instance;
   int maxRequestLength = 0x7FFFFFFFF;
@@ -49,16 +53,20 @@ class Service {
   Handler operator [](String name) => _handlers[name];
   void operator []=(String name, Handler value) => _handlers[name] = value;
   Service() {
-    if (!_creators.containsKey('mock')) {
-      register<MockHandler>('mock', new MockHandlerCreator());
-    }
-
+    init();
     _invokeManager = new InvokeManager(execute);
     _ioManager = new IOManager(process);
     _creators
         .forEach((name, creator) => _handlers[name] = creator.create(this));
     add(new Method(_methodManager.getNames, '~'));
   }
+
+  void init() {
+    if (!isRegister('mock')) {
+      register<MockHandler>('mock', new MockHandlerCreator());
+    }
+  }
+
   void bind(dynamic server, [String name]) {
     final type = server.runtimeType.toString();
     if (_serverTypes.containsKey(type)) {

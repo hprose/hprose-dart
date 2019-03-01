@@ -39,6 +39,7 @@ class _Proxy {
     String name = symbol.toString();
     return name.substring(8, name.length - 2);
   }
+
   noSuchMethod(Invocation mirror) {
     String name = this._namespace + _getName(mirror.memberName);
     if (mirror.isGetter) {
@@ -92,6 +93,10 @@ class Client {
     }
   }
 
+  static bool isRegister(String name) {
+    return _creators.containsKey(name);
+  }
+
   Map<String, Transport> _transports = {};
   Transport operator [](String name) => _transports[name];
   final Map<String, dynamic> requestHeaders = {};
@@ -109,9 +114,7 @@ class Client {
   InvokeManager _invokeManager;
   IOManager _ioManager;
   Client([List<String> uris]) {
-    if (!_creators.containsKey('mock')) {
-      register<MockTransport>('mock', new MockTransportCreator());
-    }
+    init();
     _invokeManager = new InvokeManager(call);
     _ioManager = new IOManager(transport);
     for (final entry in _creators.entries) {
@@ -119,6 +122,12 @@ class Client {
     }
     if (uris != null) {
       _urilist.addAll(uris.map((uri) => Uri.parse(uri)));
+    }
+  }
+
+  void init() {
+    if (!isRegister('mock')) {
+      register<MockTransport>('mock', new MockTransportCreator());
     }
   }
 
