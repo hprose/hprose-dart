@@ -75,8 +75,6 @@ class HttpHandler implements Handler<HttpServer> {
         response.headers.add(HttpHeaders.contentTypeHeader, 'text/xml');
         response.write(this._crossDomainXmlContent);
       }
-      response.flush();
-      response.close();
       return true;
     }
     return false;
@@ -135,6 +133,11 @@ class HttpHandler implements Handler<HttpServer> {
     }
   }
 
+  void _end(HttpResponse response) async {
+    await response.flush();
+    await response.close();
+  }
+
   void handler(HttpRequest request) async {
     final response = request.response;
     final context = service.createContext() as ServiceContext;
@@ -147,13 +150,11 @@ class HttpHandler implements Handler<HttpServer> {
     if (request.contentLength > service.maxRequestLength) {
       response.statusCode = HttpStatus.requestEntityTooLarge;
       response.reasonPhrase = 'Request Entity Too Large';
-      await response.flush();
-      await response.close();
+      _end(response);
       return;
     }
-    ByteStream stream = new ByteStream(request.contentLength >= 0
-        ? request.contentLength
-        : await request.length);
+    ByteStream stream =
+        new ByteStream(request.contentLength >= 0 ? request.contentLength : 0);
     await for (var data in request) stream.write(data);
     final data = stream.takeBytes();
     Uint8List result;
@@ -161,21 +162,18 @@ class HttpHandler implements Handler<HttpServer> {
       case 'GET':
         if (_clientAccessPolicyXmlContent.isNotEmpty &&
             _clientAccessPolicyXmlHandler(request)) {
-          await response.flush();
-          await response.close();
+          _end(response);
           return;
         }
         if (_crossDomainXmlContent.isNotEmpty &&
             _crossDomainXmlHandler(request)) {
-          await response.flush();
-          await response.close();
+          _end(response);
           return;
         }
         if (!get) {
           response.statusCode = HttpStatus.forbidden;
           response.reasonPhrase = 'Forbidden';
-          await response.flush();
-          await response.close();
+          _end(response);
           return;
         }
         result = await service.handle(data, context);
@@ -185,9 +183,9 @@ class HttpHandler implements Handler<HttpServer> {
         break;
     }
     sendHeader(request);
+    response.contentLength = result.length;
     response.add(result);
-    await response.flush();
-    await response.close();
+    _end(response);
   }
 }
 

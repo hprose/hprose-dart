@@ -74,7 +74,8 @@ class HttpTransport implements Transport {
     }
     if (httpResponse.statusCode >= 200 && httpResponse.statusCode < 300) {
       context['httpResponseHeaders'] = httpResponse.headers;
-      ByteStream stream = new ByteStream();
+      ByteStream stream = new ByteStream(
+          httpResponse.contentLength >= 0 ? httpResponse.contentLength : 0);
       await for (var data in httpResponse) stream.write(data);
       return stream.takeBytes();
     }
