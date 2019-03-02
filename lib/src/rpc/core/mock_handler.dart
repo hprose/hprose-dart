@@ -8,7 +8,7 @@
 |                                                          |
 | MockHandler for Dart.                                    |
 |                                                          |
-| LastModified: Feb 27, 2019                               |
+| LastModified: Mar 2, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -36,7 +36,7 @@ class MockHandler implements Handler<MockServer> {
     if (request.length > service.maxRequestLength) {
       throw new Exception('Request entity too large');
     }
-    final context = new ServiceContext(service);
+    final context = service.createContext();
     context.host = address;
     context.port = 0;
     context.handler = this;

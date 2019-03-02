@@ -8,7 +8,7 @@
 |                                                          |
 | hprose Client for Dart.                                  |
 |                                                          |
-| LastModified: Feb 28, 2019                               |
+| LastModified: Mar 2, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -99,6 +99,8 @@ class Client {
 
   Map<String, Transport> _transports = {};
   Transport operator [](String name) => _transports[name];
+  void operator []=(String name, Transport value) => _transports[name] = value;
+  MockTransport get mock => _transports['mock'];
   final Map<String, dynamic> requestHeaders = {};
   ClientCodec codec = DefaultClientCodec.instance;
   Duration timeout = new Duration(seconds: 30);

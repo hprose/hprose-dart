@@ -22,8 +22,12 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'dart:io';
 import 'io.dart';
-import 'rpc_core.dart' as core show ServiceContext;
-import 'rpc_core.dart' hide ServiceContext;
-export 'rpc_core.dart' hide ServiceContext;
+import 'rpc_core.dart' as core show ServiceContext, Service, Client;
+import 'rpc_core.dart' hide ServiceContext, Service, Client;
+export 'rpc_core.dart' hide ServiceContext, Service, Client;
 
+part 'src/rpc/client.dart';
+part 'src/rpc/service.dart';
 part 'src/rpc/service_context.dart';
+part 'src/rpc/http_transport.dart';
+part 'src/rpc/http_handler.dart';

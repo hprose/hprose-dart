@@ -8,7 +8,7 @@
 |                                                          |
 | MockTransport for Dart.                                  |
 |                                                          |
-| LastModified: Feb 27, 2019                               |
+| LastModified: Mar 2, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -22,14 +22,21 @@ class MockTransport implements Transport {
     final uri = clientContext.uri;
     if (clientContext.timeout > Duration.zero) {
       var completer = new Completer<Uint8List>();
-      var timer = new Timer(clientContext.timeout,
-          () => completer.completeError(new TimeoutException('Timeout')));
+      var timer = new Timer(clientContext.timeout, () {
+        if (!completer.isCompleted) {
+          completer.completeError(new TimeoutException('Timeout'));
+        }
+      });
       _MockAgent.handler(uri.host, request).then((value) {
         timer.cancel();
-        completer.complete(value);
+        if (!completer.isCompleted) {
+          completer.complete(value);
+        }
       }, onError: (error) {
         timer.cancel();
-        completer.completeError(error);
+        if (!completer.isCompleted) {
+          completer.completeError(error);
+        }
       });
       return await completer.future;
     }

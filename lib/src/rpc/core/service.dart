@@ -8,7 +8,7 @@
 |                                                          |
 | hprose Service for Dart.                                 |
 |                                                          |
-| LastModified: Feb 28, 2019                               |
+| LastModified: Mar 2, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -52,6 +52,7 @@ class Service {
   Map<String, Handler> _handlers = {};
   Handler operator [](String name) => _handlers[name];
   void operator []=(String name, Handler value) => _handlers[name] = value;
+  MockHandler get mock => _handlers['mock'];
   Service() {
     init();
     _invokeManager = new InvokeManager(execute);
@@ -66,6 +67,8 @@ class Service {
       register<MockHandler>('mock', new MockHandlerCreator());
     }
   }
+
+  ServiceContext createContext() => new ServiceContext(this);
 
   void bind(dynamic server, [String name]) {
     final type = server.runtimeType.toString();
@@ -90,16 +93,23 @@ class Service {
       final requestInfo = codec.decode(request, context as ServiceContext);
       if (timeout > Duration.zero) {
         var completer = new Completer();
-        var timer = new Timer(timeout,
-            () => completer.completeError(new TimeoutException('Timeout')));
+        var timer = new Timer(timeout, () {
+          if (!completer.isCompleted) {
+            completer.completeError(new TimeoutException('Timeout'));
+          }
+        });
         _invokeManager
             .handler(requestInfo.name, requestInfo.args, context)
             .then((value) {
           timer.cancel();
-          completer.complete(value);
+          if (!completer.isCompleted) {
+            completer.complete(value);
+          }
         }, onError: (error) {
           timer.cancel();
-          completer.completeError(error);
+          if (!completer.isCompleted) {
+            completer.completeError(error);
+          }
         });
         result = await completer.future;
       } else {
