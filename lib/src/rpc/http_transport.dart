@@ -8,7 +8,7 @@
 |                                                          |
 | HttpTransport for Dart.                                  |
 |                                                          |
-| LastModified: Mar 2, 2019                                |
+| LastModified: Mar 3, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -53,8 +53,8 @@ class HttpTransport implements Transport {
       var completer = new Completer<HttpClientResponse>();
       var timer = new Timer(clientContext.timeout, () {
         if (!completer.isCompleted) {
-          abort();
           completer.completeError(new TimeoutException('Timeout'));
+          abort();
         }
       });
       httpRequest.close().then((value) {

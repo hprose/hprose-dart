@@ -26,8 +26,11 @@ import 'rpc_core.dart' as core show ServiceContext, Service, Client;
 import 'rpc_core.dart' hide ServiceContext, Service, Client;
 export 'rpc_core.dart' hide ServiceContext, Service, Client;
 
+part 'src/rpc/crc32.dart';
 part 'src/rpc/client.dart';
 part 'src/rpc/service.dart';
 part 'src/rpc/service_context.dart';
 part 'src/rpc/http_transport.dart';
 part 'src/rpc/http_handler.dart';
+part 'src/rpc/socket_transport.dart';
+part 'src/rpc/socket_handler.dart';

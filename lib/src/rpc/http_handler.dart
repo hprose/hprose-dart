@@ -4,9 +4,9 @@
 |                                                          |
 | Official WebSite: https://hprose.com                     |
 |                                                          |
-| http_transport.dart                                      |
+| http_handler.dart                                        |
 |                                                          |
-| HttpTransport for Dart.                                  |
+| HttpHandler for Dart.                                    |
 |                                                          |
 | LastModified: Mar 2, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
@@ -53,7 +53,7 @@ class HttpHandler implements Handler<HttpServer> {
     _clientAccessPolicyXmlContent = value;
   }
 
-  void Function(dynamic error, StackTrace stackTrace) onError;
+  void Function(dynamic error) onError;
   void Function() onDone;
   core.Service service;
   HttpHandler(this.service);

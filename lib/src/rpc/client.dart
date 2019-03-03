@@ -8,7 +8,7 @@
 |                                                          |
 | Client for Dart.                                         |
 |                                                          |
-| LastModified: Mar 2, 2019                                |
+| LastModified: Mar 3, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -27,12 +27,16 @@ class Client extends core.Client {
 
   Client([List<String> uris]) : super(uris);
   HttpTransport get http => this['http'];
+  HttpTransport get tcp => this['tcp'];
 
   @override
   void init() {
     super.init();
     if (!isRegister('http')) {
       register<HttpTransport>('http', new HttpTransportCreator());
+    }
+    if (!isRegister('tcp')) {
+      register<SocketTransport>('tcp', new SocketTransportCreator());
     }
   }
 }

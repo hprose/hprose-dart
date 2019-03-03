@@ -26,12 +26,16 @@ class Service extends core.Service {
   }
 
   HttpHandler get http => this['http'];
+  HttpHandler get tcp => this['tcp'];
 
   @override
   void init() {
     super.init();
     if (!isRegister('http')) {
       register<HttpHandler>('http', new HttpHandlerCreator());
+    }
+    if (!isRegister('tcp')) {
+      register<SocketHandler>('tcp', new SocketHandlerCreator());
     }
   }
 

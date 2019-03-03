@@ -162,6 +162,11 @@ class Client {
     if (context == null) context = new ClientContext();
     context.init(this, T);
     if (args == null) args = [];
+    for (var i = 0; i < args.length; i++) {
+      if (args[i] is Future) {
+        args[i] = await args[i];
+      }
+    }
     return await _invokeManager.handler(fullname, args, context);
   }
 
