@@ -27,7 +27,8 @@ class Client extends core.Client {
 
   Client([List<String> uris]) : super(uris);
   HttpTransport get http => this['http'];
-  HttpTransport get tcp => this['tcp'];
+  TcpTransport get tcp => this['tcp'];
+  UdpTransport get udp => this['udp'];
 
   @override
   void init() {
@@ -36,7 +37,10 @@ class Client extends core.Client {
       register<HttpTransport>('http', new HttpTransportCreator());
     }
     if (!isRegister('tcp')) {
-      register<SocketTransport>('tcp', new SocketTransportCreator());
+      register<TcpTransport>('tcp', new TcpTransportCreator());
+    }
+    if (!isRegister('udp')) {
+      register<UdpTransport>('udp', new UdpTransportCreator());
     }
   }
 }

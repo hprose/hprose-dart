@@ -4,9 +4,9 @@
 |                                                          |
 | Official WebSite: https://hprose.com                     |
 |                                                          |
-| socket_handler.dart                                      |
+| tcp_handler.dart                                         |
 |                                                          |
-| SocketHandler for Dart.                                  |
+| TcpHandler for Dart.                                     |
 |                                                          |
 | LastModified: Mar 3, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
@@ -15,14 +15,14 @@
 
 part of hprose.rpc;
 
-class SocketHandler<T extends Socket> implements Handler<Stream<T>> {
+class TcpHandler<T extends Socket> implements Handler<Stream<T>> {
   void Function(T socket) onAccept;
   void Function(dynamic error) onServerError;
   void Function() onDone;
   void Function(T socket, dynamic error) onError;
   void Function(T socket) onClose;
   core.Service service;
-  SocketHandler(this.service);
+  TcpHandler(this.service);
 
   @override
   void bind(Stream<T> server) {
@@ -49,10 +49,10 @@ class SocketHandler<T extends Socket> implements Handler<Stream<T>> {
     final n = response.length;
     final header = new Uint8List(12);
     final view = new ByteData.view(header.buffer);
-    view.setInt32(4, n | 0x80000000, Endian.big);
-    view.setInt32(8, index, Endian.big);
+    view.setUint32(4, n | 0x80000000, Endian.big);
+    view.setUint32(8, index, Endian.big);
     final crc = crc32(header.sublist(4, 12));
-    view.setUint32(0, crc);
+    view.setUint32(0, crc, Endian.big);
     socket.add(header);
     socket.add(response);
   }
@@ -96,8 +96,8 @@ class SocketHandler<T extends Socket> implements Handler<Stream<T>> {
             return;
           }
           instream.reset();
-          bodyLength = instream.readInt32BE() & 0x7FFFFFFF;
-          index = instream.readInt32BE();
+          bodyLength = instream.readUInt32BE() & 0x7FFFFFFF;
+          index = instream.readUInt32BE();
           if (bodyLength > service.maxRequestLength) {
             _send(socket, utf8.encode('Request entity too large'),
                 index | 0x80000000);
@@ -119,12 +119,12 @@ class SocketHandler<T extends Socket> implements Handler<Stream<T>> {
   }
 }
 
-class SocketHandlerCreator implements HandlerCreator<SocketHandler> {
+class TcpHandlerCreator implements HandlerCreator<TcpHandler> {
   @override
   List<String> serverTypes = ['_ServerSocket', 'SecureServerSocket'];
 
   @override
-  SocketHandler create(core.Service service) {
-    return new SocketHandler(service);
+  TcpHandler create(core.Service service) {
+    return new TcpHandler(service);
   }
 }

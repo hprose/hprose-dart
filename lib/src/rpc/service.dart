@@ -26,7 +26,8 @@ class Service extends core.Service {
   }
 
   HttpHandler get http => this['http'];
-  HttpHandler get tcp => this['tcp'];
+  TcpHandler get tcp => this['tcp'];
+  UdpHandler get udp => this['udp'];
 
   @override
   void init() {
@@ -35,7 +36,10 @@ class Service extends core.Service {
       register<HttpHandler>('http', new HttpHandlerCreator());
     }
     if (!isRegister('tcp')) {
-      register<SocketHandler>('tcp', new SocketHandlerCreator());
+      register<TcpHandler>('tcp', new TcpHandlerCreator());
+    }
+    if (!isRegister('udp')) {
+      register<UdpHandler>('udp', new UdpHandlerCreator());
     }
   }
 

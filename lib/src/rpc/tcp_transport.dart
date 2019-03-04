@@ -4,9 +4,9 @@
 |                                                          |
 | Official WebSite: https://hprose.com                     |
 |                                                          |
-| socket_transport.dart                                    |
+| tcp_transport.dart                                       |
 |                                                          |
-| SocketTransport for Dart.                                |
+| TcpTransport for Dart.                                   |
 |                                                          |
 | LastModified: Mar 3, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
@@ -15,7 +15,7 @@
 
 part of hprose.rpc;
 
-class SocketTransport implements Transport {
+class TcpTransport implements Transport {
   int _counter = 0;
   Map<Socket, Map<int, Completer<Uint8List>>> _results = {};
   Map<Uri, Socket> _sockets = {};
@@ -92,8 +92,8 @@ class SocketTransport implements Transport {
             return;
           }
           instream.reset();
-          bodyLength = instream.readInt32BE() & 0x7FFFFFFF;
-          index = instream.readInt32BE();
+          bodyLength = instream.readUInt32BE() & 0x7FFFFFFF;
+          index = instream.readUInt32BE();
         }
         if ((bodyLength >= 0) &&
             ((instream.length - headerLength) >= bodyLength)) {
@@ -166,10 +166,10 @@ class SocketTransport implements Transport {
     final n = request.length;
     final header = new Uint8List(12);
     final view = new ByteData.view(header.buffer);
-    view.setInt32(4, n | 0x80000000, Endian.big);
-    view.setInt32(8, index, Endian.big);
+    view.setUint32(4, n | 0x80000000, Endian.big);
+    view.setUint32(8, index, Endian.big);
     final crc = crc32(header.sublist(4, 12));
-    view.setUint32(0, crc);
+    view.setUint32(0, crc, Endian.big);
     socket.add(header);
     socket.add(request);
     return await result.future;
@@ -186,7 +186,7 @@ class SocketTransport implements Transport {
   }
 }
 
-class SocketTransportCreator implements TransportCreator<SocketTransport> {
+class TcpTransportCreator implements TransportCreator<TcpTransport> {
   @override
   List<String> schemes = [
     'tcp',
@@ -201,7 +201,7 @@ class SocketTransportCreator implements TransportCreator<SocketTransport> {
   ];
 
   @override
-  SocketTransport create() {
-    return new SocketTransport();
+  TcpTransport create() {
+    return new TcpTransport();
   }
 }
