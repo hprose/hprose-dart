@@ -8,7 +8,7 @@
 |                                                          |
 | HttpHandler for Dart.                                    |
 |                                                          |
-| LastModified: Mar 2, 2019                                |
+| LastModified: Mar 5, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -186,15 +186,5 @@ class HttpHandler implements Handler<HttpServer> {
     response.contentLength = result.length;
     response.add(result);
     _end(response);
-  }
-}
-
-class HttpHandlerCreator implements HandlerCreator<HttpHandler> {
-  @override
-  List<String> serverTypes = ['_HttpServer'];
-
-  @override
-  HttpHandler create(core.Service service) {
-    return new HttpHandler(service);
   }
 }

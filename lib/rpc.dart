@@ -36,3 +36,5 @@ part 'src/rpc/tcp_transport.dart';
 part 'src/rpc/tcp_handler.dart';
 part 'src/rpc/udp_transport.dart';
 part 'src/rpc/udp_handler.dart';
+part 'src/rpc/websocket_transport.dart';
+part 'src/rpc/websocket_handler.dart';

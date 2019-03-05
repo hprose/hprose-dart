@@ -8,7 +8,7 @@
 |                                                          |
 | UdpTransport for Dart.                                   |
 |                                                          |
-| LastModified: Mar 3, 2019                                |
+| LastModified: Mar 5, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -102,7 +102,7 @@ class UdpTransport implements Transport {
     }
   }
 
-  Future<_UdpSocket> _getSocket(Uri uri, Duration timeout) async {
+  Future<_UdpSocket> _getSocket(Uri uri) async {
     if (_sockets.containsKey(uri)) {
       return _sockets[uri];
     }
@@ -125,9 +125,9 @@ class UdpTransport implements Transport {
   Future<Uint8List> transport(Uint8List request, Context context) async {
     final clientContext = context as ClientContext;
     final uri = clientContext.uri;
-    final index = (_counter < 0x7FFFFFFF) ? ++_counter : _counter = 0;
+    final index = (_counter < 0x7FFF) ? ++_counter : _counter = 0;
     final result = new Completer<Uint8List>();
-    final udp = await _getSocket(uri, clientContext.timeout);
+    final udp = await _getSocket(uri);
     final socket = udp.socket;
     if (!_results.containsKey(socket)) {
       _results[socket] = {};

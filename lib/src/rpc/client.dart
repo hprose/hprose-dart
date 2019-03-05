@@ -8,7 +8,7 @@
 |                                                          |
 | Client for Dart.                                         |
 |                                                          |
-| LastModified: Mar 3, 2019                                |
+| LastModified: Mar 5, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -29,6 +29,7 @@ class Client extends core.Client {
   HttpTransport get http => this['http'];
   TcpTransport get tcp => this['tcp'];
   UdpTransport get udp => this['udp'];
+  WebSocketTransport get websocket => this['websocket'];
 
   @override
   void init() {
@@ -41,6 +42,9 @@ class Client extends core.Client {
     }
     if (!isRegister('udp')) {
       register<UdpTransport>('udp', new UdpTransportCreator());
+    }
+    if (!isRegister('websocket')) {
+      register<WebSocketTransport>('websocket', new WebSocketTransportCreator());
     }
   }
 }
