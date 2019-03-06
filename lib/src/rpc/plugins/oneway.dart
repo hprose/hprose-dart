@@ -4,26 +4,24 @@
 |                                                          |
 | Official WebSite: https://hprose.com                     |
 |                                                          |
-| rpc_plugins.dart                                         |
+| oneway.dart                                              |
 |                                                          |
-| hprose.rpc.plugins library for Dart.                     |
+| Oneway plugin for Dart.                                  |
 |                                                          |
 | LastModified: Mar 6, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-library hprose.rpc.plugins;
+part of hprose.rpc.plugins;
 
-import 'dart:collection';
-import 'dart:core';
-import 'dart:async';
-import 'dart:math';
-import 'dart:convert';
-import 'dart:typed_data';
-import 'io.dart';
-import 'rpc_core.dart';
-
-part 'src/rpc/plugins/log.dart';
-part 'src/rpc/plugins/limiter.dart';
-part 'src/rpc/plugins/oneway.dart';
+class Oneway {
+  Future handler(
+      String name, List args, Context context, NextInvokeHandler next) async {
+    final result = next(name, args, context);
+    if (context.containsKey('oneway') && context['oneway'] as bool) {
+      return null;
+    }
+    return result;
+  }
+}
