@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 import 'package:hprose/io.dart';
 import 'package:hprose/rpc.dart';
+import 'package:hprose/rpc_plugins.dart';
 
 String hello(String name) {
   return 'hello $name';
@@ -44,13 +45,16 @@ void main() {
   test('rpc', () async {
     DefaultServiceCodec.instance.debug = true;
     final service = new Service();
-    service.addMethod(hello);
-    service.addMethod(sum);
-    service.addMethod(getAddress);
-    service.addMethod(createUser);
+    service
+      ..use(log.ioHandler)
+      ..addMethod(hello)
+      ..addMethod(sum)
+      ..addMethod(getAddress)
+      ..addMethod(createUser);
     final server = new MockServer('127.0.0.1');
     service.bind(server);
     final client = new Client(['mock://127.0.0.1']);
+    client.use(log.invokeHandler);
     final proxy = client.useService();
     expect(await proxy.hello<String>('world'), equals('hello world'));
     final r1 = proxy.sum<int>(1, 2);
@@ -82,13 +86,16 @@ void main() {
   test('http rpc', () async {
     DefaultServiceCodec.instance.debug = true;
     final service = new Service();
-    service.addMethod(hello);
-    service.addMethod(sum);
-    service.addMethod(getAddress);
-    service.addMethod(createUser);
+    service
+      ..use(log.ioHandler)
+      ..addMethod(hello)
+      ..addMethod(sum)
+      ..addMethod(getAddress)
+      ..addMethod(createUser);
     final server = await HttpServer.bind('127.0.0.1', 8000);
     service.bind(server);
     final client = new Client(['http://127.0.0.1:8000/']);
+    client.use(log.invokeHandler);
     client.http.maxConnectionsPerHost = 1;
     final proxy = client.useService();
     expect(await proxy.hello<String>('world'), equals('hello world'));
@@ -121,13 +128,16 @@ void main() {
   test('tcp rpc', () async {
     DefaultServiceCodec.instance.debug = true;
     final service = new Service();
-    service.addMethod(hello);
-    service.addMethod(sum);
-    service.addMethod(getAddress);
-    service.addMethod(createUser);
+    service
+      ..use(log.ioHandler)
+      ..addMethod(hello)
+      ..addMethod(sum)
+      ..addMethod(getAddress)
+      ..addMethod(createUser);
     final server = await ServerSocket.bind('127.0.0.1', 8412);
     service.bind(server);
     final client = new Client(['tcp://127.0.0.1/']);
+    client.use(log.invokeHandler);
     final proxy = client.useService();
     expect(await proxy.hello<String>('world'), equals('hello world'));
     final r1 = proxy.sum<int>(1, 2);
@@ -159,13 +169,16 @@ void main() {
   test('udp rpc', () async {
     DefaultServiceCodec.instance.debug = true;
     final service = new Service();
-    service.addMethod(hello);
-    service.addMethod(sum);
-    service.addMethod(getAddress);
-    service.addMethod(createUser);
+    service
+      ..use(log.ioHandler)
+      ..addMethod(hello)
+      ..addMethod(sum)
+      ..addMethod(getAddress)
+      ..addMethod(createUser);
     final server = await RawDatagramSocket.bind('127.0.0.1', 8412);
     service.bind(server);
     final client = new Client(['udp://127.0.0.1/']);
+    client.use(log.invokeHandler);
     final proxy = client.useService();
     expect(await proxy.hello<String>('world'), equals('hello world'));
     final r1 = proxy.sum<int>(1, 2);
@@ -197,13 +210,16 @@ void main() {
   test('websocket rpc', () async {
     DefaultServiceCodec.instance.debug = true;
     final service = new Service();
-    service.addMethod(hello);
-    service.addMethod(sum);
-    service.addMethod(getAddress);
-    service.addMethod(createUser);
+    service
+      ..use(log.ioHandler)
+      ..addMethod(hello)
+      ..addMethod(sum)
+      ..addMethod(getAddress)
+      ..addMethod(createUser);
     final server = await HttpServer.bind('127.0.0.1', 8001);
     service.bind(server);
     final client = new Client(['ws://127.0.0.1:8001/']);
+    client.use(log.invokeHandler);
     final proxy = client.useService();
     expect(await proxy.hello<String>('world'), equals('hello world'));
     final r1 = proxy.sum<int>(1, 2);
@@ -232,4 +248,25 @@ void main() {
     server.close();
   });
 
+  test('limiter', () async {
+    DefaultServiceCodec.instance.debug = true;
+    final service = new Service();
+    service.addMethod(hello);
+    final server = new MockServer('127.0.0.1');
+    service.bind(server);
+    final client = new Client(['mock://127.0.0.1']);
+    final proxy = client.useService();
+    client
+      ..use(new RateLimiter(20).invokeHandler)
+      ..use(new ConcurrentLimiter(100000).handler);
+    final begin = new DateTime.now();
+    List<Future> tasks = [];
+    for (int i = 0; i <= 6; i++) {
+      tasks.add(proxy.hello<String>('world'));
+    }
+    await Future.wait(tasks);
+    final end = new DateTime.now();
+    print(end.difference(begin));
+    server.close();
+  });
 }
