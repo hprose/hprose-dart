@@ -8,7 +8,7 @@
 |                                                          |
 | hprose Serializer for Dart.                              |
 |                                                          |
-| LastModified: Feb 27, 2019                               |
+| LastModified: Mar 9, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -100,6 +100,10 @@ class _Serializer {
 
   void register<T>(AbstractSerializer serializer) {
     _serializers[T.toString()] = serializer;
+  }
+
+  bool isRegister<T>() {
+    return _serializers.containsKey(T.toString());
   }
 
   AbstractSerializer getInstance(Type type, dynamic value) {
