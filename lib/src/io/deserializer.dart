@@ -8,7 +8,7 @@
 |                                                          |
 | hprose Deserializer for Dart.                            |
 |                                                          |
-| LastModified: Feb 27, 2019                               |
+| LastModified: Mar 9, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -110,12 +110,18 @@ class _Deserializer {
     register<Map<Object, Object>>(new MapDeserializer<Object, Object>());
     register<Map<String, dynamic>>(new MapDeserializer<String, dynamic>());
     register<Map<String, Object>>(new MapDeserializer<String, Object>());
+    register<Map<String, int>>(new MapDeserializer<String, int>());
+    register<Map<String, bool>>(new MapDeserializer<String, bool>());
     register<Map<int, dynamic>>(new MapDeserializer<int, dynamic>());
     register<Map<int, Object>>(new MapDeserializer<int, Object>());
   }
 
   void register<T>(AbstractDeserializer deserializer) {
     _deserializers[T.toString()] = deserializer;
+  }
+
+  bool isRegister<T>() {
+    return _deserializers.containsKey(T.toString());
   }
 
   AbstractDeserializer getInstance(Type type) {
