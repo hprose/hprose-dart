@@ -28,3 +28,4 @@ part 'src/rpc/plugins/log.dart';
 part 'src/rpc/plugins/limiter.dart';
 part 'src/rpc/plugins/oneway.dart';
 part 'src/rpc/plugins/circuit_breaker.dart';
+part 'src/rpc/plugins/cluster.dart';

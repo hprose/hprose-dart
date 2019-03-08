@@ -16,17 +16,28 @@
 part of hprose.rpc.core;
 
 class Context {
-  final Map<String, dynamic> Items = <String, dynamic>{};
+  final Map<String, dynamic> items = <String, dynamic>{};
 
-  operator [](String key) => Items[key];
+  operator [](String key) => items[key];
 
-  void operator []=(String key, value) => Items[key] = value;
+  void operator []=(String key, value) => items[key] = value;
 
-  bool containsKey(String key) => Items.containsKey(key);
+  bool containsKey(String key) => items.containsKey(key);
+
+  noSuchMethod(Invocation invocation) {
+    var name = invocation.memberName.toString();
+    name = name.substring(8, name.length - 2);
+    if (invocation.isGetter) {
+      return items[name];
+    } else if (invocation.isSetter) {
+      name = name.substring(0, name.length - 1);
+      items[name] = invocation.positionalArguments[0];
+    }
+  }
 
   Context clone() {
     final context = new Context();
-    context.Items.addAll(Items);
+    context.items.addAll(items);
     return context;
   }
 }
