@@ -8,7 +8,7 @@
 |                                                          |
 | hprose ExceptionSerializer for Dart.                     |
 |                                                          |
-| LastModified: Feb 27, 2019                               |
+| LastModified: Mar 9, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -24,6 +24,12 @@ class ExceptionSerializer extends ReferenceSerializer<dynamic> {
     final stream = writer.stream;
     stream.writeByte(TagError);
     stream.writeByte(TagString);
-    ValueWriter.writeStringBody(stream, value.toString());
+    String message;
+    try {
+      message = value.message;
+    } catch (e) {
+      message = value.toString();
+    }
+    ValueWriter.writeStringBody(stream, message);
   }
 }
