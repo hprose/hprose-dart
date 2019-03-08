@@ -269,4 +269,43 @@ void main() {
     print(end.difference(begin));
     server.close();
   });
+
+  test('test push', () async {
+    final service = new Broker(new Service()).service;
+    service.use(log.ioHandler);
+    final server = new MockServer('testpush');
+    service.bind(server);
+    final client1 = new Client(['mock://testpush']);
+    final prosumer1 = new Prosumer(client1, '1');
+    final client2 = new Client(['mock://testpush']);
+    final prosumer2 = new Prosumer(client2, '2');
+    await prosumer1.subscribe('test', (message) {
+      print(message.toJson());
+      expect(message.from, equals('2'));
+      expect(message.data, equals('hello'));
+    });
+    await prosumer1.subscribe('test2', (message) {
+      print(message.toJson());
+      expect(message.from, equals('2'));
+      expect(message.data, equals('world'));
+    });
+    await prosumer1.subscribe('test3', (message) {
+      print(message.toJson());
+      expect(message.from, equals('2'));
+      expect(message.data.toString(), equals('error'));
+    });
+    final r1 = prosumer2.push('hello', 'test', '1');
+    final r2 = prosumer2.push('hello', 'test', '1');
+    final r3 = prosumer2.push('world', 'test2', '1');
+    final r4 = prosumer2.push('world', 'test2', '1');
+    final r5 = prosumer2.push(new Exception('error'), 'test3', '1');
+
+    await Future.wait([r1, r2, r3, r4, r5]);
+    await Future.delayed(const Duration(milliseconds: 10), () async {
+      await prosumer1.unsubscribe('test');
+      await prosumer1.unsubscribe('test2');
+      await prosumer1.unsubscribe('test3');
+      server.close();
+    });
+  });
 }
