@@ -270,14 +270,14 @@ void main() {
     server.close();
   });
 
-  test('test push', () async {
+  test('push', () async {
     final service = new Broker(new Service()).service;
     service.use(log.ioHandler);
-    final server = new MockServer('testpush');
+    final server = await HttpServer.bind('127.0.0.1', 8000);
     service.bind(server);
-    final client1 = new Client(['mock://testpush']);
+    final client1 = new Client(['http://127.0.0.1:8000/']);
     final prosumer1 = new Prosumer(client1, '1');
-    final client2 = new Client(['mock://testpush']);
+    final client2 = new Client(['http://127.0.0.1:8000/']);
     final prosumer2 = new Prosumer(client2, '2');
     await prosumer1.subscribe('test', (message) {
       print(message.toJson());
