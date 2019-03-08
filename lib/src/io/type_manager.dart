@@ -8,7 +8,7 @@
 |                                                          |
 | hprose TypeManager for Dart.                             |
 |                                                          |
-| LastModified: Feb 26, 2019                               |
+| LastModified: Mar 8, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -21,8 +21,11 @@ class _TypeManager {
   final Map<String, FromJson> _fromJson = {};
   final Map<String, Map<String, Type>> _types = {};
   final Map<String, Type> _emptyType = {};
-  void register<T>(FromJson<T> fromJson, [Map<String, Type> fields]) {
-    var name = T.toString();
+  void register<T>(FromJson<T> fromJson,
+      [Map<String, Type> fields, String name]) {
+    if (name == null || name.isEmpty) {
+      name = T.toString();
+    }
     _fromJson[name] = fromJson;
     _types[name] = fields;
     if (fromJson != null) {
