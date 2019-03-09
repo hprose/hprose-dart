@@ -107,7 +107,7 @@ class Broker {
     return true;
   }
 
-  void _doHeartbeat(String id) async {
+  void _doHeartbeat(String id) {
     var timer = new Completer<bool>();
     if (_timers.containsKey(id) && !_timers[id].isCompleted) {
       _timers[id].complete(false);
@@ -204,7 +204,7 @@ class Broker {
             responder.complete({});
           }
         });
-        responder.future.then((value) {
+        await responder.future.then((value) {
           timeoutTimer.cancel();
         });
       }
@@ -344,7 +344,7 @@ class Prosumer {
     if (id != null && id.isNotEmpty) this.id = id;
   }
 
-  Future<void> _dispatch(Map<String, List<Message>> topics) async {
+  void _dispatch(Map<String, List<Message>> topics) {
     for (final topic in topics.keys) {
       final callback = _callbacks[topic];
       if (callback != null) {
@@ -371,7 +371,7 @@ class Prosumer {
     }
   }
 
-  Future<void> _message() async {
+  void _message() async {
     while (true) {
       try {
         final topics = await client.invoke<Map<String, List<Message>>>('<');
