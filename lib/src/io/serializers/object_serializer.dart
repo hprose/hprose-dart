@@ -22,7 +22,7 @@ class ObjectSerializer extends ReferenceSerializer {
     final stream = writer.stream;
     final Map<String, dynamic> data = value.toJson();
     final n = data.length;
-    final name = value.runtimeType.toString();
+    final name = TypeManager.getName(value.runtimeType.toString());
     final r = writer.writeClass(name, () {
       stream.writeByte(TagClass);
       ValueWriter.writeStringBody(stream, name);

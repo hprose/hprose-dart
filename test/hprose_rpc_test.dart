@@ -280,16 +280,19 @@ void main() {
     final client2 = new Client(['http://127.0.0.1:8000/']);
     final prosumer2 = new Prosumer(client2, '2');
     await prosumer1.subscribe('test', (message) {
+      print(message);
       print(message.toJson());
       expect(message.from, equals('2'));
       expect(message.data, equals('hello'));
     });
     await prosumer1.subscribe('test2', (message) {
+      print(message);
       print(message.toJson());
       expect(message.from, equals('2'));
       expect(message.data, equals('world'));
     });
     await prosumer1.subscribe('test3', (message) {
+      print(message);
       print(message.toJson());
       expect(message.from, equals('2'));
       expect(message.data.toString(), equals('error'));
