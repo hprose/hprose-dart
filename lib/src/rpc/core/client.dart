@@ -41,9 +41,9 @@ class _Proxy {
   }
 
   noSuchMethod(Invocation mirror) {
-    String name = this._namespace + _getName(mirror.memberName);
+    String name = _namespace + _getName(mirror.memberName);
     if (mirror.isGetter) {
-      return new _Proxy(this._client, name);
+      return new _Proxy(_client, name);
     }
     if (mirror.isMethod) {
       Type type = dynamic;
