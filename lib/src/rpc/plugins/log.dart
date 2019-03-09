@@ -8,7 +8,7 @@
 |                                                          |
 | Log plugin for Dart.                                     |
 |                                                          |
-| LastModified: Mar 6, 2019                                |
+| LastModified: Mar 10, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -29,7 +29,7 @@ class Log {
       print(e);
     }
     final response = next(request, context);
-    response.then((value) => print(utf8.decode(value))).catchError(print);
+    await response.then((value) => print(utf8.decode(value))).catchError(print);
     return response;
   }
 
@@ -40,14 +40,14 @@ class Log {
     if (!enabled) return next(name, args, context);
     var a = '';
     try {
-      a = json.encode((args.length > 0 && args.last is Context)
+      a = json.encode((args.isNotEmpty && args.last is Context)
           ? args.sublist(0, args.length - 1)
           : args);
     } catch (e) {
       print(e);
     }
     final result = next(name, args, context);
-    result
+    await result
         .then((value) => print(
             '${name}(${a.substring(1, a.length - 1)}) = ${json.encode(value)}'))
         .catchError(print);
