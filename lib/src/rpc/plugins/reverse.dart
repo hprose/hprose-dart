@@ -327,10 +327,7 @@ class Caller {
         args[i] = await args[i];
       }
     }
-    if (++_counter > 0x7FFFFFFF) {
-      _counter = 0;
-    }
-    final index = _counter;
+    final index = (_counter < 0x7FFFFFFF) ? ++_counter : _counter = 0;
     final result = new Completer();
     if (!_calls.containsKey(id)) {
       _calls[id] = [];
