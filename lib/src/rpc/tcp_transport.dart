@@ -180,7 +180,7 @@ class TcpTransport implements Transport {
     _sockets.clear();
     sockets.forEach((uri, socket) {
       _close(uri, socket, new SocketException.closed());
-      socket.destroy();
+      socket.close();
     });
   }
 }
