@@ -1,5 +1,5 @@
 name: hprose
-version: 3.0.0-beta.2
+version: 3.0.0-beta.3
 author: Ma Bingyao <mabingyao@gmail.com>
 description: Hprose for Dart
   Hprose is a High Performance Remote Object Service Engine.
