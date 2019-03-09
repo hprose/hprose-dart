@@ -19,7 +19,7 @@ class WebSocketTransport implements Transport {
   int _counter = 0;
   Map<WebSocket, Map<int, Completer<Uint8List>>> _results = {};
   Map<Uri, WebSocket> _sockets = {};
-  Map<String, dynamic> headers = null;
+  Map<String, dynamic> headers;
   CompressionOptions compression = new CompressionOptions(enabled: false);
 
   void _close(Uri uri, WebSocket socket, Object error) async {
@@ -86,10 +86,10 @@ class WebSocketTransport implements Transport {
     final results = _results[socket];
     results[index] = result;
     if (clientContext.timeout > Duration.zero) {
-      var timer = new Timer(clientContext.timeout, () {
+      var timer = new Timer(clientContext.timeout, () async {
         if (!result.isCompleted) {
           result.completeError(new TimeoutException('Timeout'));
-          abort();
+          await abort();
         }
       });
       result.future.then((value) {

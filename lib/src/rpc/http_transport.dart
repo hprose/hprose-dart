@@ -51,13 +51,13 @@ class HttpTransport implements Transport {
     HttpClientResponse httpResponse;
     if (clientContext.timeout > Duration.zero) {
       var completer = new Completer<HttpClientResponse>();
-      var timer = new Timer(clientContext.timeout, () {
+      var timer = new Timer(clientContext.timeout, () async {
         if (!completer.isCompleted) {
           completer.completeError(new TimeoutException('Timeout'));
-          abort();
+          await abort();
         }
       });
-      httpRequest.close().then((value) {
+      await httpRequest.close().then((value) {
         timer.cancel();
         if (!completer.isCompleted) {
           completer.complete(value);
@@ -84,10 +84,9 @@ class HttpTransport implements Transport {
   }
 
   @override
-  Future<void> abort() {
+  Future<void> abort() async {
     httpClient.close(force: true);
     httpClient = createHttpClient();
-    return Future<void>.value();
   }
 }
 

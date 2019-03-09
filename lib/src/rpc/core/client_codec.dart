@@ -32,14 +32,14 @@ class DefaultClientCodec implements ClientCodec {
     if (simple) {
       headers['simple'] = true;
     }
-    if (headers.length > 0) {
+    if (headers.isNotEmpty) {
       stream.writeByte(TagHeader);
       writer.serialize(headers);
       writer.reset();
     }
     stream.writeByte(TagCall);
     writer.serialize(name);
-    if (args.length > 0) {
+    if (args.isNotEmpty) {
       writer.reset();
       writer.serialize(args);
     }

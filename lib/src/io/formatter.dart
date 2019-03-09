@@ -39,8 +39,7 @@ class Formatter {
     final reader = new Reader(stream, simple: simple);
     if (type == null) {
       return reader.deserialize<T>();
-    }
-    else {
+    } else {
       return Deserializer.get(type).deserialize(reader);
     }
   }

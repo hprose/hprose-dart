@@ -151,13 +151,13 @@ class TcpTransport implements Transport {
     final results = _results[socket];
     results[index] = result;
     if (clientContext.timeout > Duration.zero) {
-      var timer = new Timer(clientContext.timeout, () {
+      var timer = new Timer(clientContext.timeout, () async {
         if (!result.isCompleted) {
           result.completeError(new TimeoutException('Timeout'));
-          abort();
+          await abort();
         }
       });
-      result.future.then((value) {
+      await result.future.then((value) {
         timer.cancel();
       }, onError: (reason) {
         timer.cancel();

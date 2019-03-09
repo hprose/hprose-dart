@@ -67,7 +67,7 @@ class HttpHandler implements Handler<HttpServer> {
     if (request.uri.path.toLowerCase() == '/crossdomain.xml') {
       final response = request.response;
       if (request.headers.ifModifiedSince == _lastModified &&
-          request.headers[HttpHeaders.ifNoneMatchHeader] == _etag) {
+          request.headers.value(HttpHeaders.ifNoneMatchHeader) == _etag) {
         response.statusCode = 304;
       } else {
         response.headers.add(HttpHeaders.lastModifiedHeader, _lastModified);
@@ -84,7 +84,7 @@ class HttpHandler implements Handler<HttpServer> {
     if (request.uri.path.toLowerCase() == '/clientaccesspolicy.xml') {
       final response = request.response;
       if (request.headers.ifModifiedSince == _lastModified &&
-          request.headers[HttpHeaders.ifNoneMatchHeader] == _etag) {
+          request.headers.value(HttpHeaders.ifNoneMatchHeader) == _etag) {
         response.statusCode = 304;
       } else {
         response.headers.add(HttpHeaders.lastModifiedHeader, _lastModified);
