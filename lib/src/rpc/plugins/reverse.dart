@@ -137,7 +137,7 @@ class Provider {
     }
   }
 
-  Future<void> _dispatch(List<List> calls) async {
+  void _dispatch(List<List> calls) async {
     final n = calls.length;
     final results = new List<Future>(n);
     for (var i = 0; i < n; i++) {
@@ -255,7 +255,7 @@ class Caller {
   bool _send(String id, Completer<List<List>> responder) {
     if (_calls.containsKey(id)) {
       final calls = _calls[id];
-      if (calls.length == 0) {
+      if (calls.isEmpty) {
         return false;
       }
       _calls[id] = [];
@@ -294,7 +294,7 @@ class Caller {
             responder.complete([]);
           }
         });
-        responder.future.then((value) {
+        await responder.future.then((value) {
           timeoutTimer.cancel();
         });
       }
