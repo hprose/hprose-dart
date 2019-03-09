@@ -311,4 +311,32 @@ void main() {
       server.close();
     });
   });
+
+
+test('reverse RPC', () async {
+    final service = new Service();
+    final caller = new Caller(service);
+    service.use(log.ioHandler);
+    final server = new MockServer('127.0.0.1');
+    service.bind(server);
+
+    final client = new Client(['mock://127.0.0.1']);
+    //client.use(log.invokeHandler);
+    final provider = new Provider(client, '1');
+    provider.debug = true;
+    //provider.use(log.invokeHandler);
+    provider.addMethod(hello);
+    provider.listen();
+
+    final proxy = caller.useService('1');
+    final result1 = proxy.hello<String>('world1');
+    final result2 = proxy.hello<String>('world2');
+    final result3 = proxy.hello<String>('world3');
+
+    expect(await result1, equals('hello world1'));
+    expect(await result2, equals('hello world2'));
+    expect(await result3, equals('hello world3'));
+    await provider.close();
+    server.close();
+});
 }
