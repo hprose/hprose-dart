@@ -1,8 +1,8 @@
-<p align="center"><img src="http://hprose.com/banner.@2x.png" alt="Hprose" title="Hprose" width="650" height="200" /></p>
+<p align="center"><img src="https://hprose.com/banner.@2x.png" alt="Hprose" title="Hprose" width="650" height="200" /></p>
 
 # Hprose 3.0 for Dart
 
-[![Join the chat at https://gitter.im/hprose/hprose-dart](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/hprose/hprose-dart?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Join the chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/hprose/hprose-dart?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://travis-ci.org/hprose/hprose-dart.svg?branch=master)](https://travis-ci.org/hprose/hprose-dart)
 [![Pub](https://img.shields.io/pub/v/hprose.svg)](https://pub.dartlang.org/packages/hprose)
 
