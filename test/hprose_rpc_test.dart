@@ -191,10 +191,10 @@ void main() {
     expect(await proxy.sum<int>(r1, r2, 3, 4), equals(36));
     expect(await proxy.sum<int>(1, 2, 3, 4), equals(10));
     expect(await proxy.sum(1, 2, 3, 4, 5), equals(10));
-    // await expectLater(
-    //     proxy.sum(1, 2, 3, 4,
-    //         new ClientContext(timeout: new Duration(microseconds: 1))),
-    //     throwsException);
+    await expectLater(
+        proxy.sum(1, 2, 3, 4,
+            new ClientContext(timeout: new Duration(microseconds: 1))),
+        throwsException);
     expect(await proxy.getAddress<String>('localhost'),
         equals('localhost : 127.0.0.1'));
     User user = await proxy.createUser<User>('张三', age: 18, male: true);
