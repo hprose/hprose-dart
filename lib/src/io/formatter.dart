@@ -1,42 +1,47 @@
-/**********************************************************\
+/*--------------------------------------------------------*\
 |                                                          |
 |                          hprose                          |
 |                                                          |
-| Official WebSite: http://www.hprose.com/                 |
-|                   http://www.hprose.org/                 |
+| Official WebSite: https://hprose.com                     |
 |                                                          |
-\**********************************************************/
-/**********************************************************\
- *                                                        *
- * formatter.dart                                         *
- *                                                        *
- * hprose formatter for Dart.                             *
- *                                                        *
- * LastModified: Feb 14, 2016                             *
- * Author: Ma Bingyao <andot@hprose.com>                  *
- *                                                        *
-\**********************************************************/
+| formatter.dart                                           |
+|                                                          |
+| hprose Formatter for Dart.                               |
+|                                                          |
+| LastModified: Feb 17, 2019                               |
+| Author: Ma Bingyao <andot@hprose.com>                    |
+|                                                          |
+\*________________________________________________________*/
+
 part of hprose.io;
 
-abstract class Formatter {
-  static BytesIO serialize(dynamic value, [bool simple = false]) {
-    BytesIO bytes = new BytesIO();
-    Writer writer = new Writer(bytes, simple);
+class Formatter {
+  static Uint8List serialize<T>(T value, {bool simple = false}) {
+    final stream = new ByteStream();
+    final writer = new Writer(stream, simple: simple);
     writer.serialize(value);
-    return bytes;
+    return stream.bytes;
   }
 
-  static dynamic unserialize(dynamic bytes, [bool simple = false]) {
-    if (bytes is! BytesIO) {
-      bytes = new BytesIO(bytes);
+  static T deserialize<T>(dynamic data, {bool simple = false, String type}) {
+    ByteStream stream;
+    if (data is ByteStream) {
+      stream = data;
+    } else if (data is Uint8List) {
+      stream = new ByteStream.fromUint8List(data);
+    } else if (data is ByteBuffer) {
+      stream = new ByteStream.fromByteBuffer(data);
+    } else if (data is Uint8ClampedList) {
+      stream = new ByteStream.fromUint8ClampedList(data);
+    } else if (data is String) {
+      stream = new ByteStream.fromString(data);
     }
-    return new Reader(bytes, simple).unserialize();
+    final reader = new Reader(stream, simple: simple);
+    if (type == null) {
+      return reader.deserialize<T>();
+    }
+    else {
+      return Deserializer.get(type).deserialize(reader);
+    }
   }
-}
-
-Uint8List serialize(dynamic value, [bool simple = false]) {
-  return Formatter.serialize(value, simple).bytes;
-}
-dynamic unserialize(dynamic bytes, [bool simple = false]) {
-  return Formatter.unserialize(bytes, simple);
 }

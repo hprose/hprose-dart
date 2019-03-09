@@ -1,141 +1,51 @@
-/**********************************************************\
+/*--------------------------------------------------------*\
 |                                                          |
 |                          hprose                          |
 |                                                          |
-| Official WebSite: http://www.hprose.com/                 |
-|                   http://www.hprose.org/                 |
+| Official WebSite: https://hprose.com                     |
 |                                                          |
-\**********************************************************/
-/**********************************************************\
- *                                                        *
- * client.dart                                            *
- *                                                        *
- * hprose context class for Dart.                         *
- *                                                        *
- * LastModified: Feb 15, 2016                             *
- * Author: Ma Bingyao <andot@hprose.com>                  *
- *                                                        *
-\**********************************************************/
+| client.dart                                              |
+|                                                          |
+| Client for Dart.                                         |
+|                                                          |
+| LastModified: Mar 5, 2019                                |
+| Author: Ma Bingyao <andot@hprose.com>                    |
+|                                                          |
+\*________________________________________________________*/
+
 part of hprose.rpc;
 
-@proxy
-class Proxy {
-  Client _client;
-  String _namespace;
-  Proxy(this._client, this._namespace) {
-    if (_namespace != '') {
-      _namespace += '_';
-    }
-  }
-  noSuchMethod(Invocation mirror) {
-    String name = this._namespace + mirror.memberName.toString();
-    if (mirror.isGetter) {
-      return new Proxy(this._client, name);
-    }
-    if (mirror.isMethod) {
-      return _client.invoke(name, mirror.positionalArguments);
-    }
-    super.noSuchMethod(mirror);
-  }
-}
-
-abstract class Client {
-  String _uri;
-
-  String get uri => _uri;
-  set uri(String value) => _uri = value;
-
-  Future<Uint8List> sendAndReceive(Uint8List data);
-
-  List<Filter> _filters = new List<Filter>();
-  List<Filter> get filters => _filters;
-  Uint8List _doOutput(String name, List<dynamic> args, bool byref, bool simple, Context context) {
-    BytesIO bytes = new BytesIO();
-    Writer writer = new Writer(bytes, simple);
-    bytes.writeByte(TagCall);
-    writer.writeString(name);
-    if (args.length > 0 || byref) {
-      writer.reset();
-      writer.writeList(args);
-      if (byref) {
-        writer.writeBool(true);
-      }
-    }
-    bytes.writeByte(TagEnd);
-    Uint8List request = bytes.bytes;
-    bytes.clear();
-    filters.forEach((filter) => request = filter.outputFilter(request, context));
-    return request;
+class Client extends core.Client {
+  static void register<T extends Transport>(
+      String name, TransportCreator<T> creator) {
+    core.Client.register<T>(name, creator);
   }
 
-  dynamic _doInput(Uint8List response, List<dynamic> args, int mode, Context context) {
-    filters.reversed.forEach((filter) => response = filter.inputFilter(response, context));
-    if (mode == RawWithEndTag) {
-      return response;
-    }
-    if (mode == Raw) {
-      return response.sublist(0, response.length - 1);
-    }
-    BytesIO bytes = new BytesIO(response);
-    Reader reader = new Reader(bytes);
-    dynamic result;
-    int tag;
-    while ((tag = bytes.readByte()) != TagEnd) {
-      switch (tag) {
-        case TagResult:
-          if (mode == Serialized) {
-            result = reader.readRaw();
-          } else {
-            reader.reset();
-            result = reader.unserialize();
-          }
-          break;
-        case TagArgument:
-          reader.reset();
-          List<dynamic> a = reader.readList();
-          int n = min(a.length, args.length);
-          for (int i = 0; i < n; ++i) args[i] = a[i];
-          break;
-        case TagError:
-          reader.reset();
-          throw new Exception(reader.readString());
-        default:
-          throw new Exception("Wrong Response: \r\n" + bytes.toString());
-      }
-    }
-    bytes.clear();
-    return result;
+  static bool isRegister(String name) {
+    return core.Client.isRegister(name);
   }
 
-  Client([this._uri = '']);
-  Proxy useService([String uri = '', String namespace = '']) {
-    if (uri != '') {
-      this._uri = uri;
-    }
-    return new Proxy(this, namespace);
-  }
-
-  Future<dynamic> invoke(String name, List<dynamic> args,
-      [bool byref = false, int mode = Normal, bool simple = false]) async {
-    Context context = new Context();
-    Uint8List request = _doOutput(name, args, byref, simple, context);
-    try {
-      Uint8List response = await sendAndReceive(request);
-      return _doInput(response, args, mode, context);
-    } catch (e) {
-      throw e;
-    }
-  }
+  Client([List<String> uris]) : super(uris);
+  HttpTransport get http => this['http'];
+  TcpTransport get tcp => this['tcp'];
+  UdpTransport get udp => this['udp'];
+  WebSocketTransport get websocket => this['websocket'];
 
   @override
-  noSuchMethod(Invocation mirror) {
-    String name = MirrorSystem.getName(mirror.memberName);
-    if (mirror.isGetter) {
-      return new Proxy(this, name);
+  void init() {
+    super.init();
+    if (!isRegister('http')) {
+      register<HttpTransport>('http', new HttpTransportCreator());
     }
-    if (mirror.isMethod) {
-      return invoke(name, mirror.positionalArguments);
+    if (!isRegister('tcp')) {
+      register<TcpTransport>('tcp', new TcpTransportCreator());
     }
-    super.noSuchMethod(mirror);
+    if (!isRegister('udp')) {
+      register<UdpTransport>('udp', new UdpTransportCreator());
+    }
+    if (!isRegister('websocket')) {
+      register<WebSocketTransport>(
+          'websocket', new WebSocketTransportCreator());
+    }
   }
 }

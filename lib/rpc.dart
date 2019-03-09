@@ -1,31 +1,40 @@
-/**********************************************************\
+/*--------------------------------------------------------*\
 |                                                          |
 |                          hprose                          |
 |                                                          |
-| Official WebSite: http://www.hprose.com/                 |
-|                   http://www.hprose.org/                 |
+| Official WebSite: https://hprose.com                     |
 |                                                          |
-\**********************************************************/
-/**********************************************************\
- *                                                        *
- * rpc.dart                                               *
- *                                                        *
- * hprose RPC for Dart.                                   *
- *                                                        *
- * LastModified: Mar 3, 2015                              *
- * Author: Ma Bingyao <andot@hprose.com>                  *
- *                                                        *
-\**********************************************************/
+| rpc.dart                                                 |
+|                                                          |
+| hprose.rpc library for Dart.                             |
+|                                                          |
+| LastModified: Feb 21, 2019                               |
+| Author: Ma Bingyao <andot@hprose.com>                    |
+|                                                          |
+\*________________________________________________________*/
+
 library hprose.rpc;
 
-import "dart:async";
-import "dart:core";
-import "dart:math";
-import "dart:mirrors";
-import "dart:typed_data";
-import "io.dart";
+import 'dart:core';
+import 'dart:async';
+import 'dart:math';
+import 'dart:convert';
+import 'dart:typed_data';
+import 'dart:io';
+import 'io.dart';
+import 'core.dart' as core show ServiceContext, Service, Client;
+import 'core.dart' hide ServiceContext, Service, Client;
+export 'core.dart' hide ServiceContext, Service, Client;
 
-part 'src/rpc/context.dart';
-part 'src/rpc/filter.dart';
-part 'src/rpc/resultmode.dart';
+part 'src/rpc/crc32.dart';
 part 'src/rpc/client.dart';
+part 'src/rpc/service.dart';
+part 'src/rpc/service_context.dart';
+part 'src/rpc/http_transport.dart';
+part 'src/rpc/http_handler.dart';
+part 'src/rpc/tcp_transport.dart';
+part 'src/rpc/tcp_handler.dart';
+part 'src/rpc/udp_transport.dart';
+part 'src/rpc/udp_handler.dart';
+part 'src/rpc/websocket_transport.dart';
+part 'src/rpc/websocket_handler.dart';
