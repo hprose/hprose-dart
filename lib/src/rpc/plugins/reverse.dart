@@ -72,6 +72,9 @@ class Provider {
       if (!method.missing) {
         var count = args.length;
         var ppl = method.positionalParameterTypes.length;
+        if (count < ppl) {
+          args.length = ppl;
+        }
         var opl = method.optionalParameterTypes.length;
         var n = ppl + opl;
         if (method.hasOptionalArguments) {
@@ -83,6 +86,9 @@ class Provider {
         }
         if (method.hasNamedArguments) {
           n = ppl + 1;
+        }
+        if (count > n) {
+          args.length = n;
         }
         if (method.contextInPositionalArguments) {
           ppl--;
@@ -98,7 +104,7 @@ class Provider {
                 type: method.optionalParameterTypes[i - ppl]);
           }
           if (i == ppl && method.hasNamedArguments) {
-            if (args[i] is Map) {
+            if (args[i] is! Map) {
               throw new ArgumentError(
                   'Invalid argument, expected named parameters, but positional parameter found.');
             }
