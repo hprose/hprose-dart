@@ -8,7 +8,7 @@
 |                                                          |
 | TcpHandler for Dart.                                     |
 |                                                          |
-| LastModified: Mar 3, 2019                                |
+| LastModified: Mar 10, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -26,7 +26,9 @@ class TcpHandler<T extends Socket> implements Handler<Stream<T>> {
 
   @override
   void bind(Stream<T> server) {
-    server.listen(handler, onError: onServerError, onDone: onDone);
+    try {
+      server.listen(handler, onError: onServerError, onDone: onDone);
+    } catch (e) {}
   }
 
   void handler(T socket) {
