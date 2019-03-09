@@ -177,9 +177,9 @@ void main() {
       ..addMethod(sum)
       ..addMethod(getAddress)
       ..addMethod(createUser);
-    final server = await ServerSocket.bind('127.0.0.1', 8412);
+    final server = await ServerSocket.bind('127.0.0.1', 8414);
     service.bind(server);
-    final client = new Client(['tcp://127.0.0.1/']);
+    final client = new Client(['tcp://127.0.0.1:8414/']);
     //client.use(log.invokeHandler);
     final proxy = client.useService();
     expect(await proxy.hello<String>('world'), equals('hello world'));
@@ -218,9 +218,9 @@ void main() {
       ..addMethod(sum)
       ..addMethod(getAddress)
       ..addMethod(createUser);
-    final server = await RawDatagramSocket.bind('127.0.0.1', 8412);
+    final server = await RawDatagramSocket.bind('127.0.0.1', 8413);
     service.bind(server);
-    final client = new Client(['udp://127.0.0.1/']);
+    final client = new Client(['udp://127.0.0.1:8413/']);
     //client.use(log.invokeHandler);
     final proxy = client.useService();
     expect(await proxy.hello<String>('world'), equals('hello world'));
