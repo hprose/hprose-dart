@@ -4,11 +4,11 @@
 |                                                          |
 | Official WebSite: https://hprose.com                     |
 |                                                          |
-| rpc.dart                                                 |
+| core.dart                                                |
 |                                                          |
-| hprose.rpc library for Dart.                             |
+| hprose.rpc.core library for Dart.                        |
 |                                                          |
-| LastModified: Feb 21, 2019                               |
+| LastModified: Mar 9 2019                                 |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/

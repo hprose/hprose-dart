@@ -4,7 +4,7 @@
 |                                                          |
 | Official WebSite: https://hprose.com                     |
 |                                                          |
-| rpc_plugins.dart                                         |
+| plugins.dart                                             |
 |                                                          |
 | hprose.rpc.plugins library for Dart.                     |
 |                                                          |
@@ -22,7 +22,7 @@ import 'dart:math';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'io.dart';
-import 'rpc_core.dart';
+import 'core.dart';
 
 part 'src/rpc/plugins/log.dart';
 part 'src/rpc/plugins/limiter.dart';

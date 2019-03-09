@@ -22,9 +22,9 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'dart:io';
 import 'io.dart';
-import 'rpc_core.dart' as core show ServiceContext, Service, Client;
-import 'rpc_core.dart' hide ServiceContext, Service, Client;
-export 'rpc_core.dart' hide ServiceContext, Service, Client;
+import 'core.dart' as core show ServiceContext, Service, Client;
+import 'core.dart' hide ServiceContext, Service, Client;
+export 'core.dart' hide ServiceContext, Service, Client;
 
 part 'src/rpc/crc32.dart';
 part 'src/rpc/client.dart';

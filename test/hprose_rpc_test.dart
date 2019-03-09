@@ -5,7 +5,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 import 'package:hprose/io.dart';
 import 'package:hprose/rpc.dart';
-import 'package:hprose/rpc_plugins.dart';
+import 'package:hprose/plugins.dart';
 
 String hello(String name) {
   return 'hello $name';
@@ -312,8 +312,7 @@ void main() {
     });
   });
 
-
-test('reverse RPC', () async {
+  test('reverse RPC', () async {
     final service = new Service();
     final caller = new Caller(service);
     service.use(log.ioHandler);
@@ -338,5 +337,5 @@ test('reverse RPC', () async {
     expect(await result3, equals('hello world3'));
     await provider.close();
     server.close();
-});
+  });
 }
