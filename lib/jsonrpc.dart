@@ -15,9 +15,7 @@
 
 library hprose.rpc.codec.jsonrpc;
 
-import 'dart:collection';
 import 'dart:core';
-import 'dart:async';
 import 'dart:math';
 import 'dart:convert';
 import 'dart:typed_data';

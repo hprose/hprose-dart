@@ -19,7 +19,7 @@ class BaseDeserializer<T> implements AbstractDeserializer<T> {
   static final AbstractDeserializer instance = new BaseDeserializer();
   String type = T.toString();
   BaseDeserializer([String type]) {
-     if (type != null) this.type = type;
+    if (type != null) this.type = type;
   }
   @override
   T read(Reader reader, int tag) {

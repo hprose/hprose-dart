@@ -15,7 +15,8 @@
 
 part of hprose.rpc.core;
 
-abstract class HandlerManager<Handler extends Function, NextHandler extends Function> {
+abstract class HandlerManager<Handler extends Function,
+    NextHandler extends Function> {
   List<Handler> _handlers = [];
   NextHandler _firstHandler;
   NextHandler _defaultHandler;

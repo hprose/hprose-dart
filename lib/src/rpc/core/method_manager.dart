@@ -42,8 +42,7 @@ class MethodManager {
       for (int i = 0; i < methods.length; ++i) {
         add(new Method(methods[i], fullnames[i]));
       }
-    }
-    else {
+    } else {
       for (int i = 0; i < methods.length; ++i) {
         add(new Method(methods[i]));
       }

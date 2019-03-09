@@ -16,7 +16,7 @@
 part of hprose.io;
 
 class ObjectDeserializer<T> extends BaseDeserializer<T> {
-  ObjectDeserializer(String type) :super(type);
+  ObjectDeserializer(String type) : super(type);
   @override
   T read(Reader reader, int tag) {
     switch (tag) {
