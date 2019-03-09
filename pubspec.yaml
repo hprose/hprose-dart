@@ -4,6 +4,8 @@ author: Ma Bingyao <mabingyao@gmail.com>
 description: Hprose for Dart
   Hprose is a High Performance Remote Object Service Engine.
 homepage: https://github.com/hprose/hprose-dart
+documentation: https://github.com/hprose/hprose-dart/wiki
+issue_tracker: https://github.com/hprose/hprose-dart/issues
 environment:
   sdk: '>=2.0.0 <3.0.0'
 dev_dependencies:

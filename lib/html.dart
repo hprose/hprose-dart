@@ -17,7 +17,6 @@ library hprose.rpc.html;
 
 import 'dart:core';
 import 'dart:async';
-import 'dart:math';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'dart:html';
