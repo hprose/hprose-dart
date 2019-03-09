@@ -6,6 +6,7 @@ import 'package:test/test.dart';
 import 'package:hprose/io.dart';
 import 'package:hprose/rpc.dart';
 import 'package:hprose/plugins.dart';
+import 'package:hprose/jsonrpc.dart';
 
 String hello(String name) {
   return 'hello $name';
@@ -54,6 +55,49 @@ void main() {
     final server = new MockServer('127.0.0.1');
     service.bind(server);
     final client = new Client(['mock://127.0.0.1']);
+    client.use(log.invokeHandler);
+    final proxy = client.useService();
+    expect(await proxy.hello<String>('world'), equals('hello world'));
+    final r1 = proxy.sum<int>(1, 2);
+    final r2 = proxy.sum<int>(1, 2, 3);
+    expect(await r1, equals(13));
+    expect(await r2, equals(16));
+    expect(await proxy.sum<int>(r1, r2, 3, 4), equals(36));
+    expect(await proxy.sum<int>(1, 2, 3, 4), equals(10));
+    expect(await proxy.sum(1, 2, 3, 4, 5), equals(10));
+    await expectLater(
+        proxy.sum(1, 2, 3, 4,
+            new ClientContext(timeout: new Duration(microseconds: 1))),
+        throwsException);
+    expect(await proxy.getAddress<String>('localhost'),
+        equals('localhost : 127.0.0.1'));
+    User user = await proxy.createUser<User>('张三', age: 18, male: true);
+    expect(user.name, equals('张三'));
+    expect(user.age, equals(18));
+    expect(user.male, equals(true));
+    await proxy.createUser<User>('张三', age: 18, male: true);
+    await proxy.createUser<User>('张三', age: 18, male: true);
+    await client.abort();
+    await proxy.createUser<User>('张三', age: 18, male: true);
+    await proxy.createUser<User>('张三', age: 18, male: true);
+    await proxy.createUser<User>('张三', age: 18, male: true);
+    server.close();
+  });
+
+
+  test('jsonrpc', () async {
+    final service = new Service();
+    service.codec = JsonRpcServiceCodec.instance;
+    service
+      ..use(log.ioHandler)
+      ..addMethod(hello)
+      ..addMethod(sum)
+      ..addMethod(getAddress)
+      ..addMethod(createUser);
+    final server = new MockServer('127.0.0.1');
+    service.bind(server);
+    final client = new Client(['mock://127.0.0.1']);
+    client.codec =JsonRpcClientCodec.instance;
     client.use(log.invokeHandler);
     final proxy = client.useService();
     expect(await proxy.hello<String>('world'), equals('hello world'));
