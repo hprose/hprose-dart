@@ -8,7 +8,7 @@
 |                                                          |
 | Push plugin for Dart.                                    |
 |                                                          |
-| LastModified: Mar 8, 2019                                |
+| LastModified: Mar 9, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -66,7 +66,7 @@ class Broker {
       ..addMethod(broadcast, '>*')
       ..addMethod(exists, '?')
       ..addMethod(idlist, '|')
-      ..use(handler);
+      ..use(_handler);
   }
   bool _send(String id, Completer<Map<String, List<Message>>> responder) {
     if (!_messages.containsKey(id)) {
@@ -291,7 +291,7 @@ class Broker {
     return idlist;
   }
 
-  Future handler(
+  Future _handler(
       String name, List args, Context context, NextInvokeHandler next) {
     final serviceContext = context as ServiceContext;
     final from = serviceContext.requestHeaders.containsKey('id')
