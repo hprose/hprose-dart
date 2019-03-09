@@ -47,7 +47,7 @@ void main() {
     DefaultServiceCodec.instance.debug = true;
     final service = new Service();
     service
-      //..use(log.ioHandler)
+      ..use(log.ioHandler)
       ..addMethod(hello)
       ..addMethod(sum)
       ..addMethod(getAddress)
@@ -55,7 +55,7 @@ void main() {
     final server = new MockServer('127.0.0.1');
     service.bind(server);
     final client = new Client(['mock://127.0.0.1']);
-    //client.use(log.invokeHandler);
+    client.use(log.invokeHandler);
     final proxy = client.useService();
     expect(await proxy.hello<String>('world'), equals('hello world'));
     final r1 = proxy.sum<int>(1, 2);
@@ -84,11 +84,12 @@ void main() {
     server.close();
   });
 
+
   test('jsonrpc', () async {
     final service = new Service();
     service.codec = JsonRpcServiceCodec.instance;
     service
-      //..use(log.ioHandler)
+      ..use(log.ioHandler)
       ..addMethod(hello)
       ..addMethod(sum)
       ..addMethod(getAddress)
@@ -96,8 +97,8 @@ void main() {
     final server = new MockServer('127.0.0.1');
     service.bind(server);
     final client = new Client(['mock://127.0.0.1']);
-    client.codec = JsonRpcClientCodec.instance;
-    //client.use(log.invokeHandler);
+    client.codec =JsonRpcClientCodec.instance;
+    client.use(log.invokeHandler);
     final proxy = client.useService();
     expect(await proxy.hello<String>('world'), equals('hello world'));
     final r1 = proxy.sum<int>(1, 2);
@@ -130,7 +131,7 @@ void main() {
     DefaultServiceCodec.instance.debug = true;
     final service = new Service();
     service
-      //..use(log.ioHandler)
+      ..use(log.ioHandler)
       ..addMethod(hello)
       ..addMethod(sum)
       ..addMethod(getAddress)
@@ -138,7 +139,7 @@ void main() {
     final server = await HttpServer.bind('127.0.0.1', 8000);
     service.bind(server);
     final client = new Client(['http://127.0.0.1:8000/']);
-    //client.use(log.invokeHandler);
+    client.use(log.invokeHandler);
     client.http.maxConnectionsPerHost = 1;
     final proxy = client.useService();
     expect(await proxy.hello<String>('world'), equals('hello world'));
@@ -172,15 +173,15 @@ void main() {
     DefaultServiceCodec.instance.debug = true;
     final service = new Service();
     service
-      //..use(log.ioHandler)
+      ..use(log.ioHandler)
       ..addMethod(hello)
       ..addMethod(sum)
       ..addMethod(getAddress)
       ..addMethod(createUser);
-    final server = await ServerSocket.bind('127.0.0.1', 8414);
+    final server = await ServerSocket.bind('127.0.0.1', 8412);
     service.bind(server);
-    final client = new Client(['tcp://127.0.0.1:8414/']);
-    //client.use(log.invokeHandler);
+    final client = new Client(['tcp://127.0.0.1/']);
+    client.use(log.invokeHandler);
     final proxy = client.useService();
     expect(await proxy.hello<String>('world'), equals('hello world'));
     final r1 = proxy.sum<int>(1, 2);
@@ -213,15 +214,15 @@ void main() {
     DefaultServiceCodec.instance.debug = true;
     final service = new Service();
     service
-      //..use(log.ioHandler)
+      ..use(log.ioHandler)
       ..addMethod(hello)
       ..addMethod(sum)
       ..addMethod(getAddress)
       ..addMethod(createUser);
-    final server = await RawDatagramSocket.bind('127.0.0.1', 8413);
+    final server = await RawDatagramSocket.bind('127.0.0.1', 8412);
     service.bind(server);
-    final client = new Client(['udp://127.0.0.1:8413/']);
-    //client.use(log.invokeHandler);
+    final client = new Client(['udp://127.0.0.1/']);
+    client.use(log.invokeHandler);
     final proxy = client.useService();
     expect(await proxy.hello<String>('world'), equals('hello world'));
     final r1 = proxy.sum<int>(1, 2);
@@ -254,7 +255,7 @@ void main() {
     DefaultServiceCodec.instance.debug = true;
     final service = new Service();
     service
-      //..use(log.ioHandler)
+      ..use(log.ioHandler)
       ..addMethod(hello)
       ..addMethod(sum)
       ..addMethod(getAddress)
@@ -262,7 +263,7 @@ void main() {
     final server = await HttpServer.bind('127.0.0.1', 8001);
     service.bind(server);
     final client = new Client(['ws://127.0.0.1:8001/']);
-    //client.use(log.invokeHandler);
+    client.use(log.invokeHandler);
     final proxy = client.useService();
     expect(await proxy.hello<String>('world'), equals('hello world'));
     final r1 = proxy.sum<int>(1, 2);
@@ -315,7 +316,7 @@ void main() {
 
   test('push', () async {
     final service = new Broker(new Service()).service;
-    //service.use(log.ioHandler);
+    service.use(log.ioHandler);
     final server = await HttpServer.bind('127.0.0.1', 8000);
     service.bind(server);
     final client1 = new Client(['http://127.0.0.1:8000/']);
@@ -323,20 +324,20 @@ void main() {
     final client2 = new Client(['http://127.0.0.1:8000/']);
     final prosumer2 = new Prosumer(client2, '2');
     await prosumer1.subscribe('test', (message) {
-      //print(message);
-      //print(message.toJson());
+      print(message);
+      print(message.toJson());
       expect(message.from, equals('2'));
       expect(message.data, equals('hello'));
     });
     await prosumer1.subscribe('test2', (message) {
-      //print(message);
-      //print(message.toJson());
+      print(message);
+      print(message.toJson());
       expect(message.from, equals('2'));
       expect(message.data, equals('world'));
     });
     await prosumer1.subscribe('test3', (message) {
-      //print(message);
-      //print(message.toJson());
+      print(message);
+      print(message.toJson());
       expect(message.from, equals('2'));
       expect(message.data.toString(), equals('error'));
     });
@@ -358,15 +359,15 @@ void main() {
   test('reverse RPC', () async {
     final service = new Service();
     final caller = new Caller(service);
-    //service.use(log.ioHandler);
+    service.use(log.ioHandler);
     final server = new MockServer('127.0.0.1');
     service.bind(server);
 
     final client = new Client(['mock://127.0.0.1']);
-    //client.use(log.invokeHandler);
+    client.use(log.invokeHandler);
     final provider = new Provider(client, '1');
     provider.debug = true;
-    //provider.use(log.invokeHandler);
+    provider.use(log.invokeHandler);
     provider.addMethod(hello);
     provider.listen();
 

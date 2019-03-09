@@ -170,8 +170,7 @@ class TcpTransport implements Transport {
     view.setUint32(8, index, Endian.big);
     final crc = crc32(header.sublist(4, 12));
     view.setUint32(0, crc, Endian.big);
-    socket.add(header);
-    socket.add(request);
+    socket.add(header + request);
     return await result.future;
   }
 

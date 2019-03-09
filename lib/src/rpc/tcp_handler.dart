@@ -53,8 +53,7 @@ class TcpHandler<T extends Socket> implements Handler<Stream<T>> {
     view.setUint32(8, index, Endian.big);
     final crc = crc32(header.sublist(4, 12));
     view.setUint32(0, crc, Endian.big);
-    socket.add(header);
-    socket.add(response);
+    socket.add(header + response);
   }
 
   void _run(T socket, Uint8List request, int index) async {
