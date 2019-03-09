@@ -50,9 +50,9 @@ const _crc32Table = [
     0xB3667A2E, 0xC4614AB8, 0x5D681B02, 0x2A6F2B94, 0xB40BBE37, 0xC30C8EA1, 0x5A05DF1B, 0x2D02EF8D];
 
 int crc32(Uint8List data, [int crc = 0]) {
-    crc = crc ^ (-1);
-    for (var i = 0, n = data.length; i < n; ++i) {
-        crc = (crc >> 8) ^ _crc32Table[(crc ^ data[i]) & 0xFF];
-    }
-    return crc ^ (-1);
+  crc = crc ^ (-1);
+  for (var i = 0, n = data.length; i < n; ++i) {
+    crc = (crc >> 8) ^ _crc32Table[(crc ^ data[i]) & 0xFF];
+  }
+  return crc ^ (-1);
 }

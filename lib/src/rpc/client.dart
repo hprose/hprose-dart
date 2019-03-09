@@ -44,7 +44,8 @@ class Client extends core.Client {
       register<UdpTransport>('udp', new UdpTransportCreator());
     }
     if (!isRegister('websocket')) {
-      register<WebSocketTransport>('websocket', new WebSocketTransportCreator());
+      register<WebSocketTransport>(
+          'websocket', new WebSocketTransportCreator());
     }
   }
 }
