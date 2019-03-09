@@ -23,7 +23,7 @@ class Formatter {
     return stream.bytes;
   }
 
-  static T deserialize<T>(dynamic data, {bool simple = false}) {
+  static T deserialize<T>(dynamic data, {bool simple = false, String type}) {
     ByteStream stream;
     if (data is ByteStream) {
       stream = data;
@@ -37,6 +37,11 @@ class Formatter {
       stream = new ByteStream.fromString(data);
     }
     final reader = new Reader(stream, simple: simple);
-    return reader.deserialize<T>();
+    if (type == null) {
+      return reader.deserialize<T>();
+    }
+    else {
+      return Deserializer.get(type).deserialize(reader);
+    }
   }
 }
