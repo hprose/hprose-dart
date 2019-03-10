@@ -19,7 +19,6 @@ class WebSocketTransport implements Transport {
   int _counter = 0;
   Map<WebSocket, Map<int, Completer<Uint8List>>> _results = {};
   Map<Uri, WebSocket> _sockets = {};
-  Map<String, dynamic> headers = null;
 
   void _close(Uri uri, WebSocket socket, Object error) async {
     if (_sockets.containsKey(uri) && _sockets[uri] == socket) {
@@ -82,17 +81,13 @@ class WebSocketTransport implements Transport {
     }
     final results = _results[socket];
     results[index] = result;
+    Timer timer;
     if (clientContext.timeout > Duration.zero) {
-      var timer = new Timer(clientContext.timeout, () {
+      timer = new Timer(clientContext.timeout, () {
         if (!result.isCompleted) {
           result.completeError(new TimeoutException('Timeout'));
           abort();
         }
-      });
-      result.future.then((value) {
-        timer.cancel();
-      }, onError: (reason) {
-        timer.cancel();
       });
     }
     final n = request.length;
@@ -101,7 +96,11 @@ class WebSocketTransport implements Transport {
     view.setUint32(0, index, Endian.big);
     data.setRange(4, 4 + n, request);
     socket.sendTypedData(data);
-    return await result.future;
+    try {
+      return await result.future;
+    } finally {
+      timer?.cancel();
+    }
   }
 
   @override

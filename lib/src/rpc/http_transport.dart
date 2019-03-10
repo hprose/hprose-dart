@@ -8,7 +8,7 @@
 |                                                          |
 | HttpTransport for Dart.                                  |
 |                                                          |
-| LastModified: Mar 3, 2019                                |
+| LastModified: Mar 10, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -19,7 +19,7 @@ class HttpTransport implements Transport {
   HttpClient httpClient;
   Map<String, Object> httpRequestHeaders = {};
   bool keepAlive = true;
-  int maxConnectionsPerHost = null;
+  int maxConnectionsPerHost = 0;
 
   HttpTransport() {
     httpClient = createHttpClient();
@@ -27,7 +27,7 @@ class HttpTransport implements Transport {
 
   HttpClient createHttpClient() {
     HttpClient httpClient = new HttpClient();
-    if (maxConnectionsPerHost != null) {
+    if (maxConnectionsPerHost > 0) {
       httpClient.maxConnectionsPerHost = maxConnectionsPerHost;
     }
     return httpClient;

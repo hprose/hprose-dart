@@ -8,7 +8,7 @@
 |                                                          |
 | TcpTransport for Dart.                                   |
 |                                                          |
-| LastModified: Mar 3, 2019                                |
+| LastModified: Mar 10, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -20,7 +20,7 @@ class TcpTransport implements Transport {
   Map<Socket, Map<int, Completer<Uint8List>>> _results = {};
   Map<Uri, Socket> _sockets = {};
   bool noDelay = true;
-  SecurityContext securityContext = null;
+  SecurityContext securityContext;
   bool Function(X509Certificate certificate) onBadCertificate = (_) => true;
 
   Future<Socket> _connect(Uri uri, Duration timeout) async {
