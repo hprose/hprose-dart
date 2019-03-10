@@ -8,7 +8,7 @@
 |                                                          |
 | UdpTransport for Dart.                                   |
 |                                                          |
-| LastModified: Mar 5, 2019                                |
+| LastModified: Mar 10, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -94,7 +94,6 @@ class UdpTransport implements Transport {
           }
           _close(uri, socket, new SocketException.closed());
           socket.close();
-          return;
         } else if (result != null && !result.isCompleted) {
           result.complete(response);
         }
@@ -134,20 +133,15 @@ class UdpTransport implements Transport {
     }
     final results = _results[socket];
     results[index] = result;
+    Timer timer;
     if (clientContext.timeout > Duration.zero) {
-      var timer = new Timer(clientContext.timeout, () {
+      timer = new Timer(clientContext.timeout, () async {
         if (!result.isCompleted) {
           result.completeError(new TimeoutException('Timeout'));
-          abort();
+          await abort();
         }
       });
-      result.future.then((value) {
-        timer.cancel();
-      }, onError: (reason) {
-        timer.cancel();
-      });
     }
-
     final n = request.length;
     final data = new Uint8List(8 + n);
     final view = new ByteData.view(data.buffer);
@@ -157,7 +151,11 @@ class UdpTransport implements Transport {
     view.setUint32(0, crc, Endian.big);
     data.setRange(8, 8 + n, request);
     socket.send(data, udp.remoteAddress, udp.remotePort);
-    return await result.future;
+    try {
+      return await result.future;
+    } finally {
+      timer?.cancel();
+    }
   }
 
   @override

@@ -57,18 +57,12 @@ class HttpTransport implements Transport {
           await abort();
         }
       });
-      await httpRequest.close().then((value) {
+      try {
+        httpResponse =
+            await Future.any([httpRequest.close(), completer.future]);
+      } finally {
         timer.cancel();
-        if (!completer.isCompleted) {
-          completer.complete(value);
-        }
-      }, onError: (error) {
-        timer.cancel();
-        if (!completer.isCompleted) {
-          completer.completeError(error);
-        }
-      });
-      httpResponse = await completer.future;
+      }
     } else {
       httpResponse = await httpRequest.close();
     }

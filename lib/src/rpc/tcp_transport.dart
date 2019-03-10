@@ -150,17 +150,13 @@ class TcpTransport implements Transport {
     }
     final results = _results[socket];
     results[index] = result;
+    Timer timer;
     if (clientContext.timeout > Duration.zero) {
-      var timer = new Timer(clientContext.timeout, () async {
+      timer = new Timer(clientContext.timeout, () async {
         if (!result.isCompleted) {
           result.completeError(new TimeoutException('Timeout'));
           await abort();
         }
-      });
-      await result.future.then((value) {
-        timer.cancel();
-      }, onError: (reason) {
-        timer.cancel();
       });
     }
     final n = request.length;
@@ -171,7 +167,11 @@ class TcpTransport implements Transport {
     final crc = crc32(header.sublist(4, 12));
     view.setUint32(0, crc, Endian.big);
     socket.add(header + request);
-    return await result.future;
+    try {
+      return await result.future;
+    } finally {
+      timer?.cancel();
+    }
   }
 
   @override

@@ -85,17 +85,13 @@ class WebSocketTransport implements Transport {
     }
     final results = _results[socket];
     results[index] = result;
+    Timer timer;
     if (clientContext.timeout > Duration.zero) {
-      var timer = new Timer(clientContext.timeout, () async {
+      timer = new Timer(clientContext.timeout, () async {
         if (!result.isCompleted) {
           result.completeError(new TimeoutException('Timeout'));
           await abort();
         }
-      });
-      result.future.then((value) {
-        timer.cancel();
-      }, onError: (reason) {
-        timer.cancel();
       });
     }
     final n = request.length;
@@ -104,7 +100,11 @@ class WebSocketTransport implements Transport {
     view.setUint32(0, index, Endian.big);
     data.setRange(4, 4 + n, request);
     socket.add(data);
-    return await result.future;
+    try {
+      return await result.future;
+    } finally {
+      timer?.cancel();
+    }
   }
 
   @override

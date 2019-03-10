@@ -8,7 +8,7 @@
 |                                                          |
 | MockTransport for Dart.                                  |
 |                                                          |
-| LastModified: Mar 2, 2019                                |
+| LastModified: Mar 10, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -20,6 +20,7 @@ class MockTransport implements Transport {
   Future<Uint8List> transport(Uint8List request, Context context) async {
     final clientContext = context as ClientContext;
     final uri = clientContext.uri;
+    final result = _MockAgent.handler(uri.host, request);
     if (clientContext.timeout > Duration.zero) {
       var completer = new Completer<Uint8List>();
       var timer = new Timer(clientContext.timeout, () {
@@ -27,26 +28,17 @@ class MockTransport implements Transport {
           completer.completeError(new TimeoutException('Timeout'));
         }
       });
-      _MockAgent.handler(uri.host, request).then((value) {
+      try {
+        return await Future.any([result, completer.future]);
+      } finally {
         timer.cancel();
-        if (!completer.isCompleted) {
-          completer.complete(value);
-        }
-      }, onError: (error) {
-        timer.cancel();
-        if (!completer.isCompleted) {
-          completer.completeError(error);
-        }
-      });
-      return await completer.future;
+      }
     }
-    return await _MockAgent.handler(uri.host, request);
+    return await result;
   }
 
   @override
-  Future<void> abort() {
-    return Future<void>.value();
-  }
+  Future<void> abort() async {}
 }
 
 class MockTransportCreator implements TransportCreator<MockTransport> {
