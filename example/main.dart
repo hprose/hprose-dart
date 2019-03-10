@@ -2,8 +2,7 @@ library hprose_example;
 
 import 'dart:async';
 import 'dart:io';
-import 'package:hprose/io.dart';
-import 'package:hprose/rpc.dart';
+import 'package:hprose/hprose.dart';
 
 String hello(String name) {
   return 'hello $name';
