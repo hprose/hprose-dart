@@ -16,7 +16,7 @@
 part of hprose.io;
 
 class ValueReader {
-  static int readInt(ByteStream stream, {int tag: TagSemicolon}) {
+  static int readInt(ByteStream stream, {int tag = TagSemicolon}) {
     final s = stream.readUntil(tag);
     if (s.isEmpty) return 0;
     return int.parse(s, radix: 10);

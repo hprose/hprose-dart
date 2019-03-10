@@ -13,7 +13,7 @@
 |                                                          |
 \*________________________________________________________*/
 
-part of hprose.rpc.html;
+part of hprose.rpc.browser;
 
 class Client extends core.Client {
   static void register<T extends Transport>(

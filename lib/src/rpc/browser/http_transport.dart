@@ -13,7 +13,7 @@
 |                                                          |
 \*________________________________________________________*/
 
-part of hprose.rpc.html;
+part of hprose.rpc.browser;
 
 typedef void OnProgress(ProgressEvent e);
 

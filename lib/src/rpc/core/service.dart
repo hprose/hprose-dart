@@ -91,6 +91,8 @@ class Service {
     dynamic result;
     try {
       final requestInfo = codec.decode(request, context as ServiceContext);
+      final task =
+          _invokeManager.handler(requestInfo.name, requestInfo.args, context);
       if (timeout > Duration.zero) {
         var completer = new Completer();
         var timer = new Timer(timeout, () {
@@ -98,23 +100,13 @@ class Service {
             completer.completeError(new TimeoutException('Timeout'));
           }
         });
-        _invokeManager
-            .handler(requestInfo.name, requestInfo.args, context)
-            .then((value) {
+        try {
+          result = await Future.any([task, completer.future]);
+        } finally {
           timer.cancel();
-          if (!completer.isCompleted) {
-            completer.complete(value);
-          }
-        }, onError: (error) {
-          timer.cancel();
-          if (!completer.isCompleted) {
-            completer.completeError(error);
-          }
-        });
-        result = await completer.future;
+        }
       } else {
-        result = await _invokeManager.handler(
-            requestInfo.name, requestInfo.args, context);
+        result = await task;
       }
     } catch (e) {
       result = e;

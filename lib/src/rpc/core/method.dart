@@ -8,7 +8,7 @@
 |                                                          |
 | Method for Dart.                                         |
 |                                                          |
-| LastModified: Feb 28, 2019                               |
+| LastModified: Mar 10, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -129,7 +129,7 @@ class Method {
         break;
       }
     }
-    if (str.length > 0 && types == positionalParameterTypes) {
+    if (str.isNotEmpty && types == positionalParameterTypes) {
       positionalParameterTypes.add(str.substring(p, str.length));
     }
     _replaceGenericsArguments(genericsArguments, positionalParameterTypes);

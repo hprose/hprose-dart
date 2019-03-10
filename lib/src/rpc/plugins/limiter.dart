@@ -65,19 +65,19 @@ class ConcurrentLimiter {
     if (++_counter <= maxConcurrentRequests) return null;
     final task = new Completer<void>();
     _tasks.add(task);
+    Timer timer;
     if (timeout > Duration.zero) {
-      var timer = new Timer(timeout, () {
+      timer = new Timer(timeout, () {
         if (!task.isCompleted) {
           task.completeError(new TimeoutException('Timeout'));
         }
       });
-      task.future.then((value) {
-        timer.cancel();
-      }, onError: (reason) {
-        timer.cancel();
-      });
     }
-    return task.future;
+    try {
+      return await task.future;
+    } finally {
+      timer?.cancel();
+    }
   }
 
   void release() {

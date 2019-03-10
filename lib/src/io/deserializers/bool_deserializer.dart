@@ -36,7 +36,7 @@ class BoolDeserializer extends BaseDeserializer<bool> {
       case TagString:
         return bool.fromEnvironment(ReferenceReader.readString(reader));
       case TagUTF8Char:
-        return '0\0'.indexOf(stream.readString(1)) == -1;
+        return '0\0'.contains(stream.readString(1));
       case TagInfinity:
         stream.readByte();
         return true;

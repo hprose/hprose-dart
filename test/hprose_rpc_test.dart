@@ -3,10 +3,7 @@ library hprose_rpc_tests;
 import 'dart:async';
 import 'dart:io';
 import 'package:test/test.dart';
-import 'package:hprose/io.dart';
-import 'package:hprose/rpc.dart';
-import 'package:hprose/plugins.dart';
-import 'package:hprose/jsonrpc.dart';
+import 'package:hprose/hprose.dart';
 
 String hello(String name) {
   return 'hello $name';
@@ -138,7 +135,7 @@ void main() {
       ..addMethod(createUser);
     final server = await HttpServer.bind('127.0.0.1', 8000);
     service.bind(server);
-    final client = new Client(['http://127.0.0.1:8000/']);
+    final dynamic client = new Client(['http://127.0.0.1:8000/']);
     client.use(log.invokeHandler);
     client.http.maxConnectionsPerHost = 1;
     final proxy = client.useService();

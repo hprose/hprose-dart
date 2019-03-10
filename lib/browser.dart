@@ -4,16 +4,16 @@
 |                                                          |
 | Official WebSite: https://hprose.com                     |
 |                                                          |
-| html.dart                                                |
+| browser.dart                                             |
 |                                                          |
-| hprose.rpc.html library for Dart.                        |
+| hprose.rpc.browser library for Dart.                     |
 |                                                          |
 | LastModified: Mar 10, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
-library hprose.rpc.html;
+library hprose.rpc.browser;
 
 import 'dart:core';
 import 'dart:async';
@@ -25,6 +25,6 @@ import 'core.dart' as core show Client;
 import 'core.dart' hide Client;
 export 'core.dart' hide Client;
 
-part 'src/rpc/html/client.dart';
-part 'src/rpc/html/http_transport.dart';
-part 'src/rpc/html/websocket_transport.dart';
+part 'src/rpc/browser/client.dart';
+part 'src/rpc/browser/http_transport.dart';
+part 'src/rpc/browser/websocket_transport.dart';

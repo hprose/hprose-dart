@@ -8,7 +8,7 @@
 |                                                          |
 | hprose Client for Dart.                                  |
 |                                                          |
-| LastModified: Mar 2, 2019                                |
+| LastModified: Mar 10, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -107,7 +107,7 @@ class Client {
   List<Uri> _urilist = [];
   List<Uri> get uris => _urilist;
   set uris(List<Uri> value) {
-    if (value.length > 0) {
+    if (value.isNotEmpty) {
       _urilist = List<Uri>.from(value);
       _urilist.shuffle();
     }
@@ -123,7 +123,7 @@ class Client {
       _transports[entry.key] = entry.value.create();
     }
     if (uris != null) {
-      _urilist.addAll(uris.map((uri) => Uri.parse(uri)));
+      _urilist.addAll(uris.map(Uri.parse));
     }
   }
 

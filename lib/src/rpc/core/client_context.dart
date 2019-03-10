@@ -8,7 +8,7 @@
 |                                                          |
 | ClientContext for Dart.                                  |
 |                                                          |
-| LastModified: Mar 9, 2019                                |
+| LastModified: Mar 10, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -37,7 +37,7 @@ class ClientContext extends Context {
   }
   void init(Client client, Type type) {
     this.client = client;
-    if (client.uris.length > 0) this.uri = client.uris.first;
+    if (client.uris.isNotEmpty) this.uri = client.uris.first;
     if (returnType == null) returnType = type;
     if (timeout == null) timeout = client.timeout;
     requestHeaders.addAll(client.requestHeaders);
