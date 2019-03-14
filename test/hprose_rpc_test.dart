@@ -81,7 +81,6 @@ void main() {
     server.close();
   });
 
-
   test('jsonrpc', () async {
     final service = new Service();
     service.codec = JsonRpcServiceCodec.instance;
@@ -94,7 +93,7 @@ void main() {
     final server = new MockServer('127.0.0.1');
     service.bind(server);
     final client = new Client(['mock://127.0.0.1']);
-    client.codec =JsonRpcClientCodec.instance;
+    client.codec = JsonRpcClientCodec.instance;
     client.use(log.invokeHandler);
     final proxy = client.useService();
     expect(await proxy.hello<String>('world'), equals('hello world'));
@@ -353,6 +352,52 @@ void main() {
     });
   });
 
+  test('push with jsonrpc codec', () async {
+    final service = new Broker(new Service()).service;
+    service.codec = JsonRpcServiceCodec.instance;
+    service.use(log.ioHandler);
+    final server = await HttpServer.bind('127.0.0.1', 8000);
+    service.bind(server);
+    final client1 = new Client(['http://127.0.0.1:8000/']);
+    client1.codec = JsonRpcClientCodec.instance;
+    final prosumer1 = new Prosumer(client1, '1');
+    final client2 = new Client(['http://127.0.0.1:8000/']);
+    client2.codec = JsonRpcClientCodec.instance;
+    final prosumer2 = new Prosumer(client2, '2');
+    await prosumer1.subscribe('test', (message) {
+      print(message);
+      print(message.toJson());
+      expect(message.from, equals('2'));
+      expect(message.data, equals('hello'));
+    });
+    await prosumer1.subscribe('test2', (message) {
+      print(message);
+      print(message.toJson());
+      expect(message.from, equals('2'));
+      expect(message.data, equals('world'));
+    });
+    await prosumer1.subscribe('test3', (message) {
+      print(message);
+      print(message.toJson());
+      expect(message.from, equals('2'));
+      expect(message.data.toString(), equals('error'));
+    });
+    final r1 = prosumer2.push('hello', 'test', '1');
+    final r2 = prosumer2.push('hello', 'test', '1');
+    final r3 = prosumer2.push('world', 'test2', '1');
+    final r4 = prosumer2.push('world', 'test2', '1');
+    // json.encode can't serialize Exception.
+    // final r5 = prosumer2.push(new Exception('error'), 'test3', '1');
+
+    await Future.wait([r1, r2, r3, r4]);
+    await Future.delayed(const Duration(milliseconds: 10), () async {
+      await prosumer1.unsubscribe('test');
+      await prosumer1.unsubscribe('test2');
+      await prosumer1.unsubscribe('test3');
+      server.close();
+    });
+  });
+
   test('reverse RPC', () async {
     final service = new Service();
     final caller = new Caller(service);
@@ -361,6 +406,35 @@ void main() {
     service.bind(server);
 
     final client = new Client(['mock://127.0.0.1']);
+    client.use(log.invokeHandler);
+    final provider = new Provider(client, '1');
+    provider.debug = true;
+    provider.use(log.invokeHandler);
+    provider.addMethod(hello);
+    provider.listen();
+
+    final proxy = caller.useService('1');
+    final result1 = proxy.hello<String>('world1');
+    final result2 = proxy.hello<String>('world2');
+    final result3 = proxy.hello<String>('world3');
+
+    expect(await result1, equals('hello world1'));
+    expect(await result2, equals('hello world2'));
+    expect(await result3, equals('hello world3'));
+    await provider.close();
+    server.close();
+  });
+
+  test('reverse JsonRpc', () async {
+    final service = new Service();
+    service.codec = JsonRpcServiceCodec.instance;
+    final caller = new Caller(service);
+    service.use(log.ioHandler);
+    final server = new MockServer('127.0.0.1');
+    service.bind(server);
+
+    final client = new Client(['mock://127.0.0.1']);
+    client.codec = JsonRpcClientCodec.instance;
     client.use(log.invokeHandler);
     final provider = new Provider(client, '1');
     provider.debug = true;

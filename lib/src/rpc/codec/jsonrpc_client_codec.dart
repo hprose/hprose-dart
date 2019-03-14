@@ -8,7 +8,7 @@
 |                                                          |
 | JsonRpcClientCodec for Dart.                             |
 |                                                          |
-| LastModified: Mar 9, 2019                                |
+| LastModified: Mar 14, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -21,6 +21,9 @@ class JsonRpcClientCodec implements ClientCodec {
   @override
   Uint8List encode(String name, List args, ClientContext context) {
     final request = {'jsonrpc': '2.0', 'id': _counter++, 'method': name};
+    if (context.requestHeaders.isNotEmpty) {
+      request['headers'] = context.requestHeaders;
+    }
     if (args.isNotEmpty) {
       request['params'] = args;
     }
@@ -30,6 +33,9 @@ class JsonRpcClientCodec implements ClientCodec {
   @override
   decode(Uint8List response, ClientContext context) {
     final Map<String, dynamic> result = json.decode(utf8.decode(response));
+    if (result.containsKey('headers')) {
+      context.responseHeaders.addAll(result['headers']);
+    }
     if (result.containsKey('result')) {
       if (context.returnType == dynamic ||
           result['result'].runtimeType == context.returnType) {

@@ -8,7 +8,7 @@
 |                                                          |
 | JsonRpcServiceCodec for Dart.                            |
 |                                                          |
-| LastModified: Mar 9, 2019                                |
+| LastModified: Mar 14, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -24,6 +24,9 @@ class JsonRpcServiceCodec implements ServiceCodec {
       return DefaultServiceCodec.instance.encode(result, context);
     }
     final response = {'jsonrpc': '2.0', 'id': context['jsonrpc.id']};
+    if (context.responseHeaders.isNotEmpty) {
+      response['headers'] = context.responseHeaders;
+    }
     if (result is FormatException) {
       response['error'] = <String, dynamic>{
         'code': -32700,
@@ -87,6 +90,9 @@ class JsonRpcServiceCodec implements ServiceCodec {
         !call.containsKey('method') ||
         !call.containsKey('id')) {
       throw new Exception('Invalid Request');
+    }
+    if (call.containsKey('headers')) {
+      context.requestHeaders.addAll(call['headers']);
     }
     context['jsonrpc.id'] = call['id'];
     final fullname = call['method'];
