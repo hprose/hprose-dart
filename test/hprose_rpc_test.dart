@@ -413,6 +413,9 @@ void main() {
     provider.addMethod(hello);
     provider.listen();
 
+    expect(caller.exists('1'), equals(true));
+    expect(caller.idlist(), equals(['1']));
+
     final proxy = caller.useService('1');
     final result1 = proxy.hello<String>('world1');
     final result2 = proxy.hello<String>('world2');
@@ -441,6 +444,9 @@ void main() {
     provider.use(log.invokeHandler);
     provider.addMethod(hello);
     provider.listen();
+
+    expect(caller.exists('1'), equals(true));
+    expect(caller.idlist(), equals(['1']));
 
     final proxy = caller.useService('1');
     final result1 = proxy.hello<String>('world1');

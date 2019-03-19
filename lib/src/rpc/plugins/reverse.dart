@@ -8,7 +8,7 @@
 |                                                          |
 | Reverse plugin for Dart.                                 |
 |                                                          |
-| LastModified: Mar 9, 2019                                |
+| LastModified: Mar 20, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -235,7 +235,7 @@ class Caller {
   final Map<String, List<List>> _calls = {};
   final Map<String, Map<int, Completer>> _results = {};
   final Map<String, Completer<List<List>>> _responders = {};
-  final Map<String, Completer<bool>> _timers = {};
+  final Map<String, bool> _onlines = {};
   final Service service;
   Duration timeout = const Duration(minutes: 2);
   Caller(this.service) {
@@ -274,7 +274,7 @@ class Caller {
     }
   }
 
-  String _close(ServiceContext context) {
+  String _stop(ServiceContext context) {
     final id = _getId(context);
     if (_responders.containsKey(id)) {
       final responder = _responders.remove(id);
@@ -283,8 +283,14 @@ class Caller {
     return id;
   }
 
+  void _close(ServiceContext context) {
+    final id = _stop(context);
+    _onlines.remove(id);
+  }
+
   Future<List<List>> _begin(ServiceContext context) async {
-    final id = _close(context);
+    final id = _stop(context);
+    _onlines.putIfAbsent(id, () => true);
     final responder = new Completer<List<List>>();
     if (!_send(id, responder)) {
       _responders[id] = responder;
@@ -353,6 +359,14 @@ class Caller {
 
   dynamic useService(String id, [String namespace]) {
     return new _Proxy(this, id, namespace);
+  }
+
+  bool exists(String id) {
+    return _onlines.containsKey(id);
+  }
+
+  List<String> idlist() {
+    return _onlines.keys.toList();
   }
 
   Future _handler(
