@@ -8,7 +8,7 @@
 |                                                          |
 | hprose Service for Dart.                                 |
 |                                                          |
-| LastModified: Mar 2, 2019                                |
+| LastModified: Mar 24, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -52,6 +52,7 @@ class Service {
   Map<String, Handler> _handlers = {};
   Handler operator [](String name) => _handlers[name];
   void operator []=(String name, Handler value) => _handlers[name] = value;
+  List<String> get names => _methodManager.getNames().toList();
   MockHandler get mock => _handlers['mock'];
   Service() {
     init();
