@@ -52,7 +52,7 @@ void main() {
     final server = new MockServer('127.0.0.1');
     service.bind(server);
     final client = new Client(['mock://127.0.0.1']);
-    client.use(log.invokeHandler);
+    client..use(log.invokeHandler)..use(oneway.handler);
     final proxy = client.useService();
     expect(await proxy.hello<String>('world'), equals('hello world'));
     final r1 = proxy.sum<int>(1, 2);
@@ -62,6 +62,9 @@ void main() {
     expect(await proxy.sum<int>(r1, r2, 3, 4), equals(36));
     expect(await proxy.sum<int>(1, 2, 3, 4), equals(10));
     expect(await proxy.sum(1, 2, 3, 4, 5), equals(10));
+    expect(await proxy.oneway(new ClientContext(items: {
+      'oneway': true
+    })), equals(null));
     await expectLater(
         proxy.sum(1, 2, 3, 4,
             new ClientContext(timeout: new Duration(microseconds: 1))),
