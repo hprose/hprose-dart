@@ -8,7 +8,7 @@
 |                                                          |
 | Limiter plugin for Dart.                                 |
 |                                                          |
-| LastModified: Mar 6, 2019                                |
+| LastModified: Mar 27, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -68,6 +68,9 @@ class ConcurrentLimiter {
     Timer timer;
     if (timeout > Duration.zero) {
       timer = new Timer(timeout, () {
+        if (_tasks.remove(task)) {
+          --_counter;
+        }
         if (!task.isCompleted) {
           task.completeError(new TimeoutException('Timeout'));
         }
