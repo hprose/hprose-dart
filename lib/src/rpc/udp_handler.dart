@@ -8,7 +8,7 @@
 |                                                          |
 | UdpHandler for Dart.                                     |
 |                                                          |
-| LastModified: Mar 4, 2019                                |
+| LastModified: Mar 28, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -77,9 +77,11 @@ class UdpHandler implements Handler<RawDatagramSocket> {
       InternetAddress address, int port) async {
     final context = service.createContext() as ServiceContext;
     context['socket'] = socket;
-    context.address = address;
-    context.host = address.host;
-    context.port = port;
+    context.remoteAddress = address;
+    context.remotePort = port;
+    context.localAddress = socket.address;
+    context.localPort = socket.port;
+    context.host = socket.address.host;
     context.handler = this;
     List<int> response;
     try {

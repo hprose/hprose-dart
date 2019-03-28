@@ -8,7 +8,7 @@
 |                                                          |
 | TcpHandler for Dart.                                     |
 |                                                          |
-| LastModified: Mar 3, 2019                                |
+| LastModified: Mar 28, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -56,12 +56,14 @@ class TcpHandler<T extends Socket> implements Handler<Stream<T>> {
     socket.add(header + response);
   }
 
-  void _run(T socket, Uint8List request, int index) async {
+  void _run(Socket socket, Uint8List request, int index) async {
     final context = service.createContext() as ServiceContext;
     context['socket'] = socket;
-    context.address = socket.remoteAddress;
-    context.host = socket.remoteAddress.host;
-    context.port = socket.remotePort;
+    context.remoteAddress = socket.remoteAddress;
+    context.remotePort = socket.remotePort;
+    context.localAddress = socket.address;
+    context.localPort = socket.port;
+    context.host = socket.address.host;
     context.handler = this;
     List<int> response;
     try {

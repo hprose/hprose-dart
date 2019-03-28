@@ -8,7 +8,7 @@
 |                                                          |
 | MockHandler for Dart.                                    |
 |                                                          |
-| LastModified: Mar 2, 2019                                |
+| LastModified: Mar 28, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -38,7 +38,6 @@ class MockHandler implements Handler<MockServer> {
     }
     final context = service.createContext();
     context.host = address;
-    context.port = 0;
     context.handler = this;
     return service.handle(request, context);
   }

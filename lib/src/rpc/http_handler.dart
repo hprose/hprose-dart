@@ -8,7 +8,7 @@
 |                                                          |
 | HttpHandler for Dart.                                    |
 |                                                          |
-| LastModified: Mar 5, 2019                                |
+| LastModified: Mar 28, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -60,7 +60,8 @@ class HttpHandler implements Handler<HttpServer> {
 
   @override
   void bind(HttpServer server) {
-    server.listen(handler, onError: onError, onDone: onDone);
+    server.listen((request) => handler(request, server),
+        onError: onError, onDone: onDone);
   }
 
   bool _crossDomainXmlHandler(HttpRequest request) {
@@ -138,14 +139,17 @@ class HttpHandler implements Handler<HttpServer> {
     await response.close();
   }
 
-  void handler(HttpRequest request) async {
+  void handler(HttpRequest request, HttpServer server) async {
     final response = request.response;
     final context = service.createContext() as ServiceContext;
     context['request'] = request;
     context['response'] = response;
-    context.address = request.connectionInfo.remoteAddress;
-    context.host = request.connectionInfo.remoteAddress.host;
-    context.port = request.connectionInfo.remotePort;
+    context['server'] = server;
+    context.remoteAddress = request.connectionInfo.remoteAddress;
+    context.remotePort = request.connectionInfo.remotePort;
+    context.localAddress = server.address;
+    context.localPort = request.connectionInfo.localPort;
+    context.host = server.address.host;
     context.handler = this;
     if (request.contentLength > service.maxRequestLength) {
       response.statusCode = HttpStatus.requestEntityTooLarge;

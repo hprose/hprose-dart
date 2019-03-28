@@ -2,7 +2,8 @@ library hprose_example;
 
 import 'dart:async';
 import 'dart:io';
-import 'package:hprose/hprose.dart';
+import 'package:hprose/io.dart';
+import 'package:hprose/rpc.dart';
 
 String hello(String name) {
   return 'hello $name';
@@ -31,7 +32,7 @@ class User {
 
 User createUser(String name, {int age, bool male, Context context}) {
   final serviceContext = context as ServiceContext;
-  print('${serviceContext.host}:${serviceContext.port}');
+  print('${serviceContext.remoteAddress.host}:${serviceContext.remotePort}');
   return new User(name, age, male);
 }
 

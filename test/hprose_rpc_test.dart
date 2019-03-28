@@ -32,7 +32,7 @@ class User {
 
 User createUser(String name, {int age, bool male, Context context}) {
   final serviceContext = context as ServiceContext;
-  print('${serviceContext.host}:${serviceContext.port}');
+  print('${serviceContext.host}');
   return new User(name, age, male);
 }
 

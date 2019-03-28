@@ -8,7 +8,7 @@
 |                                                          |
 | hprose library for Dart.                                 |
 |                                                          |
-| LastModified: Mar 10 2019                                |
+| LastModified: Mar 10, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/

@@ -8,7 +8,7 @@
 |                                                          |
 | WebSocketHandler for Dart.                               |
 |                                                          |
-| LastModified: Mar 5, 2019                                |
+| LastModified: Mar 28, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -36,14 +36,14 @@ class WebSocketHandler implements Handler<HttpServer> {
   void bind(HttpServer server) {
     server.listen((request) async {
       if (request.headers[HttpHeaders.upgradeHeader]?.first == 'websocket') {
-        handler(request, await WebSocketTransformer.upgrade(request));
+        handler(request, await WebSocketTransformer.upgrade(request), server);
       } else {
-        http.handler(request);
+        http.handler(request, server);
       }
     }, onError: onServerError, onDone: onDone);
   }
 
-  void handler(HttpRequest request, WebSocket socket) {
+  void handler(HttpRequest request, WebSocket socket, HttpServer server) {
     try {
       if (onAccept != null) onAccept(socket);
     } catch (e) {
@@ -56,11 +56,14 @@ class WebSocketHandler implements Handler<HttpServer> {
       final stream = new ByteStream.fromUint8List(data);
       var index = stream.readUInt32BE();
       final context = service.createContext() as ServiceContext;
-      context['websocket'] = socket;
       context['request'] = request;
-      context.address = request.connectionInfo.remoteAddress;
-      context.host = context.address.host;
-      context.port = request.connectionInfo.remotePort;
+      context['websocket'] = socket;
+      context['server'] = server;
+      context.remoteAddress = request.connectionInfo.remoteAddress;
+      context.remotePort = request.connectionInfo.remotePort;
+      context.localAddress = server.address;
+      context.localPort = request.connectionInfo.localPort;
+      context.host = server.address.host;
       context.handler = this;
       List<int> response;
       try {
