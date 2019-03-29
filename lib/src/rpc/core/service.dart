@@ -8,7 +8,7 @@
 |                                                          |
 | hprose Service for Dart.                                 |
 |                                                          |
-| LastModified: Mar 24, 2019                               |
+| LastModified: Mar 29, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -57,6 +57,7 @@ class Service {
   Service() {
     init();
     _invokeManager = new InvokeManager(execute);
+    _invokeManager.use(_timeoutHandler);
     _ioManager = new IOManager(process);
     _creators
         .forEach((name, creator) => _handlers[name] = creator.create(this));
@@ -92,27 +93,32 @@ class Service {
     dynamic result;
     try {
       final requestInfo = codec.decode(request, context as ServiceContext);
-      final task =
-          _invokeManager.handler(requestInfo.name, requestInfo.args, context);
-      if (timeout > Duration.zero) {
-        var completer = new Completer();
-        var timer = new Timer(timeout, () {
-          if (!completer.isCompleted) {
-            completer.completeError(new TimeoutException('Timeout'));
-          }
-        });
-        try {
-          result = await Future.any([task, completer.future]);
-        } finally {
-          timer.cancel();
-        }
-      } else {
-        result = await task;
-      }
+      result = await _invokeManager.handler(
+          requestInfo.name, requestInfo.args, context);
     } catch (e) {
       result = e;
     }
     return codec.encode(result, context as ServiceContext);
+  }
+
+  Future _timeoutHandler(String fullname, List args, Context context,
+      NextInvokeHandler next) async {
+    final task = next(fullname, args, context);
+    final timeout = (context as ServiceContext).service.timeout;
+    if (timeout <= Duration.zero) {
+      return await task;
+    }
+    var completer = new Completer();
+    var timer = new Timer(timeout, () {
+      if (!completer.isCompleted) {
+        completer.completeError(new TimeoutException('Timeout'));
+      }
+    });
+    try {
+      return await Future.any([task, completer.future]);
+    } finally {
+      timer.cancel();
+    }
   }
 
   Future execute(String fullname, List args, Context context) async {
