@@ -24,6 +24,8 @@ class Method {
   final bool missing;
   Duration timeout;
   final Map<String, dynamic> options;
+  operator [](String key) => options[key];
+  void operator []=(String key, value) => options[key] = value;
   bool passContext = false;
   bool contextInPositionalArguments = false;
   bool contextInNamedArguments = false;
@@ -54,7 +56,16 @@ class Method {
       contextInNamedArguments = true;
     }
   }
-
+  noSuchMethod(Invocation invocation) {
+    var name = invocation.memberName.toString();
+    name = name.substring(8, name.length - 2);
+    if (invocation.isGetter) {
+      return options[name];
+    } else if (invocation.isSetter) {
+      name = name.substring(0, name.length - 1);
+      options[name] = invocation.positionalArguments[0];
+    }
+  }
   String _getFunctionName(Function func) {
     var str = func.toString();
     var n = str.indexOf(' from Function \'');
