@@ -8,7 +8,7 @@
 |                                                          |
 | MethodManager for Dart.                                  |
 |                                                          |
-| LastModified: Feb 27, 2019                               |
+| LastModified: Mar 29, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -34,13 +34,13 @@ class MethodManager {
   }
 
   void addMethod(Function method, [String fullname]) {
-    add(new Method(method, fullname));
+    add(new Method(method, fullname: fullname));
   }
 
   void addMethods(List<Function> methods, [List<String> fullnames]) {
     if (fullnames != null) {
       for (int i = 0; i < methods.length; ++i) {
-        add(new Method(methods[i], fullnames[i]));
+        add(new Method(methods[i], fullname: fullnames[i]));
       }
     } else {
       for (int i = 0; i < methods.length; ++i) {
@@ -51,7 +51,7 @@ class MethodManager {
 
   void addMissingMethod<MissingMethod extends Function>(MissingMethod method) {
     if (method is MissingMethod1 || method is MissingMethod2) {
-      methods['*'] = new Method(method, '*', true);
+      methods['*'] = new Method(method, fullname: '*', missing: true);
     } else {
       throw new ArgumentError('method is not a missing method');
     }

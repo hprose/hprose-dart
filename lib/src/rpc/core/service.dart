@@ -54,6 +54,7 @@ class Service {
   void operator []=(String name, Handler value) => _handlers[name] = value;
   List<String> get names => _methodManager.getNames().toList();
   MockHandler get mock => _handlers['mock'];
+  final Map<String, dynamic> options = {};
   Service() {
     init();
     _invokeManager = new InvokeManager(execute);
@@ -61,7 +62,7 @@ class Service {
     _ioManager = new IOManager(process);
     _creators
         .forEach((name, creator) => _handlers[name] = creator.create(this));
-    add(new Method(_methodManager.getNames, '~'));
+    addMethod(_methodManager.getNames, '~');
   }
 
   void init() {
@@ -104,7 +105,10 @@ class Service {
   Future _timeoutHandler(String fullname, List args, Context context,
       NextInvokeHandler next) async {
     final task = next(fullname, args, context);
-    final timeout = (context as ServiceContext).service.timeout;
+    final serviceContext = context as ServiceContext;
+    final timeout = serviceContext.method.timeout > Duration.zero
+        ? serviceContext.method.timeout
+        : serviceContext.service.timeout;
     if (timeout <= Duration.zero) {
       return await task;
     }

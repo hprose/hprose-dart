@@ -8,7 +8,7 @@
 |                                                          |
 | Reverse plugin for Dart.                                 |
 |                                                          |
-| LastModified: Mar 20, 2019                               |
+| LastModified: Mar 29, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -42,7 +42,7 @@ class Provider {
   Provider(this.client, [String id]) {
     _invokeManager = new InvokeManager(_execute);
     if (id != null && id.isNotEmpty) this.id = id;
-    add(new Method(_methodManager.getNames, '~'));
+    addMethod(_methodManager.getNames, '~');
   }
   Future _execute(String name, List args, Context context) async {
     final method = (context as ProviderContext).method;
