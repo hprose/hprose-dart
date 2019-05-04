@@ -8,7 +8,7 @@
 |                                                          |
 | HttpTransport for Dart.                                  |
 |                                                          |
-| LastModified: Mar 10, 2019                               |
+| LastModified: May 4, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -60,6 +60,8 @@ class HttpTransport implements Transport {
     }
     var result = new Completer<Uint8List>();
     httpRequest.onLoad.listen((e) {
+      context['httpStatusCode'] = httpRequest.status;
+      context['httpStatusText'] = httpRequest.statusText;
       if (httpRequest.status >= 200 && httpRequest.status < 300) {
         context['httpResponseHeaders'] = httpRequest.responseHeaders;
         result.complete(Uint8List.view(httpRequest.response));

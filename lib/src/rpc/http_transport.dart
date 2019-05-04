@@ -8,7 +8,7 @@
 |                                                          |
 | HttpTransport for Dart.                                  |
 |                                                          |
-| LastModified: Mar 10, 2019                               |
+| LastModified: May 4, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -66,6 +66,8 @@ class HttpTransport implements Transport {
     } else {
       httpResponse = await httpRequest.close();
     }
+    context['httpStatusCode'] = httpResponse.statusCode;
+    context['httpStatusText'] = httpResponse.reasonPhrase;
     if (httpResponse.statusCode >= 200 && httpResponse.statusCode < 300) {
       context['httpResponseHeaders'] = httpResponse.headers;
       ByteStream stream = new ByteStream(
