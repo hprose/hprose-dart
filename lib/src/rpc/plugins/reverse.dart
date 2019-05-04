@@ -8,7 +8,7 @@
 |                                                          |
 | Reverse plugin for Dart.                                 |
 |                                                          |
-| LastModified: Mar 29, 2019                               |
+| LastModified: May 4, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -237,7 +237,8 @@ class Caller {
   final Map<String, Completer<List<List>>> _responders = {};
   final Map<String, bool> _onlines = {};
   final Service service;
-  Duration timeout = const Duration(minutes: 2);
+  Duration heartbeat = const Duration(minutes: 2);
+  Duration timeout = const Duration(seconds: 30);
   Caller(this.service) {
     service
       ..addMethod(_close, '!!')
@@ -294,8 +295,8 @@ class Caller {
     final responder = new Completer<List<List>>();
     if (!_send(id, responder)) {
       _responders[id] = responder;
-      if (timeout > Duration.zero) {
-        var timeoutTimer = new Timer(timeout, () {
+      if (heartbeat > Duration.zero) {
+        var timeoutTimer = new Timer(heartbeat, () {
           if (!responder.isCompleted) {
             responder.complete([]);
           }
@@ -338,12 +339,25 @@ class Caller {
     if (!_calls.containsKey(id)) {
       _calls[id] = [];
     }
-    _calls[id].add([index, fullname, args]);
+    final call = [index, fullname, args];
+    _calls[id].add(call);
     if (!_results.containsKey(id)) {
       _results[id] = {};
     }
     _results[id][index] = result;
     _response(id);
+    if (timeout > Duration.zero) {
+      var timeoutTimer = new Timer(timeout, () {
+        if (!result.isCompleted) {
+          _calls[id].remove(call);
+          _results[id].remove(index);
+          result.completeError(new TimeoutException('Timeout'));
+        }
+      });
+      await result.future.then((value) {
+        timeoutTimer.cancel();
+      });
+    }
     final value = await result.future;
     if (returnType == dynamic || value.runtimeType == returnType) {
       return value;
