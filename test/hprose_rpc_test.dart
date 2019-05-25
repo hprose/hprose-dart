@@ -47,6 +47,7 @@ void main() {
       ..use(log.ioHandler)
       ..addMethod(hello)
       ..addMethod(sum)
+      ..addMethod((){}, "oneway")
       ..addMethod(getAddress)
       ..addMethod(createUser);
     final server = new MockServer('127.0.0.1');
