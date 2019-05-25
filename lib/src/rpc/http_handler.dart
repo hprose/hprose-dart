@@ -156,6 +156,11 @@ class HttpHandler implements Handler<HttpServer> {
     return context;
   }
 
+  void requestHandler(HttpRequest request) async {
+    final context = getContext(request);
+    await handler(request, context);
+  }
+
   void handler(HttpRequest request, ServiceContext context) async {
     final response = request.response;
     if (request.contentLength > service.maxRequestLength) {

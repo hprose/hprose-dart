@@ -8,7 +8,7 @@
 |                                                          |
 | Service for Dart.                                        |
 |                                                          |
-| LastModified: Mar 5, 2019                                |
+| LastModified: May 25, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -25,7 +25,7 @@ class Service extends core.Service {
     return core.Service.isRegister(name);
   }
 
-  HttpHandler get http => websocket.http;
+  HttpHandler get http => this['websocket'];
   TcpHandler get tcp => this['tcp'];
   UdpHandler get udp => this['udp'];
   WebSocketHandler get websocket => this['websocket'];
