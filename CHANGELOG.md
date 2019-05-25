@@ -32,3 +32,24 @@
 - Added Oneway call plugin.
 - Added Push plugin.
 - Added Reverse RPC plugin.
+
+## 3.0.1
+
+- Added headers on JsonRpc.
+- Added exists & idlist for caller.
+- Added names property on Service.
+- Fixed ClientContext.
+- Fixed oneway plugin.
+- Fixed ConcurrentLimiter plugin.
+- Added remoteAddress & localAddress on ServiceContext.
+- Added request method on Client.
+- Improved Method.
+- Added httpStatusCode & httpStatusText on ClientContext.
+
+## 3.0.2
+
+- Added google app engine support.
+
+## 3.0.3
+
+- Improved google app engine support.
