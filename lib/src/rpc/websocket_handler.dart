@@ -8,7 +8,7 @@
 |                                                          |
 | WebSocketHandler for Dart.                               |
 |                                                          |
-| LastModified: Mar 28, 2019                               |
+| LastModified: May 25, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -38,7 +38,11 @@ class WebSocketHandler implements Handler<HttpServer> {
       if (request.headers[HttpHeaders.upgradeHeader]?.first == 'websocket') {
         handler(request, await WebSocketTransformer.upgrade(request), server);
       } else {
-        http.handler(request, server);
+        final context = http.getContext(request);
+        context['server'] = server;
+        context.localAddress = server.address;
+        context.host = server.address.host;
+        await http.handler(request, context);
       }
     }, onError: onServerError, onDone: onDone);
   }

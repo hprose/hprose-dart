@@ -8,7 +8,7 @@
 |                                                          |
 | HttpHandler for Dart.                                    |
 |                                                          |
-| LastModified: Mar 28, 2019                               |
+| LastModified: May 25, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -60,8 +60,13 @@ class HttpHandler implements Handler<HttpServer> {
 
   @override
   void bind(HttpServer server) {
-    server.listen((request) => handler(request, server),
-        onError: onError, onDone: onDone);
+    server.listen((request) async {
+      final context = getContext(request);
+      context['server'] = server;
+      context.localAddress = server.address;
+      context.host = server.address.host;
+      await handler(request, context);
+    }, onError: onError, onDone: onDone);
   }
 
   bool _crossDomainXmlHandler(HttpRequest request) {
@@ -139,18 +144,20 @@ class HttpHandler implements Handler<HttpServer> {
     await response.close();
   }
 
-  void handler(HttpRequest request, HttpServer server) async {
+  ServiceContext getContext(HttpRequest request) {
     final response = request.response;
     final context = service.createContext() as ServiceContext;
     context['request'] = request;
     context['response'] = response;
-    context['server'] = server;
     context.remoteAddress = request.connectionInfo.remoteAddress;
     context.remotePort = request.connectionInfo.remotePort;
-    context.localAddress = server.address;
     context.localPort = request.connectionInfo.localPort;
-    context.host = server.address.host;
     context.handler = this;
+    return context;
+  }
+
+  void handler(HttpRequest request, ServiceContext context) async {
+    final response = request.response;
     if (request.contentLength > service.maxRequestLength) {
       response.statusCode = HttpStatus.requestEntityTooLarge;
       response.reasonPhrase = 'Request Entity Too Large';
