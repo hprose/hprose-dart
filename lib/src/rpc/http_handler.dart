@@ -24,6 +24,7 @@ class HttpHandler implements Handler<HttpServer> {
   bool p3p = true;
   bool get = true;
   bool crossDomain = true;
+  Map<String, String> httpHeaders = {};
   Map<String, bool> _origins = {};
   String _crossDomainXmlFile = '';
   String _crossDomainXmlContent = '';
@@ -118,6 +119,11 @@ class HttpHandler implements Handler<HttpServer> {
         }
       } else {
         response.headers.add('Access-Control-Allow-Origin', '*');
+      }
+    }
+    if (this.httpHeaders != null) {
+      for (final header in this.httpHeaders.entries) {
+        response.headers.add(header.key, header.value);
       }
     }
   }
