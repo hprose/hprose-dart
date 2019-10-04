@@ -53,3 +53,7 @@
 ## 3.0.3
 
 - Improved google app engine support.
+
+## 3.0.4
+
+- Added httpHeaders on HttpHandler.
