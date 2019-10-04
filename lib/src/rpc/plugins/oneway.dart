@@ -22,7 +22,7 @@ class Oneway {
     final result = next(name, args, context);
     if (context.containsKey('oneway') && context['oneway'] as bool) {
       result.catchError((e) => {});
-      return null;
+      return Future.value(null);
     }
     return result;
   }
