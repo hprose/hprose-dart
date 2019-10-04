@@ -8,7 +8,7 @@
 |                                                          |
 | Method for Dart.                                         |
 |                                                          |
-| LastModified: Mar 29, 2019                               |
+| LastModified: Oct 4, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -66,6 +66,7 @@ class Method {
       options[name] = invocation.positionalArguments[0];
     }
   }
+
   String _getFunctionName(Function func) {
     var str = func.toString();
     var n = str.indexOf(' from Function \'');

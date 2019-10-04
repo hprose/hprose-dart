@@ -8,7 +8,7 @@
 |                                                          |
 | Oneway plugin for Dart.                                  |
 |                                                          |
-| LastModified: Mar 25, 2019                               |
+| LastModified: Oct 4, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -18,7 +18,7 @@ part of hprose.rpc.plugins;
 class Oneway {
   const Oneway();
   Future handler(
-      String name, List args, Context context, NextInvokeHandler next) async {
+      String name, List args, Context context, NextInvokeHandler next) {
     final result = next(name, args, context);
     if (context.containsKey('oneway') && context['oneway'] as bool) {
       result.catchError((e) => {});

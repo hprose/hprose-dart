@@ -8,7 +8,7 @@
 |                                                          |
 | WebSocketHandler for Dart.                               |
 |                                                          |
-| LastModified: May 25, 2019                               |
+| LastModified: Oct 4, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -33,7 +33,7 @@ class WebSocketHandler extends HttpHandler {
       if (onAccept != null) onAccept(socket);
     } catch (e) {
       if (onError != null) onWebSocketError(socket, e);
-      socket.close();
+      await socket.close();
       if (onClose != null) onClose(socket);
       return;
     }

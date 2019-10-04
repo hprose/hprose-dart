@@ -8,7 +8,7 @@
 |                                                          |
 | HttpHandler for Dart.                                    |
 |                                                          |
-| LastModified: May 25, 2019                               |
+| LastModified: Oct 4, 2019                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -177,7 +177,9 @@ class HttpHandler implements Handler<HttpServer> {
     }
     ByteStream stream =
         new ByteStream(request.contentLength >= 0 ? request.contentLength : 0);
-    await for (var data in request) stream.write(data);
+    await for (var data in request) {
+      stream.write(data);
+    }
     final data = stream.takeBytes();
     Uint8List result;
     switch (request.method) {
