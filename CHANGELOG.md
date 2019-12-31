@@ -57,3 +57,11 @@
 ## 3.0.4
 
 - Added httpHeaders on HttpHandler.
+
+## 3.0.5
+
+- Fixed oneway plugin.
+
+## 3.0.6
+
+- Move requestHeaders & responseHeaders to Context.
