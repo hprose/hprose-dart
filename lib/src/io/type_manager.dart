@@ -8,20 +8,20 @@
 |                                                          |
 | hprose TypeManager for Dart.                             |
 |                                                          |
-| LastModified: Mar 9, 2019                                |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
 part of hprose.io;
 
-typedef T FromJson<T>(Map<String, dynamic> data);
+typedef FromJson<T> = T Function(Map<String, dynamic> data);
 
 class _TypeManager {
-  final Map<String, FromJson> _fromJson = {};
-  final Map<String, Map<String, Type>> _types = {};
-  final Map<String, String> _names = {};
-  final Map<String, Type> _emptyType = {};
+  final _fromJson = <String, FromJson>{};
+  final _types = <String, Map<String, Type>>{};
+  final _names = <String, String>{};
+  final _emptyType = <String, Type>{};
   void register<T>(FromJson<T> fromJson,
       [Map<String, Type> fields, String name]) {
     if (name == null || name.isEmpty) {
@@ -31,7 +31,7 @@ class _TypeManager {
     _fromJson[name] = fromJson;
     _types[name] = fields;
     if (fromJson != null) {
-      Deserializer.register<T>(new ObjectDeserializer(name));
+      Deserializer.register<T>(ObjectDeserializer(name));
     }
   }
 
@@ -52,4 +52,4 @@ class _TypeManager {
   }
 }
 
-final TypeManager = new _TypeManager();
+final TypeManager = _TypeManager();

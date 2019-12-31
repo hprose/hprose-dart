@@ -8,7 +8,7 @@
 |                                                          |
 | hprose IntDeserializer for Dart.                         |
 |                                                          |
-| LastModified: Feb 16, 2019                               |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -16,7 +16,7 @@
 part of hprose.io;
 
 class IntDeserializer extends BaseDeserializer<int> {
-  static final AbstractDeserializer<int> instance = new IntDeserializer();
+  static final AbstractDeserializer<int> instance = IntDeserializer();
   @override
   int read(Reader reader, int tag) {
     if (tag >= 0x30 && tag <= 0x39) {

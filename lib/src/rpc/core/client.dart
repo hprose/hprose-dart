@@ -8,7 +8,7 @@
 |                                                          |
 | hprose Client for Dart.                                  |
 |                                                          |
-| LastModified: Mar 29, 2019                               |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -36,17 +36,18 @@ class _Proxy {
     }
   }
   String _getName(Symbol symbol) {
-    String name = symbol.toString();
+    var name = symbol.toString();
     return name.substring(8, name.length - 2);
   }
 
-  noSuchMethod(Invocation mirror) {
-    String name = _namespace + _getName(mirror.memberName);
+  @override
+  dynamic noSuchMethod(Invocation mirror) {
+    var name = _namespace + _getName(mirror.memberName);
     if (mirror.isGetter) {
-      return new _Proxy(_client, name);
+      return _Proxy(_client, name);
     }
     if (mirror.isMethod) {
-      Type type = dynamic;
+      var type = dynamic;
       if (mirror.typeArguments.isNotEmpty) {
         type = mirror.typeArguments.first;
       }
@@ -59,7 +60,7 @@ class _Proxy {
         }
       }
       if (mirror.namedArguments.isNotEmpty) {
-        var namedArgs = new Map<String, dynamic>();
+        var namedArgs = <String, dynamic>{};
         mirror.namedArguments.forEach((name, value) {
           namedArgs[_getName(name)] = value;
         });
@@ -71,9 +72,7 @@ class _Proxy {
           args.add(namedArgs);
         }
       }
-      if (context == null) {
-        context = new ClientContext();
-      }
+      context ??= ClientContext();
       context.returnType = type;
       return _client.invoke(name, args, context);
     }
@@ -97,13 +96,13 @@ class Client {
     return _creators.containsKey(name);
   }
 
-  Map<String, Transport> _transports = {};
+  final _transports = <String, Transport>{};
   Transport operator [](String name) => _transports[name];
   void operator []=(String name, Transport value) => _transports[name] = value;
   MockTransport get mock => _transports['mock'];
   final Map<String, dynamic> requestHeaders = {};
   ClientCodec codec = DefaultClientCodec.instance;
-  Duration timeout = new Duration(seconds: 30);
+  Duration timeout = Duration(seconds: 30);
   List<Uri> _urilist = [];
   List<Uri> get uris => _urilist;
   set uris(List<Uri> value) {
@@ -117,8 +116,8 @@ class Client {
   IOManager _ioManager;
   Client([List<String> uris]) {
     init();
-    _invokeManager = new InvokeManager(call);
-    _ioManager = new IOManager(transport);
+    _invokeManager = InvokeManager(call);
+    _ioManager = IOManager(transport);
     for (final entry in _creators.entries) {
       _transports[entry.key] = entry.value.create();
     }
@@ -129,12 +128,12 @@ class Client {
 
   void init() {
     if (!isRegister('mock')) {
-      register<MockTransport>('mock', new MockTransportCreator());
+      register<MockTransport>('mock', MockTransportCreator());
     }
   }
 
   dynamic useService([String namespace]) {
-    return new _Proxy(this, namespace);
+    return _Proxy(this, namespace);
   }
 
   void use<Handler>(Handler handler) {
@@ -143,7 +142,7 @@ class Client {
     } else if (handler is IOHandler) {
       _ioManager.use(handler);
     } else {
-      throw new Exception('Invalid parameter type');
+      throw Exception('Invalid parameter type');
     }
   }
 
@@ -153,15 +152,15 @@ class Client {
     } else if (handler is IOHandler) {
       _ioManager.unuse(handler);
     } else {
-      throw new Exception('Invalid parameter type');
+      throw Exception('Invalid parameter type');
     }
   }
 
   Future<T> invoke<T>(String fullname,
       [List args, ClientContext context]) async {
-    if (context == null) context = new ClientContext();
+    context ??= ClientContext();
     context.init(this, T);
-    if (args == null) args = [];
+    args ??= [];
     for (var i = 0; i < args.length; i++) {
       if (args[i] is Future) {
         args[i] = await args[i];
@@ -187,11 +186,11 @@ class Client {
       var name = _schemes[scheme];
       return _transports[name].transport(request, context);
     }
-    throw new Exception('The protocol $scheme is not supported.');
+    throw Exception('The protocol $scheme is not supported.');
   }
 
   Future<void> abort() {
-    List<Future> results = [];
+    final results = <Future>[];
     _transports.values.forEach((trans) {
       results.add(trans.abort());
     });

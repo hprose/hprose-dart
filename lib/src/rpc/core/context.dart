@@ -20,13 +20,14 @@ class Context {
   final Map<String, dynamic> requestHeaders = {};
   final Map<String, dynamic> responseHeaders = {};
 
-  operator [](String key) => items[key];
+  dynamic operator [](String key) => items[key];
 
   void operator []=(String key, value) => items[key] = value;
 
   bool containsKey(String key) => items.containsKey(key);
 
-  noSuchMethod(Invocation invocation) {
+  @override
+  dynamic noSuchMethod(Invocation invocation) {
     var name = invocation.memberName.toString();
     name = name.substring(8, name.length - 2);
     if (invocation.isGetter) {
@@ -38,7 +39,7 @@ class Context {
   }
 
   Context clone() {
-    final context = new Context();
+    final context = Context();
     context.items.addAll(items);
     context.requestHeaders.addAll(requestHeaders);
     context.responseHeaders.addAll(responseHeaders);

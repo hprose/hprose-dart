@@ -8,7 +8,7 @@
 |                                                          |
 | hprose DynamicDeserializer for Dart.                     |
 |                                                          |
-| LastModified: Feb 17, 2019                               |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -16,9 +16,9 @@
 part of hprose.io;
 
 class DynamicDeserializer extends BaseDeserializer {
-  static final AbstractDeserializer instance = new DynamicDeserializer();
+  static final AbstractDeserializer instance = DynamicDeserializer();
   @override
-  read(Reader reader, int tag) {
+  dynamic read(Reader reader, int tag) {
     if (tag >= 0x30 && tag <= 0x39) {
       return tag - 0x30;
     }
@@ -72,7 +72,7 @@ class DynamicDeserializer extends BaseDeserializer {
         }
         return obj;
       case TagError:
-        return new Exception(reader.deserialize<String>());
+        return Exception(reader.deserialize<String>());
       default:
         return super.read(reader, tag);
     }

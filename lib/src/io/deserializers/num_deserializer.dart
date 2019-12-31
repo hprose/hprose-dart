@@ -8,7 +8,7 @@
 |                                                          |
 | hprose NumDeserializer for Dart.                         |
 |                                                          |
-| LastModified: Feb 16, 2019                               |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -16,7 +16,7 @@
 part of hprose.io;
 
 class NumDeserializer extends BaseDeserializer<num> {
-  static final AbstractDeserializer<num> instance = new NumDeserializer();
+  static final AbstractDeserializer<num> instance = NumDeserializer();
   @override
   num read(Reader reader, int tag) {
     if (tag >= 0x30 && tag <= 0x39) {

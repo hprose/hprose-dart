@@ -8,7 +8,7 @@
 |                                                          |
 | Service for Dart.                                        |
 |                                                          |
-| LastModified: May 25, 2019                               |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -34,16 +34,16 @@ class Service extends core.Service {
   void init() {
     super.init();
     if (!isRegister('tcp')) {
-      register<TcpHandler>('tcp', new TcpHandlerCreator());
+      register<TcpHandler>('tcp', TcpHandlerCreator());
     }
     if (!isRegister('udp')) {
-      register<UdpHandler>('udp', new UdpHandlerCreator());
+      register<UdpHandler>('udp', UdpHandlerCreator());
     }
     if (!isRegister('websocket')) {
-      register<WebSocketHandler>('websocket', new WebSocketHandlerCreator());
+      register<WebSocketHandler>('websocket', WebSocketHandlerCreator());
     }
   }
 
   @override
-  ServiceContext createContext() => new ServiceContext(this);
+  ServiceContext createContext() => ServiceContext(this);
 }

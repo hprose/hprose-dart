@@ -8,7 +8,7 @@
 |                                                          |
 | hprose dynamic Serializer for Dart.                      |
 |                                                          |
-| LastModified: Feb 16, 2019                               |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -16,13 +16,13 @@
 part of hprose.io;
 
 class DynamicSerializer implements AbstractSerializer {
-  static final AbstractSerializer instance = new DynamicSerializer();
+  static final AbstractSerializer instance = DynamicSerializer();
   @override
   void write(Writer writer, dynamic value) {
     if (value == null) {
       writer.stream.writeByte(TagNull);
     } else {
-      Serializer.getInstance(value.runtimeType, value).write(writer, value);
+      Serializer.get(value.runtimeType.toString(), value).write(writer, value);
     }
   }
 
@@ -31,7 +31,8 @@ class DynamicSerializer implements AbstractSerializer {
     if (value == null) {
       writer.stream.writeByte(TagNull);
     } else {
-      Serializer.getInstance(value.runtimeType, value).serialize(writer, value);
+      Serializer.get(value.runtimeType.toString(), value)
+          .serialize(writer, value);
     }
   }
 }

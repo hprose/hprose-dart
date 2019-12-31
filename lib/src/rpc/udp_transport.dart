@@ -8,7 +8,7 @@
 |                                                          |
 | UdpTransport for Dart.                                   |
 |                                                          |
-| LastModified: Mar 10, 2019                               |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -23,15 +23,15 @@ class _UdpSocket {
 }
 
 class UdpTransport implements Transport {
-  int _counter = 0;
-  Map<RawDatagramSocket, Map<int, Completer<Uint8List>>> _results = {};
-  Map<Uri, _UdpSocket> _sockets = {};
+  var _counter = 0;
+  final _results = <RawDatagramSocket, Map<int, Completer<Uint8List>>>{};
+  final _sockets = <Uri, _UdpSocket>{};
   bool Function(X509Certificate certificate) onBadCertificate = (_) => true;
 
   Future<_UdpSocket> _connect(Uri uri) async {
     InternetAddress host;
     RawDatagramSocket socket;
-    int port = uri.port == 0 ? 8412 : uri.port;
+    var port = uri.port == 0 ? 8412 : uri.port;
     switch (uri.scheme) {
       case 'udp':
         host = (await InternetAddress.lookup(uri.host)).first;
@@ -50,9 +50,9 @@ class UdpTransport implements Transport {
         socket = await RawDatagramSocket.bind(InternetAddress.anyIPv6, 0);
         break;
       default:
-        throw new Exception('unsupported ${uri.scheme} protocol');
+        throw Exception('unsupported ${uri.scheme} protocol');
     }
-    return new _UdpSocket(socket, host, port);
+    return _UdpSocket(socket, host, port);
   }
 
   void _close(Uri uri, RawDatagramSocket socket, Object error) async {
@@ -73,7 +73,7 @@ class UdpTransport implements Transport {
     while (true) {
       final datagram = socket.receive();
       if (datagram == null) return;
-      final istream = new ByteStream.fromUint8List(datagram.data);
+      final istream = ByteStream.fromUint8List(datagram.data);
       final crc = istream.readUInt32BE();
       istream.mark();
       final header = istream.read(4);
@@ -90,9 +90,9 @@ class UdpTransport implements Transport {
         final result = results.remove(index);
         if (has_error) {
           if (result != null && !result.isCompleted) {
-            result.completeError(new Exception(utf8.decode(response)));
+            result.completeError(Exception(utf8.decode(response)));
           }
-          _close(uri, socket, new SocketException.closed());
+          _close(uri, socket, SocketException.closed());
           socket.close();
         } else if (result != null && !result.isCompleted) {
           result.complete(response);
@@ -114,7 +114,7 @@ class UdpTransport implements Transport {
     }, onError: (error) {
       _close(uri, socket, error);
     }, onDone: () {
-      _close(uri, socket, new SocketException.closed());
+      _close(uri, socket, SocketException.closed());
     }, cancelOnError: true);
     _sockets[uri] = udp;
     return udp;
@@ -125,7 +125,7 @@ class UdpTransport implements Transport {
     final clientContext = context as ClientContext;
     final uri = clientContext.uri;
     final index = (_counter < 0x7FFF) ? ++_counter : _counter = 0;
-    final result = new Completer<Uint8List>();
+    final result = Completer<Uint8List>();
     final udp = await _getSocket(uri);
     final socket = udp.socket;
     if (!_results.containsKey(socket)) {
@@ -135,16 +135,16 @@ class UdpTransport implements Transport {
     results[index] = result;
     Timer timer;
     if (clientContext.timeout > Duration.zero) {
-      timer = new Timer(clientContext.timeout, () async {
+      timer = Timer(clientContext.timeout, () async {
         if (!result.isCompleted) {
-          result.completeError(new TimeoutException('Timeout'));
+          result.completeError(TimeoutException('Timeout'));
           await abort();
         }
       });
     }
     final n = request.length;
-    final data = new Uint8List(8 + n);
-    final view = new ByteData.view(data.buffer);
+    final data = Uint8List(8 + n);
+    final view = ByteData.view(data.buffer);
     view.setUint16(4, n, Endian.big);
     view.setUint16(6, index, Endian.big);
     final crc = crc32(data.sublist(4, 8));
@@ -160,10 +160,10 @@ class UdpTransport implements Transport {
 
   @override
   Future<void> abort() async {
-    Map<Uri, _UdpSocket> sockets = new Map.from(_sockets);
+    final sockets = Map<Uri, _UdpSocket>.from(_sockets);
     _sockets.clear();
     sockets.forEach((uri, udp) {
-      _close(uri, udp.socket, new SocketException.closed());
+      _close(uri, udp.socket, SocketException.closed());
       udp.socket.close();
     });
   }
@@ -175,6 +175,6 @@ class UdpTransportCreator implements TransportCreator<UdpTransport> {
 
   @override
   UdpTransport create() {
-    return new UdpTransport();
+    return UdpTransport();
   }
 }

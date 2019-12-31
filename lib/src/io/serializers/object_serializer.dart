@@ -8,7 +8,7 @@
 |                                                          |
 | hprose Object Serializer for Dart.                       |
 |                                                          |
-| LastModified: Feb 26, 2019                               |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -16,7 +16,7 @@
 part of hprose.io;
 
 class ObjectSerializer extends ReferenceSerializer {
-  static final AbstractSerializer instance = new ObjectSerializer();
+  static final AbstractSerializer instance = ObjectSerializer();
   @override
   void write(Writer writer, dynamic value) {
     final stream = writer.stream;

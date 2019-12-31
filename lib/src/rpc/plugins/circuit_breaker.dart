@@ -8,7 +8,7 @@
 |                                                          |
 | CircuitBreaker plugin for Dart.                          |
 |                                                          |
-| LastModified: Mar 6, 2019                                |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -21,11 +21,12 @@ abstract class MockService {
 
 class BreakerError extends Error {
   BreakerError() : super();
+  @override
   String toString() => 'Service breaked';
 }
 
 class CircuitBreaker {
-  DateTime _lastFailTime = new DateTime(0);
+  DateTime _lastFailTime = DateTime(0);
   int _failCount = 0;
   final int threshold;
   final Duration recoverTime;
@@ -40,7 +41,7 @@ class CircuitBreaker {
     if (_failCount > threshold) {
       var interval = DateTime.now().difference(_lastFailTime);
       if (interval < recoverTime) {
-        throw new BreakerError();
+        throw BreakerError();
       }
       _failCount = threshold >> 1;
     }
@@ -50,7 +51,7 @@ class CircuitBreaker {
       return response;
     } catch (e) {
       ++_failCount;
-      _lastFailTime = new DateTime.now();
+      _lastFailTime = DateTime.now();
       rethrow;
     }
   }

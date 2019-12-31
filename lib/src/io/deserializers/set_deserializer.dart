@@ -8,35 +8,35 @@
 |                                                          |
 | hprose Set Deserializer for Dart.                        |
 |                                                          |
-| LastModified: Feb 16, 2019                               |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
 part of hprose.io;
 
-T _readSet<T>(Reader reader, T setCtor(), AbstractDeserializer deserializer) {
+Set<T> _readSet<T>(Reader reader, Set<T> Function() setCtor,
+    AbstractDeserializer<T> deserializer) {
   final stream = reader.stream;
   final count = ValueReader.readCount(stream);
-  dynamic list = setCtor();
-  reader.addReference(list);
+  final set = setCtor();
+  reader.addReference(set);
   for (var i = 0; i < count; ++i) {
-    list[i] = deserializer.deserialize(reader);
+    set.add(deserializer.deserialize(reader));
   }
   stream.readByte();
-  return list;
+  return set;
 }
 
 class SetDeserializer<T> extends BaseDeserializer<Set<T>> {
-  static final AbstractDeserializer instance = new SetDeserializer();
+  static final AbstractDeserializer instance = SetDeserializer();
   @override
   Set<T> read(Reader reader, int tag) {
     switch (tag) {
       case TagEmpty:
-        return new Set<T>();
+        return <T>{};
       case TagList:
-        return _readSet(
-            reader, () => new Set<T>(), Deserializer.getInstance(T));
+        return _readSet(reader, () => <T>{}, Deserializer.getInstance<T>());
       default:
         return super.read(reader, tag);
     }

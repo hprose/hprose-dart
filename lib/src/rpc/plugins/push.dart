@@ -8,7 +8,7 @@
 |                                                          |
 | Push plugin for Dart.                                    |
 |                                                          |
-| LastModified: Mar 9, 2019                                |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -20,7 +20,7 @@ class Message {
   String from;
   Message(this.data, this.from);
   factory Message.FromJson(Map<String, dynamic> json) =>
-      new Message(json['data'], json['from']);
+      Message(json['data'], json['from']);
   Map<String, dynamic> toJson() => {'data': data, 'from': from};
 }
 
@@ -42,9 +42,9 @@ class Producer {
 }
 
 class Broker {
-  Map<String, Map<String, List<Message>>> _messages = {};
-  Map<String, Completer<Map<String, List<Message>>>> _responders = {};
-  Map<String, Completer<bool>> _timers = {};
+  final _messages = <String, Map<String, List<Message>>>{};
+  final _responders = <String, Completer<Map<String, List<Message>>>>{};
+  final _timers = <String, Completer<bool>>{};
   Service service;
   int messageQueueMaxLength = 10;
   Duration timeout = const Duration(minutes: 2);
@@ -54,7 +54,7 @@ class Broker {
       ServiceContext context) onUnsubscribe;
   Broker(this.service) {
     if (!TypeManager.isRegister('@')) {
-      TypeManager.register<Message>((json) => new Message.FromJson(json),
+      TypeManager.register<Message>((json) => Message.FromJson(json),
           {'data': dynamic, 'from': String}, '@');
     }
     service
@@ -108,12 +108,12 @@ class Broker {
   }
 
   void _doHeartbeat(String id) {
-    var timer = new Completer<bool>();
+    var timer = Completer<bool>();
     if (_timers.containsKey(id) && !_timers[id].isCompleted) {
       _timers[id].complete(false);
     }
     _timers[id] = timer;
-    var heartbeatTimer = new Timer(heartbeat, () {
+    var heartbeatTimer = Timer(heartbeat, () {
       if (!timer.isCompleted) {
         timer.complete(true);
       }
@@ -133,7 +133,7 @@ class Broker {
     if (context.requestHeaders.containsKey('id')) {
       return context.requestHeaders['id'].toString();
     }
-    throw new Exception('Client unique id not found');
+    throw Exception('Client unique id not found');
   }
 
   bool _subscribe(String topic, ServiceContext context) {
@@ -195,11 +195,11 @@ class Broker {
         timer.complete(false);
       }
     }
-    final responder = new Completer<Map<String, List<Message>>>();
+    final responder = Completer<Map<String, List<Message>>>();
     if (!_send(id, responder)) {
       _responders[id] = responder;
       if (timeout > Duration.zero) {
-        var timeoutTimer = new Timer(timeout, () {
+        var timeoutTimer = Timer(timeout, () {
           if (!responder.isCompleted) {
             responder.complete({});
           }
@@ -216,7 +216,7 @@ class Broker {
     if (_messages.containsKey(id) && _messages[id].containsKey(topic)) {
       final messages = _messages[id][topic];
       if (messages.length < messageQueueMaxLength) {
-        messages.add(new Message(data, from));
+        messages.add(Message(data, from));
         _response(id);
         return true;
       }
@@ -239,7 +239,7 @@ class Broker {
       if (_messages[id].containsKey(topic)) {
         final messages = _messages[id][topic];
         if (messages.length < messageQueueMaxLength) {
-          messages.add(new Message(data, from));
+          messages.add(Message(data, from));
           _response(id);
           result[id] = true;
         } else {
@@ -306,7 +306,7 @@ class Broker {
         if (args.length == 2) args.add(from);
         break;
     }
-    var producer = new Producer(this, from);
+    var producer = Producer(this, from);
     context['producer'] = producer;
     return next(name, args, context);
   }
@@ -322,7 +322,7 @@ class Prosumer {
     if (client.requestHeaders.containsKey('id')) {
       return client.requestHeaders['id'].toString();
     }
-    throw new Exception('Client unique id not found');
+    throw Exception('Client unique id not found');
   }
 
   set id(String value) {
@@ -331,15 +331,15 @@ class Prosumer {
 
   Prosumer(this.client, [String id]) {
     if (!TypeManager.isRegister('@')) {
-      TypeManager.register<Message>((json) => new Message.FromJson(json),
+      TypeManager.register<Message>((json) => Message.FromJson(json),
           {'data': dynamic, 'from': String}, '@');
     }
     if (!Deserializer.isRegister<List<Message>>()) {
-      Deserializer.register<List<Message>>(new ListDeserializer<Message>());
+      Deserializer.register<List<Message>>(ListDeserializer<Message>());
     }
     if (!Deserializer.isRegister<Map<String, List<Message>>>()) {
       Deserializer.register<Map<String, List<Message>>>(
-          new MapDeserializer<String, List<Message>>());
+          MapDeserializer<String, List<Message>>());
     }
     if (id != null && id.isNotEmpty) this.id = id;
   }

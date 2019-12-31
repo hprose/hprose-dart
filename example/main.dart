@@ -10,7 +10,7 @@ String hello(String name) {
 }
 
 Future<int> sum(int a, int b, [int c = 0, int d = 10]) async {
-  await Future.delayed(new Duration(milliseconds: 1));
+  await Future.delayed(Duration(milliseconds: 1));
   return a + b + c + d;
 }
 
@@ -24,7 +24,7 @@ class User {
   bool male;
   User([this.name, this.age, this.male]);
   factory User.fromJson(Map<String, dynamic> json) {
-    return new User(json['name'], json['age'], json['male']);
+    return User(json['name'], json['age'], json['male']);
   }
   Map<String, dynamic> toJson() =>
       {'name': this.name, 'age': this.age, 'male': this.male};
@@ -33,13 +33,13 @@ class User {
 User createUser(String name, {int age, bool male, Context context}) {
   final serviceContext = context as ServiceContext;
   print('${serviceContext.remoteAddress.host}:${serviceContext.remotePort}');
-  return new User(name, age, male);
+  return User(name, age, male);
 }
 
 void main() async {
   TypeManager.register((data) => User.fromJson(data),
       {'name': String, 'age': int, 'male': bool});
-  final service = new Service();
+  final service = Service();
   service
     ..addMethod(hello)
     ..addMethod(sum)
@@ -47,7 +47,7 @@ void main() async {
     ..addMethod(createUser);
   final server = await HttpServer.bind('127.0.0.1', 8000);
   service.bind(server);
-  final client = new Client(['http://127.0.0.1:8000/']);
+  final client = Client(['http://127.0.0.1:8000/']);
   final proxy = client.useService();
   print(await proxy.hello<String>('world'));
   final r1 = proxy.sum<int>(1, 2);

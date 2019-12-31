@@ -8,7 +8,7 @@
 |                                                          |
 | ServiceCodec for Dart.                                   |
 |                                                          |
-| LastModified: Feb 27, 2019                               |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -27,14 +27,14 @@ abstract class ServiceCodec {
 }
 
 class DefaultServiceCodec extends ServiceCodec {
-  static DefaultServiceCodec instance = new DefaultServiceCodec();
-  bool debug = false;
-  bool simple = false;
-  LongType longType = LongType.Int;
+  static DefaultServiceCodec instance = DefaultServiceCodec();
+  var debug = false;
+  var simple = false;
+  var longType = LongType.Int;
   @override
   Uint8List encode(result, ServiceContext context) {
-    final stream = new ByteStream();
-    final writer = new Writer(stream, simple: simple);
+    final stream = ByteStream();
+    final writer = Writer(stream, simple: simple);
     final headers = context.responseHeaders;
     if (simple) {
       headers['simple'] = true;
@@ -63,7 +63,7 @@ class DefaultServiceCodec extends ServiceCodec {
     final service = context.service;
     final method = service.get(fullname);
     if (method == null) {
-      throw new Exception('Can\'t find this method ${fullname}().');
+      throw Exception('Can\'t find this method ${fullname}().');
     }
     context.method = method;
     return method;
@@ -98,13 +98,13 @@ class DefaultServiceCodec extends ServiceCodec {
     if (method.hasNamedArguments) {
       n = ppl + 1;
     }
-    var args = new List<dynamic>.filled(n, null, growable: true);
+    var args = List<dynamic>.filled(n, null, growable: true);
     if (method.contextInPositionalArguments) {
       ppl--;
       n--;
     }
     n = min(count, n);
-    for (int i = 0; i < n; ++i) {
+    for (var i = 0; i < n; ++i) {
       if (i < ppl) {
         args[i] = Deserializer.get(method.positionalParameterTypes[i])
             .deserialize(reader);
@@ -115,25 +115,25 @@ class DefaultServiceCodec extends ServiceCodec {
       if (i == ppl && method.hasNamedArguments) {
         tag = stream.readByte();
         if (tag != TagMap) {
-          throw new ArgumentError(
+          throw ArgumentError(
               'Invalid argument, expected named parameters, but positional parameter found.');
         }
         var size = ValueReader.readCount(stream);
         reader.addReference(null);
-        var namedArgs = new Map<Symbol, dynamic>();
-        for (int j = 0; j < size; ++j) {
+        var namedArgs = <Symbol, dynamic>{};
+        for (var j = 0; j < size; ++j) {
           var name = reader.deserialize<String>();
           if (method.namedParameterTypes.containsKey(name)) {
             var value = Deserializer.get(method.namedParameterTypes[name])
                 .deserialize(reader);
-            namedArgs[new Symbol(name)] = value;
+            namedArgs[Symbol(name)] = value;
           } else {
             reader.deserialize();
           }
         }
         stream.readByte();
         if (method.contextInNamedArguments) {
-          namedArgs[new Symbol('context')] = context;
+          namedArgs[Symbol('context')] = context;
         }
         args[i] = namedArgs;
       }
@@ -148,10 +148,10 @@ class DefaultServiceCodec extends ServiceCodec {
   RequestInfo decode(Uint8List request, ServiceContext context) {
     if (request.isEmpty) {
       _decodeMethod('~', context);
-      return new RequestInfo('~', []);
+      return RequestInfo('~', []);
     }
-    final stream = new ByteStream.fromUint8List(request);
-    var reader = new Reader(stream);
+    final stream = ByteStream.fromUint8List(request);
+    var reader = Reader(stream);
     reader.longType = longType;
     var tag = stream.readByte();
     if (tag == TagHeader) {
@@ -168,12 +168,12 @@ class DefaultServiceCodec extends ServiceCodec {
         final fullname = reader.deserialize<String>();
         final args =
             _decodeArguments(_decodeMethod(fullname, context), reader, context);
-        return new RequestInfo(fullname, args);
+        return RequestInfo(fullname, args);
       case TagEnd:
         _decodeMethod('~', context);
-        return new RequestInfo('~', []);
+        return RequestInfo('~', []);
       default:
-        throw new Exception('Invalid request:\r\n${stream.toString()}');
+        throw Exception('Invalid request:\r\n${stream.toString()}');
     }
   }
 }

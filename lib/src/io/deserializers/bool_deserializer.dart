@@ -8,7 +8,7 @@
 |                                                          |
 | hprose BoolDeserializer for Dart.                        |
 |                                                          |
-| LastModified: Feb 16, 2019                               |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -16,7 +16,7 @@
 part of hprose.io;
 
 class BoolDeserializer extends BaseDeserializer<bool> {
-  static final AbstractDeserializer<bool> instance = new BoolDeserializer();
+  static final AbstractDeserializer<bool> instance = BoolDeserializer();
   @override
   bool read(Reader reader, int tag) {
     final stream = reader.stream;

@@ -8,7 +8,7 @@
 |                                                          |
 | hprose reference Serializer for Dart.                    |
 |                                                          |
-| LastModified: Feb 14, 2019                               |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/

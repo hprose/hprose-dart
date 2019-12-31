@@ -8,7 +8,7 @@
 |                                                          |
 | Cluster plugin for Dart.                                 |
 |                                                          |
-| LastModified: Mar 8, 2019                                |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -24,7 +24,7 @@ abstract class ClusterConfig {
 }
 
 class FailoverConfig extends ClusterConfig {
-  static ClusterConfig instance = new FailoverConfig();
+  static ClusterConfig instance = FailoverConfig();
   FailoverConfig(
       [int retry = 10,
       Duration minInterval = const Duration(milliseconds: 500),
@@ -45,7 +45,7 @@ class FailoverConfig extends ClusterConfig {
       final uris = clientContext.client.uris;
       final n = uris.length;
       context['retried']++;
-      Duration interval = minInterval * (context['retried'] - n);
+      var interval = minInterval * (context['retried'] - n);
       if (interval > maxInterval) {
         interval = maxInterval;
       }
@@ -55,14 +55,14 @@ class FailoverConfig extends ClusterConfig {
 }
 
 class FailtryConfig extends ClusterConfig {
-  static ClusterConfig instance = new FailtryConfig();
+  static ClusterConfig instance = FailtryConfig();
   FailtryConfig(
       [int retry = 10,
       Duration minInterval = const Duration(milliseconds: 500),
       Duration maxInterval = const Duration(seconds: 5)]) {
     this.retry = retry;
     onRetry = (context) {
-      Duration interval = minInterval * (++context['retried']);
+      var interval = minInterval * (++context['retried']);
       if (interval > maxInterval) {
         interval = maxInterval;
       }
@@ -72,8 +72,8 @@ class FailtryConfig extends ClusterConfig {
 }
 
 class FailfastConfig extends ClusterConfig {
-  constructor(void Function(Context context) onFailure) {
-    this.retry = 0;
+  FailfastConfig(void Function(Context context) onFailure) {
+    retry = 0;
     this.onFailure = onFailure;
   }
 }
@@ -81,8 +81,7 @@ class FailfastConfig extends ClusterConfig {
 class Cluster {
   ClusterConfig config;
   Cluster([ClusterConfig config]) {
-    if (config == null) config = FailoverConfig.instance;
-    this.config = config;
+    this.config = config ?? FailoverConfig.instance;
   }
   Future<Uint8List> handler(
       Uint8List request, Context context, NextIOHandler next) async {
@@ -121,12 +120,12 @@ class Cluster {
 
   static Future forking(
       String name, List args, Context context, NextInvokeHandler next) {
-    final completer = new Completer();
+    final completer = Completer();
     final clientContext = context as ClientContext;
     final uris = clientContext.client.uris;
     final n = uris.length;
     var count = n;
-    for (int i = 0; i < n; ++i) {
+    for (var i = 0; i < n; ++i) {
       final forkingContext = clientContext.clone() as ClientContext;
       forkingContext.uri = uris[i];
       next(name, args, forkingContext).then((value) {
@@ -145,7 +144,7 @@ class Cluster {
     final clientContext = context as ClientContext;
     final uris = clientContext.client.uris;
     final n = uris.length;
-    final results = new List<Future>(n);
+    final results = List<Future>(n);
     for (var i = 0; i < n; ++i) {
       final forkingContext = clientContext.clone() as ClientContext;
       forkingContext.uri = uris[i];

@@ -8,7 +8,7 @@
 |                                                          |
 | hprose BaseDeserializer for Dart.                        |
 |                                                          |
-| LastModified: Feb 16, 2019                               |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -16,7 +16,7 @@
 part of hprose.io;
 
 class BaseDeserializer<T> implements AbstractDeserializer<T> {
-  static final AbstractDeserializer instance = new BaseDeserializer();
+  static final AbstractDeserializer instance = BaseDeserializer();
   String type = T.toString();
   BaseDeserializer([String type]) {
     if (type != null) this.type = type;
@@ -32,9 +32,9 @@ class BaseDeserializer<T> implements AbstractDeserializer<T> {
         reader.readClass();
         return deserialize(reader);
       case TagError:
-        throw new Exception(reader.deserialize<String>());
+        throw Exception(reader.deserialize<String>());
     }
-    throw new Exception('Cannot convert ${tagToString(tag)} to ${type}.');
+    throw Exception('Cannot convert ${tagToString(tag)} to ${type}.');
   }
 
   @override

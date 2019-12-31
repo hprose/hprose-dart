@@ -8,7 +8,7 @@
 |                                                          |
 | Oneway plugin for Dart.                                  |
 |                                                          |
-| LastModified: Oct 4, 2019                                |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -28,4 +28,4 @@ class Oneway {
   }
 }
 
-const oneway = const Oneway();
+const oneway = Oneway();

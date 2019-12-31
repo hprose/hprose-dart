@@ -8,7 +8,7 @@
 |                                                          |
 | hprose ByteStream for Dart.                              |
 |                                                          |
-| LastModified: Feb 14, 2019                               |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -17,7 +17,7 @@ part of hprose.io;
 
 class ByteStream {
   static const int _initSize = 1024;
-  static final _emptyList = new Uint8List(0);
+  static final _emptyList = Uint8List(0);
   Uint8List _buffer = _emptyList;
   int _size = 0;
   int _offset = 0;
@@ -37,7 +37,7 @@ class ByteStream {
   ByteStream([int initialCapacity = 0]) {
     _buffer = (initialCapacity <= 0)
         ? _emptyList
-        : new Uint8List(_pow2roundup(initialCapacity));
+        : Uint8List(_pow2roundup(initialCapacity));
   }
 
   ByteStream.fromByteBuffer(ByteBuffer buffer,
@@ -74,15 +74,15 @@ class ByteStream {
     mark();
   }
 
-  _grow(int n) {
+  void _grow(int n) {
     n = _size + n;
     if (n > capacity) {
       if (capacity > 0) {
-        final buf = new Uint8List(_pow2roundup(n));
+        final buf = Uint8List(_pow2roundup(n));
         buf.setAll(0, _buffer);
         _buffer = buf;
       } else {
-        _buffer = new Uint8List(max(_pow2roundup(n), _initSize));
+        _buffer = Uint8List(max(_pow2roundup(n), _initSize));
       }
     }
   }
@@ -161,7 +161,7 @@ class ByteStream {
   /// RangeError will be throwed when value is anything other than a signed 32-bit integer.
   void writeInt32BE(int value) {
     if (value < -2147483648 || value > 2147483647) {
-      throw new RangeError.range(value, -2147483648, 2147483647, 'value');
+      throw RangeError.range(value, -2147483648, 2147483647, 'value');
     }
     _grow(4);
     _size = _writeUInt32BE(_buffer, _size, value);
@@ -173,7 +173,7 @@ class ByteStream {
   /// RangeError will be throwed when value is anything other than a unsigned 32-bit integer.
   void writeUInt32BE(int value) {
     if (value < 0 || value > 0xFFFFFFFF) {
-      throw new RangeError.range(value, 0, 0xFFFFFFFF, 'value');
+      throw RangeError.range(value, 0, 0xFFFFFFFF, 'value');
     }
     _grow(4);
     _size = _writeUInt32BE(_buffer, _size, value);
@@ -185,7 +185,7 @@ class ByteStream {
   /// RangeError will be throwed when value is anything other than a signed 32-bit integer.
   void writeInt32LE(int value) {
     if (value < -2147483648 || value > 2147483647) {
-      throw new RangeError.range(value, -2147483648, 2147483647, 'value');
+      throw RangeError.range(value, -2147483648, 2147483647, 'value');
     }
     _grow(4);
     _size = _writeUInt32LE(_buffer, _size, value);
@@ -197,7 +197,7 @@ class ByteStream {
   /// RangeError will be throwed when value is anything other than a unsigned 32-bit integer.
   void writeUInt32LE(int value) {
     if (value < 0 || value > 0xFFFFFFFF) {
-      throw new RangeError.range(value, 0, 0xFFFFFFFF, 'value');
+      throw RangeError.range(value, 0, 0xFFFFFFFF, 'value');
     }
     _grow(4);
     _size = _writeUInt32LE(_buffer, _size, value);
@@ -267,7 +267,7 @@ class ByteStream {
     final bytes = _buffer;
     var offset = _offset;
     if (offset + 3 >= _size) {
-      throw new Exception('EOF');
+      throw Exception('EOF');
     }
     final result = bytes[offset++] << 24 |
         bytes[offset++] << 16 |
@@ -291,7 +291,7 @@ class ByteStream {
     final bytes = _buffer;
     var offset = _offset;
     if (offset + 3 >= _size) {
-      throw new Exception('EOF');
+      throw Exception('EOF');
     }
     final result = bytes[offset++] |
         bytes[offset++] << 8 |
@@ -369,7 +369,7 @@ class ByteStream {
   ///
   /// If n is negative, reads to the end of this stream.
   /// @param n The maximum number of bytes to read.
-  String readAsciiString(int n) => new String.fromCharCodes(read(n));
+  String readAsciiString(int n) => String.fromCharCodes(read(n));
 
   /// Returns a Uint8Array containing a string of length n.
   ///
@@ -401,13 +401,13 @@ class ByteStream {
             offset++;
             break;
           }
-          throw new Exception('Unfinished UTF-8 octet sequence');
+          throw Exception('Unfinished UTF-8 octet sequence');
         case 14:
           if (offset + 1 < length) {
             offset += 2;
             break;
           }
-          throw new Exception('Unfinished UTF-8 octet sequence');
+          throw Exception('Unfinished UTF-8 octet sequence');
         case 15:
           if (offset + 2 < length) {
             final rune = (((unit & 0x07) << 18) |
@@ -419,12 +419,12 @@ class ByteStream {
               i++;
               break;
             }
-            throw new Exception('Character outside valid Unicode range: 0x' +
+            throw Exception('Character outside valid Unicode range: 0x' +
                 rune.toRadixString(16));
           }
-          throw new Exception('Unfinished UTF-8 octet sequence');
+          throw Exception('Unfinished UTF-8 octet sequence');
         default:
-          throw new Exception('Bad UTF-8 encoding 0x' + unit.toRadixString(16));
+          throw Exception('Bad UTF-8 encoding 0x' + unit.toRadixString(16));
       }
     }
     _offset += offset;
@@ -445,13 +445,14 @@ class ByteStream {
   }
 
   /// Returns a copy of the current contents and leaves `this` intact.
-  Uint8List toBytes() => new Uint8List.fromList(bytes);
+  Uint8List toBytes() => Uint8List.fromList(bytes);
 
   /// Returns a string representation of this stream.
+  @override
   String toString() => utf8.decode(bytes);
 
   /// Creates an exact copy of this stream.
-  ByteStream clone() => new ByteStream.fromByteStream(this);
+  ByteStream clone() => ByteStream.fromByteStream(this);
 
   /// Truncates this stream, only leaves the unread data.
   ///

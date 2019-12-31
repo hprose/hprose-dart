@@ -8,7 +8,7 @@
 |                                                          |
 | hprose Formatter for Dart.                               |
 |                                                          |
-| LastModified: Feb 17, 2019                               |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -17,8 +17,8 @@ part of hprose.io;
 
 class Formatter {
   static Uint8List serialize<T>(T value, {bool simple = false}) {
-    final stream = new ByteStream();
-    final writer = new Writer(stream, simple: simple);
+    final stream = ByteStream();
+    final writer = Writer(stream, simple: simple);
     writer.serialize(value);
     return stream.bytes;
   }
@@ -28,15 +28,15 @@ class Formatter {
     if (data is ByteStream) {
       stream = data;
     } else if (data is Uint8List) {
-      stream = new ByteStream.fromUint8List(data);
+      stream = ByteStream.fromUint8List(data);
     } else if (data is ByteBuffer) {
-      stream = new ByteStream.fromByteBuffer(data);
+      stream = ByteStream.fromByteBuffer(data);
     } else if (data is Uint8ClampedList) {
-      stream = new ByteStream.fromUint8ClampedList(data);
+      stream = ByteStream.fromUint8ClampedList(data);
     } else if (data is String) {
-      stream = new ByteStream.fromString(data);
+      stream = ByteStream.fromString(data);
     }
-    final reader = new Reader(stream, simple: simple);
+    final reader = Reader(stream, simple: simple);
     if (type == null) {
       return reader.deserialize<T>();
     } else {

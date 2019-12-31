@@ -8,7 +8,7 @@
 |                                                          |
 | hprose int Serializer for Dart.                          |
 |                                                          |
-| LastModified: Feb 14, 2019                               |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -16,7 +16,7 @@
 part of hprose.io;
 
 class IntSerializer extends BaseSerializer<int> {
-  static final AbstractSerializer<int> instance = new IntSerializer();
+  static final AbstractSerializer<int> instance = IntSerializer();
   @override
   void write(Writer writer, int value) =>
       ValueWriter.writeInteger(writer.stream, value);

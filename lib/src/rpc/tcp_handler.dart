@@ -8,7 +8,7 @@
 |                                                          |
 | TcpHandler for Dart.                                     |
 |                                                          |
-| LastModified: Mar 28, 2019                               |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -47,8 +47,8 @@ class TcpHandler<T extends Socket> implements Handler<Stream<T>> {
 
   void _send(T socket, List<int> response, int index) {
     final n = response.length;
-    final header = new Uint8List(12);
-    final view = new ByteData.view(header.buffer);
+    final header = Uint8List(12);
+    final view = ByteData.view(header.buffer);
     view.setUint32(4, n | 0x80000000, Endian.big);
     view.setUint32(8, index, Endian.big);
     final crc = crc32(header.sublist(4, 12));
@@ -76,7 +76,7 @@ class TcpHandler<T extends Socket> implements Handler<Stream<T>> {
   }
 
   void Function(List<int>) _receive(T socket) {
-    final instream = new ByteStream();
+    final instream = ByteStream();
     const headerLength = 12;
     var bodyLength = -1;
     var index = 0;
@@ -91,7 +91,7 @@ class TcpHandler<T extends Socket> implements Handler<Stream<T>> {
               (header[0] & 0x80) == 0 ||
               (header[4] & 0x80) != 0) {
             if (onError != null) {
-              onError(socket, new Exception('Invalid request'));
+              onError(socket, Exception('Invalid request'));
             }
             socket.destroy();
             return;
@@ -126,6 +126,6 @@ class TcpHandlerCreator implements HandlerCreator<TcpHandler> {
 
   @override
   TcpHandler create(core.Service service) {
-    return new TcpHandler(service);
+    return TcpHandler(service);
   }
 }

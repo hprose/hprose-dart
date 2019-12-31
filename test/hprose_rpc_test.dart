@@ -10,7 +10,7 @@ String hello(String name) {
 }
 
 Future<int> sum(int a, int b, [int c = 0, int d = 10]) async {
-  await Future.delayed(new Duration(milliseconds: 1));
+  await Future.delayed(Duration(milliseconds: 1));
   return a + b + c + d;
 }
 
@@ -24,7 +24,7 @@ class User {
   bool male;
   User([this.name, this.age, this.male]);
   factory User.fromJson(Map<String, dynamic> json) {
-    return new User(json['name'], json['age'], json['male']);
+    return User(json['name'], json['age'], json['male']);
   }
   Map<String, dynamic> toJson() =>
       {'name': this.name, 'age': this.age, 'male': this.male};
@@ -33,7 +33,7 @@ class User {
 User createUser(String name, {int age, bool male, Context context}) {
   final serviceContext = context as ServiceContext;
   print('${serviceContext.host}');
-  return new User(name, age, male);
+  return User(name, age, male);
 }
 
 void main() {
@@ -42,17 +42,17 @@ void main() {
 
   test('rpc', () async {
     DefaultServiceCodec.instance.debug = true;
-    final service = new Service();
+    final service = Service();
     service
       ..use(log.ioHandler)
       ..addMethod(hello)
       ..addMethod(sum)
-      ..addMethod((){}, "oneway")
+      ..addMethod(() {}, "oneway")
       ..addMethod(getAddress)
       ..addMethod(createUser);
-    final server = new MockServer('127.0.0.1');
+    final server = MockServer('127.0.0.1');
     service.bind(server);
-    final client = new Client(['mock://127.0.0.1']);
+    final client = Client(['mock://127.0.0.1']);
     client..use(log.invokeHandler)..use(oneway.handler);
     final proxy = client.useService();
     expect(await proxy.hello<String>('world'), equals('hello world'));
@@ -63,12 +63,11 @@ void main() {
     expect(await proxy.sum<int>(r1, r2, 3, 4), equals(36));
     expect(await proxy.sum<int>(1, 2, 3, 4), equals(10));
     expect(await proxy.sum(1, 2, 3, 4, 5), equals(10));
-    expect(await proxy.oneway(new ClientContext(items: {
-      'oneway': true
-    })), equals(null));
+    expect(await proxy.oneway(ClientContext(items: {'oneway': true})),
+        equals(null));
     await expectLater(
-        proxy.sum(1, 2, 3, 4,
-            new ClientContext(timeout: new Duration(microseconds: 1))),
+        proxy.sum(
+            1, 2, 3, 4, ClientContext(timeout: Duration(microseconds: 1))),
         throwsException);
     expect(await proxy.getAddress<String>('localhost'),
         equals('localhost : 127.0.0.1'));
@@ -86,7 +85,7 @@ void main() {
   });
 
   test('jsonrpc', () async {
-    final service = new Service();
+    final service = Service();
     service.codec = JsonRpcServiceCodec.instance;
     service
       ..use(log.ioHandler)
@@ -94,9 +93,9 @@ void main() {
       ..addMethod(sum)
       ..addMethod(getAddress)
       ..addMethod(createUser);
-    final server = new MockServer('127.0.0.1');
+    final server = MockServer('127.0.0.1');
     service.bind(server);
-    final client = new Client(['mock://127.0.0.1']);
+    final client = Client(['mock://127.0.0.1']);
     client.codec = JsonRpcClientCodec.instance;
     client.use(log.invokeHandler);
     final proxy = client.useService();
@@ -109,8 +108,8 @@ void main() {
     expect(await proxy.sum<int>(1, 2, 3, 4), equals(10));
     expect(await proxy.sum(1, 2, 3, 4, 5), equals(10));
     await expectLater(
-        proxy.sum(1, 2, 3, 4,
-            new ClientContext(timeout: new Duration(microseconds: 1))),
+        proxy.sum(
+            1, 2, 3, 4, ClientContext(timeout: Duration(microseconds: 1))),
         throwsException);
     expect(await proxy.getAddress<String>('localhost'),
         equals('localhost : 127.0.0.1'));
@@ -129,7 +128,7 @@ void main() {
 
   test('http rpc', () async {
     DefaultServiceCodec.instance.debug = true;
-    final service = new Service();
+    final service = Service();
     service
       ..use(log.ioHandler)
       ..addMethod(hello)
@@ -138,7 +137,7 @@ void main() {
       ..addMethod(createUser);
     final server = await HttpServer.bind('127.0.0.1', 8000);
     service.bind(server);
-    final dynamic client = new Client(['http://127.0.0.1:8000/']);
+    final dynamic client = Client(['http://127.0.0.1:8000/']);
     client.use(log.invokeHandler);
     client.http.maxConnectionsPerHost = 1;
     final proxy = client.useService();
@@ -151,8 +150,8 @@ void main() {
     expect(await proxy.sum<int>(1, 2, 3, 4), equals(10));
     expect(await proxy.sum(1, 2, 3, 4, 5), equals(10));
     await expectLater(
-        proxy.sum(1, 2, 3, 4,
-            new ClientContext(timeout: new Duration(microseconds: 1))),
+        proxy.sum(
+            1, 2, 3, 4, ClientContext(timeout: Duration(microseconds: 1))),
         throwsException);
     expect(await proxy.getAddress<String>('localhost'),
         equals('localhost : 127.0.0.1'));
@@ -171,7 +170,7 @@ void main() {
 
   test('tcp rpc', () async {
     DefaultServiceCodec.instance.debug = true;
-    final service = new Service();
+    final service = Service();
     service
       ..use(log.ioHandler)
       ..addMethod(hello)
@@ -180,7 +179,7 @@ void main() {
       ..addMethod(createUser);
     final server = await ServerSocket.bind('127.0.0.1', 8412);
     service.bind(server);
-    final client = new Client(['tcp://127.0.0.1/']);
+    final client = Client(['tcp://127.0.0.1/']);
     client.use(log.invokeHandler);
     final proxy = client.useService();
     expect(await proxy.hello<String>('world'), equals('hello world'));
@@ -192,8 +191,8 @@ void main() {
     expect(await proxy.sum<int>(1, 2, 3, 4), equals(10));
     expect(await proxy.sum(1, 2, 3, 4, 5), equals(10));
     await expectLater(
-        proxy.sum(1, 2, 3, 4,
-            new ClientContext(timeout: new Duration(microseconds: 1))),
+        proxy.sum(
+            1, 2, 3, 4, ClientContext(timeout: Duration(microseconds: 1))),
         throwsException);
     expect(await proxy.getAddress<String>('localhost'),
         equals('localhost : 127.0.0.1'));
@@ -212,7 +211,7 @@ void main() {
 
   test('udp rpc', () async {
     DefaultServiceCodec.instance.debug = true;
-    final service = new Service();
+    final service = Service();
     service
       ..use(log.ioHandler)
       ..addMethod(hello)
@@ -221,7 +220,7 @@ void main() {
       ..addMethod(createUser);
     final server = await RawDatagramSocket.bind('127.0.0.1', 8412);
     service.bind(server);
-    final client = new Client(['udp://127.0.0.1/']);
+    final client = Client(['udp://127.0.0.1/']);
     client.use(log.invokeHandler);
     final proxy = client.useService();
     expect(await proxy.hello<String>('world'), equals('hello world'));
@@ -233,8 +232,8 @@ void main() {
     expect(await proxy.sum<int>(1, 2, 3, 4), equals(10));
     expect(await proxy.sum(1, 2, 3, 4, 5), equals(10));
     await expectLater(
-        proxy.sum(1, 2, 3, 4,
-            new ClientContext(timeout: new Duration(microseconds: 1))),
+        proxy.sum(
+            1, 2, 3, 4, ClientContext(timeout: Duration(microseconds: 1))),
         throwsException);
     expect(await proxy.getAddress<String>('localhost'),
         equals('localhost : 127.0.0.1'));
@@ -253,7 +252,7 @@ void main() {
 
   test('websocket rpc', () async {
     DefaultServiceCodec.instance.debug = true;
-    final service = new Service();
+    final service = Service();
     service
       ..use(log.ioHandler)
       ..addMethod(hello)
@@ -262,7 +261,7 @@ void main() {
       ..addMethod(createUser);
     final server = await HttpServer.bind('127.0.0.1', 8001);
     service.bind(server);
-    final client = new Client(['ws://127.0.0.1:8001/']);
+    final client = Client(['ws://127.0.0.1:8001/']);
     client.use(log.invokeHandler);
     final proxy = client.useService();
     expect(await proxy.hello<String>('world'), equals('hello world'));
@@ -274,8 +273,8 @@ void main() {
     expect(await proxy.sum<int>(1, 2, 3, 4), equals(10));
     expect(await proxy.sum(1, 2, 3, 4, 5), equals(10));
     await expectLater(
-        proxy.sum(1, 2, 3, 4,
-            new ClientContext(timeout: new Duration(microseconds: 1))),
+        proxy.sum(
+            1, 2, 3, 4, ClientContext(timeout: Duration(microseconds: 1))),
         throwsException);
     expect(await proxy.getAddress<String>('localhost'),
         equals('localhost : 127.0.0.1'));
@@ -294,35 +293,35 @@ void main() {
 
   test('limiter', () async {
     DefaultServiceCodec.instance.debug = true;
-    final service = new Service();
+    final service = Service();
     service.addMethod(hello);
-    final server = new MockServer('127.0.0.1');
+    final server = MockServer('127.0.0.1');
     service.bind(server);
-    final client = new Client(['mock://127.0.0.1']);
+    final client = Client(['mock://127.0.0.1']);
     final proxy = client.useService();
     client
-      ..use(new RateLimiter(20).invokeHandler)
-      ..use(new ConcurrentLimiter(100000).handler);
-    final begin = new DateTime.now();
+      ..use(RateLimiter(20).invokeHandler)
+      ..use(ConcurrentLimiter(100000).handler);
+    final begin = DateTime.now();
     List<Future> tasks = [];
     for (int i = 0; i <= 6; i++) {
       tasks.add(proxy.hello<String>('world'));
     }
     await Future.wait(tasks);
-    final end = new DateTime.now();
+    final end = DateTime.now();
     print(end.difference(begin));
     server.close();
   });
 
   test('push', () async {
-    final service = new Broker(new Service()).service;
+    final service = Broker(Service()).service;
     service.use(log.ioHandler);
     final server = await HttpServer.bind('127.0.0.1', 8000);
     service.bind(server);
-    final client1 = new Client(['http://127.0.0.1:8000/']);
-    final prosumer1 = new Prosumer(client1, '1');
-    final client2 = new Client(['http://127.0.0.1:8000/']);
-    final prosumer2 = new Prosumer(client2, '2');
+    final client1 = Client(['http://127.0.0.1:8000/']);
+    final prosumer1 = Prosumer(client1, '1');
+    final client2 = Client(['http://127.0.0.1:8000/']);
+    final prosumer2 = Prosumer(client2, '2');
     await prosumer1.subscribe('test', (message) {
       print(message);
       print(message.toJson());
@@ -345,7 +344,7 @@ void main() {
     final r2 = prosumer2.push('hello', 'test', '1');
     final r3 = prosumer2.push('world', 'test2', '1');
     final r4 = prosumer2.push('world', 'test2', '1');
-    final r5 = prosumer2.push(new Exception('error'), 'test3', '1');
+    final r5 = prosumer2.push(Exception('error'), 'test3', '1');
 
     await Future.wait([r1, r2, r3, r4, r5]);
     await Future.delayed(const Duration(milliseconds: 10), () async {
@@ -357,17 +356,17 @@ void main() {
   });
 
   test('push with jsonrpc codec', () async {
-    final service = new Broker(new Service()).service;
+    final service = Broker(Service()).service;
     service.codec = JsonRpcServiceCodec.instance;
     service.use(log.ioHandler);
     final server = await HttpServer.bind('127.0.0.1', 8000);
     service.bind(server);
-    final client1 = new Client(['http://127.0.0.1:8000/']);
+    final client1 = Client(['http://127.0.0.1:8000/']);
     client1.codec = JsonRpcClientCodec.instance;
-    final prosumer1 = new Prosumer(client1, '1');
-    final client2 = new Client(['http://127.0.0.1:8000/']);
+    final prosumer1 = Prosumer(client1, '1');
+    final client2 = Client(['http://127.0.0.1:8000/']);
     client2.codec = JsonRpcClientCodec.instance;
-    final prosumer2 = new Prosumer(client2, '2');
+    final prosumer2 = Prosumer(client2, '2');
     await prosumer1.subscribe('test', (message) {
       print(message);
       print(message.toJson());
@@ -391,7 +390,7 @@ void main() {
     final r3 = prosumer2.push('world', 'test2', '1');
     final r4 = prosumer2.push('world', 'test2', '1');
     // json.encode can't serialize Exception.
-    // final r5 = prosumer2.push(new Exception('error'), 'test3', '1');
+    // final r5 = prosumer2.push(Exception('error'), 'test3', '1');
 
     await Future.wait([r1, r2, r3, r4]);
     await Future.delayed(const Duration(milliseconds: 10), () async {
@@ -403,15 +402,15 @@ void main() {
   });
 
   test('reverse RPC', () async {
-    final service = new Service();
-    final caller = new Caller(service);
+    final service = Service();
+    final caller = Caller(service);
     service.use(log.ioHandler);
-    final server = new MockServer('127.0.0.1');
+    final server = MockServer('127.0.0.1');
     service.bind(server);
 
-    final client = new Client(['mock://127.0.0.1']);
+    final client = Client(['mock://127.0.0.1']);
     client.use(log.invokeHandler);
-    final provider = new Provider(client, '1');
+    final provider = Provider(client, '1');
     provider.debug = true;
     provider.use(log.invokeHandler);
     provider.addMethod(hello);
@@ -433,17 +432,17 @@ void main() {
   });
 
   test('reverse JsonRpc', () async {
-    final service = new Service();
+    final service = Service();
     service.codec = JsonRpcServiceCodec.instance;
-    final caller = new Caller(service);
+    final caller = Caller(service);
     service.use(log.ioHandler);
-    final server = new MockServer('127.0.0.1');
+    final server = MockServer('127.0.0.1');
     service.bind(server);
 
-    final client = new Client(['mock://127.0.0.1']);
+    final client = Client(['mock://127.0.0.1']);
     client.codec = JsonRpcClientCodec.instance;
     client.use(log.invokeHandler);
-    final provider = new Provider(client, '1');
+    final provider = Provider(client, '1');
     provider.debug = true;
     provider.use(log.invokeHandler);
     provider.addMethod(hello);

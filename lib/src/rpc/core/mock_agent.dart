@@ -8,22 +8,23 @@
 |                                                          |
 | MockAgent for Dart.                                      |
 |                                                          |
-| LastModified: Feb 27, 2019                               |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
 part of hprose.rpc.core;
 
-typedef Future<Uint8List> _Handler(String address, Uint8List request);
+typedef _Handler = Future<Uint8List> Function(
+    String address, Uint8List request);
 
 class _MockAgent {
   static final Map<String, _Handler> _handlers = {};
-  static register(String address, _Handler handler) {
+  static void register(String address, _Handler handler) {
     _handlers[address] = handler;
   }
 
-  static cancel(String address) {
+  static void cancel(String address) {
     _handlers.remove(address);
   }
 
@@ -31,6 +32,6 @@ class _MockAgent {
     if (_handlers.containsKey(address)) {
       return await _handlers[address](address, request);
     }
-    throw new Exception('Server is stopped');
+    throw Exception('Server is stopped');
   }
 }

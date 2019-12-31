@@ -35,15 +35,15 @@ class ClientContext extends Context {
   }
   void init(Client client, Type type) {
     this.client = client;
-    if (client.uris.isNotEmpty) this.uri = client.uris.first;
-    if (returnType == null) returnType = type;
-    if (timeout == null) timeout = client.timeout;
+    if (client.uris.isNotEmpty) uri = client.uris.first;
+    returnType ??= type;
+    timeout ??= client.timeout;
     requestHeaders.addAll(client.requestHeaders);
   }
 
   @override
   Context clone() {
-    final context = new ClientContext();
+    final context = ClientContext();
     context.client = client;
     context.uri = uri;
     context.returnType = returnType;

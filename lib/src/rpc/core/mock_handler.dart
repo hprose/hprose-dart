@@ -8,7 +8,7 @@
 |                                                          |
 | MockHandler for Dart.                                    |
 |                                                          |
-| LastModified: Mar 28, 2019                               |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -34,7 +34,7 @@ class MockHandler implements Handler<MockServer> {
 
   Future<Uint8List> handler(String address, Uint8List request) {
     if (request.length > service.maxRequestLength) {
-      throw new Exception('Request entity too large');
+      throw Exception('Request entity too large');
     }
     final context = service.createContext();
     context.host = address;
@@ -48,6 +48,6 @@ class MockHandlerCreator implements HandlerCreator<MockHandler> {
   List<String> serverTypes = ['MockServer'];
   @override
   MockHandler create(Service service) {
-    return new MockHandler(service);
+    return MockHandler(service);
   }
 }

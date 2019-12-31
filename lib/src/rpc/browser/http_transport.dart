@@ -8,19 +8,19 @@
 |                                                          |
 | HttpTransport for Dart.                                  |
 |                                                          |
-| LastModified: May 4, 2019                                |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
 part of hprose.rpc.browser;
 
-typedef void OnProgress(ProgressEvent e);
+typedef OnProgress = void Function(ProgressEvent e);
 
 class HttpTransport implements Transport {
-  int _counter = 0;
-  Map<int, HttpRequest> _requests = {};
-  Map<String, String> httpRequestHeaders = {};
+  var _counter = 0;
+  final _requests = <int, HttpRequest>{};
+  var httpRequestHeaders = <String, String>{};
   OnProgress onProgress;
   Map<String, String> _getRequestHeaders(
       Map<String, dynamic> httpRequestHeaders) {
@@ -45,7 +45,7 @@ class HttpTransport implements Transport {
   Future<Uint8List> transport(Uint8List request, Context context) async {
     final clientContext = context as ClientContext;
     final index = (_counter < 0x7FFFFFFF) ? ++_counter : _counter = 0;
-    final httpRequest = new HttpRequest();
+    final httpRequest = HttpRequest();
     _requests[index] = httpRequest;
     var httpRequestHeaders = _getRequestHeaders(context['httpRequestHeaders']);
     httpRequest.open('POST', clientContext.uri.toString());
@@ -58,7 +58,7 @@ class HttpTransport implements Transport {
       httpRequest.onProgress.listen(onProgress);
       httpRequest.upload.onProgress.listen(onProgress);
     }
-    var result = new Completer<Uint8List>();
+    var result = Completer<Uint8List>();
     httpRequest.onLoad.listen((e) {
       context['httpStatusCode'] = httpRequest.status;
       context['httpStatusText'] = httpRequest.statusText;
@@ -67,32 +67,32 @@ class HttpTransport implements Transport {
         result.complete(Uint8List.view(httpRequest.response));
       } else {
         result.completeError(
-            new Exception('${httpRequest.status}:${httpRequest.statusText}'));
+            Exception('${httpRequest.status}:${httpRequest.statusText}'));
       }
     });
     httpRequest.onError.listen((ev) {
       _requests.remove(index);
-      result.completeError(new Exception('network error'));
+      result.completeError(Exception('network error'));
     });
     httpRequest.upload.onError.listen((ev) {
       _requests.remove(index);
-      result.completeError(new Exception('network error'));
+      result.completeError(Exception('network error'));
     });
     httpRequest.onAbort.listen((ev) {
       _requests.remove(index);
-      result.completeError(new Exception('transport abort'));
+      result.completeError(Exception('transport abort'));
     });
     httpRequest.upload.onAbort.listen((ev) {
       _requests.remove(index);
-      result.completeError(new Exception('transport abort'));
+      result.completeError(Exception('transport abort'));
     });
     httpRequest.onTimeout.listen((ev) {
       _requests.remove(index);
-      result.completeError(new TimeoutException('Timeout'));
+      result.completeError(TimeoutException('Timeout'));
     });
     httpRequest.upload.onTimeout.listen((ev) {
       _requests.remove(index);
-      result.completeError(new TimeoutException('Timeout'));
+      result.completeError(TimeoutException('Timeout'));
     });
     httpRequest.send(request);
     return result.future;
@@ -112,6 +112,6 @@ class HttpTransportCreator implements TransportCreator<HttpTransport> {
 
   @override
   HttpTransport create() {
-    return new HttpTransport();
+    return HttpTransport();
   }
 }

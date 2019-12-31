@@ -8,7 +8,7 @@
 |                                                          |
 | LoadBalance plugin for Dart.                             |
 |                                                          |
-| LastModified: Mar 8, 2019                                |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -16,7 +16,7 @@
 part of hprose.rpc.plugins;
 
 class RandomLoadBalance {
-  Random _random = new Random.secure();
+  final _random = Random.secure();
   Future<Uint8List> handler(
       Uint8List request, Context context, NextIOHandler next) {
     final clientContext = context as ClientContext;
@@ -28,7 +28,7 @@ class RandomLoadBalance {
 }
 
 class RoundRobinLoadBalance {
-  int _index = -1;
+  var _index = -1;
   Future<Uint8List> handler(
       Uint8List request, Context context, NextIOHandler next) {
     final clientContext = context as ClientContext;
@@ -45,8 +45,8 @@ class RoundRobinLoadBalance {
 }
 
 class LeastActiveLoadBalance {
-  List<int> _actives = [];
-  Random _random = new Random.secure();
+  final _actives = <int>[];
+  final _random = Random.secure();
   Future<Uint8List> handler(
       Uint8List request, Context context, NextIOHandler next) async {
     final clientContext = context as ClientContext;
@@ -83,14 +83,14 @@ abstract class WeightedLoadBalance {
   List<int> _weights;
   WeightedLoadBalance(Map<Uri, int> uris) {
     if (uris == null) {
-      throw new ArgumentError.notNull('uris');
+      throw ArgumentError.notNull('uris');
     }
     if (uris.isEmpty) {
-      throw new ArgumentError('uris cannot be empty');
+      throw ArgumentError('uris cannot be empty');
     }
     for (final weight in uris.values) {
       if (weight <= 0) {
-        throw new ArgumentError('uris weight must be great than 0');
+        throw ArgumentError('uris weight must be great than 0');
       }
     }
     _uris = uris.keys.toList(growable: false);
@@ -100,7 +100,7 @@ abstract class WeightedLoadBalance {
 
 class WeightedRandomLoadBalance extends WeightedLoadBalance {
   List<int> _effectiveWeights;
-  Random _random = new Random.secure();
+  final _random = Random.secure();
   WeightedRandomLoadBalance(Map<Uri, int> uris) : super(uris) {
     _effectiveWeights = _weights.toList(growable: false);
   }
@@ -139,12 +139,12 @@ class WeightedRandomLoadBalance extends WeightedLoadBalance {
 
 int gcd(int x, int y) {
   if (x < y) {
-    int t = x;
+    var t = x;
     x = y;
     y = t;
   }
   while (y != 0) {
-    int t = x;
+    var t = x;
     x = y;
     y = t % y;
   }
@@ -154,8 +154,8 @@ int gcd(int x, int y) {
 class WeightedRoundRobinLoadBalance extends WeightedLoadBalance {
   int _maxWeight;
   int _gcdWeight;
-  int _index = -1;
-  int _currentWeight = 0;
+  var _index = -1;
+  var _currentWeight = 0;
   WeightedRoundRobinLoadBalance(Map<Uri, int> uris) : super(uris) {
     _maxWeight = _weights.reduce(max);
     _gcdWeight = _weights.reduce(gcd);
@@ -182,11 +182,11 @@ class WeightedRoundRobinLoadBalance extends WeightedLoadBalance {
 class NginxRoundRobinLoadBalance extends WeightedLoadBalance {
   List<int> _effectiveWeights;
   List<int> _currentWeights;
-  Random _random = new Random.secure();
+  final _random = Random.secure();
   NginxRoundRobinLoadBalance(Map<Uri, int> uris) : super(uris) {
     final n = uris.length;
     _effectiveWeights = _weights.toList(growable: false);
-    _currentWeights = new List<int>(n)..fillRange(0, n, 0);
+    _currentWeights = List<int>(n)..fillRange(0, n, 0);
   }
   Future<Uint8List> handler(
       Uint8List request, Context context, NextIOHandler next) async {
@@ -194,9 +194,9 @@ class NginxRoundRobinLoadBalance extends WeightedLoadBalance {
     var index = -1;
     final totalWeight = _effectiveWeights.reduce((x, y) => x + y);
     if (totalWeight > 0) {
-      int currentWeight = -2 ^ 53;
-      for (int i = 0; i < n; ++i) {
-        int weight = (_currentWeights[i] += _effectiveWeights[i]);
+      var currentWeight = -2 ^ 53;
+      for (var i = 0; i < n; ++i) {
+        var weight = (_currentWeights[i] += _effectiveWeights[i]);
         if (currentWeight < weight) {
           currentWeight = weight;
           index = i;
@@ -225,11 +225,11 @@ class NginxRoundRobinLoadBalance extends WeightedLoadBalance {
 class WeightedLeastActiveLoadBalance extends WeightedLoadBalance {
   List<int> _effectiveWeights;
   List<int> _actives;
-  Random _random = new Random.secure();
+  final _random = Random.secure();
   WeightedLeastActiveLoadBalance(Map<Uri, int> uris) : super(uris) {
     final n = uris.length;
     _effectiveWeights = _weights.toList(growable: false);
-    _actives = new List<int>(n)..fillRange(0, n, 0);
+    _actives = List<int>(n)..fillRange(0, n, 0);
   }
   Future<Uint8List> handler(
       Uint8List request, Context context, NextIOHandler next) async {

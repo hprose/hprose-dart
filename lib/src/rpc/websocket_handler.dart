@@ -8,7 +8,7 @@
 |                                                          |
 | WebSocketHandler for Dart.                               |
 |                                                          |
-| LastModified: Oct 4, 2019                                |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -38,7 +38,7 @@ class WebSocketHandler extends HttpHandler {
       return;
     }
     socket.listen((data) async {
-      final stream = new ByteStream.fromUint8List(data);
+      final stream = ByteStream.fromUint8List(data);
       var index = stream.readUInt32BE();
       final wscontext = context.clone();
       wscontext['websocket'] = socket;
@@ -50,8 +50,8 @@ class WebSocketHandler extends HttpHandler {
         response = utf8.encode(e.toString());
       }
       final n = response.length;
-      data = new Uint8List(4 + n);
-      final view = new ByteData.view(data.buffer);
+      data = Uint8List(4 + n);
+      final view = ByteData.view(data.buffer);
       view.setUint32(0, index, Endian.big);
       data.setRange(4, 4 + n, response);
       socket.add(data);
@@ -69,6 +69,6 @@ class WebSocketHandlerCreator implements HandlerCreator<WebSocketHandler> {
 
   @override
   WebSocketHandler create(core.Service service) {
-    return new WebSocketHandler(service);
+    return WebSocketHandler(service);
   }
 }

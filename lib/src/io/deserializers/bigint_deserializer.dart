@@ -8,7 +8,7 @@
 |                                                          |
 | hprose BigIntDeserializer for Dart.                      |
 |                                                          |
-| LastModified: Feb 16, 2019                               |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -16,19 +16,19 @@
 part of hprose.io;
 
 class BigIntDeserializer extends BaseDeserializer<BigInt> {
-  static final AbstractDeserializer<BigInt> instance = new BigIntDeserializer();
+  static final AbstractDeserializer<BigInt> instance = BigIntDeserializer();
   @override
   BigInt read(Reader reader, int tag) {
     if (tag >= 0x30 && tag <= 0x39) {
-      return new BigInt.from(tag - 0x30);
+      return BigInt.from(tag - 0x30);
     }
     final stream = reader.stream;
     switch (tag) {
       case TagInteger:
       case TagLong:
-        return new BigInt.from(ValueReader.readInt(stream));
+        return BigInt.from(ValueReader.readInt(stream));
       case TagDouble:
-        return new BigInt.from(ValueReader.readDouble(stream));
+        return BigInt.from(ValueReader.readDouble(stream));
       case TagTrue:
         return BigInt.one;
       case TagFalse:
@@ -37,12 +37,12 @@ class BigIntDeserializer extends BaseDeserializer<BigInt> {
       case TagString:
         return BigInt.parse(ReferenceReader.readString(reader));
       case TagUTF8Char:
-        return new BigInt.from(stream.readString(1).codeUnitAt(1));
+        return BigInt.from(stream.readString(1).codeUnitAt(1));
       case TagDate:
-        return new BigInt.from(
+        return BigInt.from(
             ReferenceReader.readDateTime(reader).millisecondsSinceEpoch);
       case TagTime:
-        return new BigInt.from(
+        return BigInt.from(
             ReferenceReader.readTime(reader).millisecondsSinceEpoch);
       default:
         return super.read(reader, tag);

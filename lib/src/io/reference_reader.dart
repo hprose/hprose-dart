@@ -8,7 +8,7 @@
 |                                                          |
 | hprose reference reader for Dart.                        |
 |                                                          |
-| LastModified: Feb 16, 2019                               |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -55,7 +55,7 @@ class ReferenceReader {
   static List<T> readList<T>(Reader reader) {
     final stream = reader.stream;
     final count = ValueReader.readCount(stream);
-    final list = new List<T>(count);
+    final list = List<T>(count);
     reader.addReference(list);
     for (var i = 0; i < count; ++i) {
       list[i] = reader.deserialize<T>();
@@ -67,7 +67,7 @@ class ReferenceReader {
   static Set<T> readSet<T>(Reader reader) {
     final stream = reader.stream;
     final count = ValueReader.readCount(stream);
-    final s = new Set<T>();
+    final s = <T>{};
     reader.addReference(s);
     for (var i = 0; i < count; ++i) {
       s.add(reader.deserialize<T>());
@@ -79,7 +79,7 @@ class ReferenceReader {
   static Map<K, V> readMap<K, V>(Reader reader) {
     final stream = reader.stream;
     final count = ValueReader.readCount(stream);
-    final map = new Map<K, V>();
+    final map = <K, V>{};
     reader.addReference(map);
     for (var i = 0; i < count; ++i) {
       final key = reader.deserialize<K>();
@@ -94,13 +94,13 @@ class ReferenceReader {
     final stream = reader.stream;
     final index = ValueReader.readInt(stream, tag: TagOpenbrace);
     final typeInfo = reader.getTypeInfo(index);
-    final obj = new DynamicObject(typeInfo.name);
+    final obj = DynamicObject(typeInfo.name);
     reader.addReference(obj);
     final names = typeInfo.names;
     final types = typeInfo.types;
     final count = names.length;
     for (var i = 0; i < count; ++i) {
-      obj[names[i]] = Deserializer.getInstance(types[i]).deserialize(reader);
+      obj[names[i]] = Deserializer.get(types[i].toString()).deserialize(reader);
     }
     stream.readByte();
     return obj;
@@ -115,7 +115,7 @@ class ReferenceReader {
   static dynamic readMapAsDynamicObject(Reader reader) {
     final stream = reader.stream;
     final count = ValueReader.readCount(stream);
-    final obj = new DynamicObject();
+    final obj = DynamicObject();
     reader.addReference(obj);
     for (var i = 0; i < count; ++i) {
       final key = reader.deserialize<String>();

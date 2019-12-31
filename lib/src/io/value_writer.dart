@@ -8,7 +8,7 @@
 |                                                          |
 | hprose value writer for Dart.                            |
 |                                                          |
-| LastModified: Feb 16, 2019                               |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -17,7 +17,7 @@ part of hprose.io;
 
 class ValueWriter {
   static final _zero = BigInt.zero;
-  static final _nine = new BigInt.from(9);
+  static final _nine = BigInt.from(9);
   static void writeInteger(ByteStream stream, int value) {
     if (0 <= value && value <= 9) {
       stream.writeByte(0x30 + value);
@@ -88,7 +88,7 @@ class ValueWriter {
   }
 
   static void _writeDate(ByteStream stream, int year, int month, int day) {
-    final date = new Uint8List(9);
+    final date = Uint8List(9);
     date[0] = TagDate;
     date[1] = 0x30 + (year ~/ 1000 % 10);
     date[2] = 0x30 + (year ~/ 100 % 10);
@@ -103,7 +103,7 @@ class ValueWriter {
 
   static void _writeTime(ByteStream stream, int hour, int minute, int second,
       int millisecond, int microsecond) {
-    var time = new Uint8List(14);
+    var time = Uint8List(14);
     time[0] = TagTime;
     time[1] = 0x30 + (hour ~/ 10 % 10);
     time[2] = 0x30 + (hour % 10);
@@ -119,10 +119,10 @@ class ValueWriter {
     time[12] = 0x30 + (microsecond ~/ 10 % 10);
     time[13] = 0x30 + (microsecond % 10);
     if (microsecond == 0) {
-      time = new Uint8List.view(time.buffer, 0, 11);
+      time = Uint8List.view(time.buffer, 0, 11);
     }
     if (millisecond == 0) {
-      time = new Uint8List.view(time.buffer, 0, 7);
+      time = Uint8List.view(time.buffer, 0, 7);
     }
     stream.write(time);
   }

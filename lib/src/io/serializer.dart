@@ -8,7 +8,7 @@
 |                                                          |
 | hprose Serializer for Dart.                              |
 |                                                          |
-| LastModified: Mar 9, 2019                                |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -50,11 +50,11 @@ class _Serializer {
     register<Float64x2>(Float64x2Serializer.instance);
     register<Error>(ExceptionSerializer.instance);
     register<Exception>(ExceptionSerializer.instance);
-    final objectIterableSerializer = new IterableSerializer<Object>();
-    final intIterableSerializer = new IterableSerializer<int>();
-    final doubleIterableSerializer = new IterableSerializer<double>();
-    final numIterableSerializer = new IterableSerializer<num>();
-    final stringIterableSerializer = new IterableSerializer<String>();
+    final objectIterableSerializer = IterableSerializer<Object>();
+    final intIterableSerializer = IterableSerializer<int>();
+    final doubleIterableSerializer = IterableSerializer<double>();
+    final numIterableSerializer = IterableSerializer<num>();
+    final stringIterableSerializer = IterableSerializer<String>();
     register<List<Object>>(objectIterableSerializer);
     register<Set<Object>>(objectIterableSerializer);
     register<List<int>>(intIterableSerializer);
@@ -74,28 +74,27 @@ class _Serializer {
     register<Set<num>>(numIterableSerializer);
     register<List<String>>(stringIterableSerializer);
     register<Set<String>>(stringIterableSerializer);
-    register<Int32x4List>(new IterableSerializer<Int32x4>());
-    register<Float32x4List>(new IterableSerializer<Float32x4>());
-    register<Float64x2List>(new IterableSerializer<Float64x2>());
-    register<List<BigInt>>(new IterableSerializer<BigInt>());
-    register<List<bool>>(new IterableSerializer<bool>());
-    register<List<DateTime>>(new IterableSerializer<DateTime>());
-    register<List<Duration>>(new IterableSerializer<Duration>());
-    register<List<Uint8List>>(new IterableSerializer<Uint8List>());
-    register<List<List>>(new IterableSerializer<List>());
-    register<List<Map>>(new IterableSerializer<Map>());
+    register<Int32x4List>(IterableSerializer<Int32x4>());
+    register<Float32x4List>(IterableSerializer<Float32x4>());
+    register<Float64x2List>(IterableSerializer<Float64x2>());
+    register<List<BigInt>>(IterableSerializer<BigInt>());
+    register<List<bool>>(IterableSerializer<bool>());
+    register<List<DateTime>>(IterableSerializer<DateTime>());
+    register<List<Duration>>(IterableSerializer<Duration>());
+    register<List<Uint8List>>(IterableSerializer<Uint8List>());
+    register<List<List>>(IterableSerializer<List>());
+    register<List<Map>>(IterableSerializer<Map>());
     register<List<Map<String, dynamic>>>(
-        new IterableSerializer<Map<String, dynamic>>());
-    register<List<Map<int, dynamic>>>(
-        new IterableSerializer<Map<int, dynamic>>());
-    register<List<List<List>>>(new IterableSerializer<List<List>>());
-    register<List<List<Map>>>(new IterableSerializer<List<Map>>());
+        IterableSerializer<Map<String, dynamic>>());
+    register<List<Map<int, dynamic>>>(IterableSerializer<Map<int, dynamic>>());
+    register<List<List<List>>>(IterableSerializer<List<List>>());
+    register<List<List<Map>>>(IterableSerializer<List<Map>>());
     register<List<List<Map<String, dynamic>>>>(
-        new IterableSerializer<List<Map<String, dynamic>>>());
+        IterableSerializer<List<Map<String, dynamic>>>());
     register<List<List<Map<int, dynamic>>>>(
-        new IterableSerializer<List<Map<int, dynamic>>>());
-    register<Map<int, dynamic>>(new MapSerializer<int, dynamic>());
-    register<Map<String, dynamic>>(new MapSerializer<String, dynamic>());
+        IterableSerializer<List<Map<int, dynamic>>>());
+    register<Map<int, dynamic>>(MapSerializer<int, dynamic>());
+    register<Map<String, dynamic>>(MapSerializer<String, dynamic>());
   }
 
   void register<T>(AbstractSerializer serializer) {
@@ -106,11 +105,8 @@ class _Serializer {
     return _serializers.containsKey(T.toString());
   }
 
-  AbstractSerializer getInstance(Type type, dynamic value) {
-    if (type == null) {
-      return DynamicSerializer.instance;
-    }
-    return get(type.toString(), value);
+  AbstractSerializer<dynamic> getInstance<T>(dynamic value) {
+    return get(T.toString(), value);
   }
 
   AbstractSerializer get(String type, dynamic value) {

@@ -8,7 +8,7 @@
 |                                                          |
 | hprose DynamicObjectDeserializer for Dart.               |
 |                                                          |
-| LastModified: Feb 17, 2019                               |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -16,7 +16,7 @@
 part of hprose.io;
 
 class DynamicObjectDeserializer extends BaseDeserializer<DynamicObject> {
-  static final AbstractDeserializer instance = new DynamicObjectDeserializer();
+  static final AbstractDeserializer instance = DynamicObjectDeserializer();
   @override
   DynamicObject read(Reader reader, int tag) {
     switch (tag) {

@@ -8,7 +8,7 @@
 |                                                          |
 | hprose ExceptionDeserializer for Dart.                   |
 |                                                          |
-| LastModified: Feb 27, 2019                               |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -16,12 +16,12 @@
 part of hprose.io;
 
 class ExceptionDeserializer extends BaseDeserializer<Exception> {
-  static final AbstractDeserializer instance = new ExceptionDeserializer();
+  static final AbstractDeserializer instance = ExceptionDeserializer();
   @override
-  read(Reader reader, int tag) {
+  Exception read(Reader reader, int tag) {
     switch (tag) {
       case TagError:
-        return new Exception(reader.deserialize<String>());
+        return Exception(reader.deserialize<String>());
       default:
         return super.read(reader, tag);
     }

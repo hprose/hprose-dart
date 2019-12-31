@@ -8,7 +8,7 @@
 |                                                          |
 | Log plugin for Dart.                                     |
 |                                                          |
-| LastModified: Mar 10, 2019                               |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -55,4 +55,4 @@ class Log {
   }
 }
 
-const log = const Log();
+const log = Log();

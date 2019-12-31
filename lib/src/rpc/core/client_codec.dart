@@ -8,7 +8,7 @@
 |                                                          |
 | ClientCodec for Dart.                                    |
 |                                                          |
-| LastModified: Feb 28, 2019                               |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -17,17 +17,17 @@ part of hprose.rpc.core;
 
 abstract class ClientCodec {
   Uint8List encode(String name, List args, ClientContext context);
-  decode(Uint8List response, ClientContext context);
+  dynamic decode(Uint8List response, ClientContext context);
 }
 
 class DefaultClientCodec implements ClientCodec {
-  static DefaultClientCodec instance = new DefaultClientCodec();
+  static DefaultClientCodec instance = DefaultClientCodec();
   bool simple = false;
   LongType longType = LongType.Int;
   @override
   Uint8List encode(String name, List args, ClientContext context) {
-    final stream = new ByteStream();
-    final writer = new Writer(stream, simple: simple);
+    final stream = ByteStream();
+    final writer = Writer(stream, simple: simple);
     final headers = context.requestHeaders;
     if (simple) {
       headers['simple'] = true;
@@ -48,9 +48,9 @@ class DefaultClientCodec implements ClientCodec {
   }
 
   @override
-  decode(Uint8List response, ClientContext context) {
-    final stream = new ByteStream.fromUint8List(response);
-    final reader = new Reader(stream);
+  dynamic decode(Uint8List response, ClientContext context) {
+    final stream = ByteStream.fromUint8List(response);
+    final reader = Reader(stream);
     reader.longType = longType;
     var tag = stream.readByte();
     if (tag == TagHeader) {
@@ -64,13 +64,14 @@ class DefaultClientCodec implements ClientCodec {
         if (context.responseHeaders.containsKey('simple')) {
           reader.simple = true;
         }
-        return Deserializer.getInstance(context.returnType).deserialize(reader);
+        return Deserializer.get(context.returnType.toString())
+            .deserialize(reader);
       case TagError:
-        throw new Exception(reader.deserialize<String>());
+        throw Exception(reader.deserialize<String>());
       case TagEnd:
         return null;
       default:
-        throw new Exception('Invalid response:\r\n${stream.toString()}');
+        throw Exception('Invalid response:\r\n${stream.toString()}');
     }
   }
 }

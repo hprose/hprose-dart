@@ -8,7 +8,7 @@
 |                                                          |
 | JsonRpcClientCodec for Dart.                             |
 |                                                          |
-| LastModified: Mar 14, 2019                               |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -16,7 +16,7 @@
 part of hprose.rpc.codec.jsonrpc;
 
 class JsonRpcClientCodec implements ClientCodec {
-  static JsonRpcClientCodec instance = new JsonRpcClientCodec();
+  static JsonRpcClientCodec instance = JsonRpcClientCodec();
   int _counter = 0;
   @override
   Uint8List encode(String name, List args, ClientContext context) {
@@ -31,7 +31,7 @@ class JsonRpcClientCodec implements ClientCodec {
   }
 
   @override
-  decode(Uint8List response, ClientContext context) {
+  dynamic decode(Uint8List response, ClientContext context) {
     final Map<String, dynamic> result = json.decode(utf8.decode(response));
     if (result.containsKey('headers')) {
       context.responseHeaders.addAll(result['headers']);
@@ -47,9 +47,9 @@ class JsonRpcClientCodec implements ClientCodec {
     if (result.containsKey('error')) {
       final Map<String, dynamic> error = result['error'];
       if (error.containsKey('code')) {
-        throw new Exception('${error["code"]}:${error["message"]}');
+        throw Exception('${error["code"]}:${error["message"]}');
       }
-      throw new Exception(error['message'].toString());
+      throw Exception(error['message'].toString());
     }
     return null;
   }

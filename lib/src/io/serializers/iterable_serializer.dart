@@ -8,7 +8,7 @@
 |                                                          |
 | hprose Iterable Serializer for Dart.                     |
 |                                                          |
-| LastModified: Feb 14, 2019                               |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -16,7 +16,7 @@
 part of hprose.io;
 
 class IterableSerializer<E> extends ReferenceSerializer<Iterable<E>> {
-  static final AbstractSerializer instance = new IterableSerializer();
+  static final AbstractSerializer instance = IterableSerializer();
   @override
   void write(Writer writer, Iterable<E> value) {
     super.write(writer, value);
@@ -25,7 +25,7 @@ class IterableSerializer<E> extends ReferenceSerializer<Iterable<E>> {
     final n = value.length;
     if (n > 0) stream.writeAsciiString(n.toString());
     stream.writeByte(TagOpenbrace);
-    AbstractSerializer serializer = Serializer.getInstance(E, value.first);
+    var serializer = Serializer.getInstance<E>(value.first);
     for (final element in value) {
       serializer.serialize(writer, element);
     }

@@ -8,7 +8,7 @@
 |                                                          |
 | hprose DynamicObject Serializer for Dart.                |
 |                                                          |
-| LastModified: Feb 15, 2019                               |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -17,7 +17,7 @@ part of hprose.io;
 
 class DynamicObjectSerializer extends ReferenceSerializer<DynamicObject> {
   static final AbstractSerializer<DynamicObject> instance =
-      new DynamicObjectSerializer();
+      DynamicObjectSerializer();
   @override
   void write(Writer writer, DynamicObject value) {
     final stream = writer.stream;

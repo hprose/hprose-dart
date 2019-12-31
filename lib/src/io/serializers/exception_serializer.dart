@@ -8,7 +8,7 @@
 |                                                          |
 | hprose ExceptionSerializer for Dart.                     |
 |                                                          |
-| LastModified: Mar 9, 2019                                |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -16,7 +16,7 @@
 part of hprose.io;
 
 class ExceptionSerializer extends ReferenceSerializer<dynamic> {
-  static final AbstractSerializer instance = new ExceptionSerializer();
+  static final AbstractSerializer instance = ExceptionSerializer();
   @override
   void write(Writer writer, dynamic value) {
     // No reference to Exception

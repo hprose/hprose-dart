@@ -8,7 +8,7 @@
 |                                                          |
 | Reverse plugin for Dart.                                 |
 |                                                          |
-| LastModified: May 4, 2019                                |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -22,17 +22,17 @@ class ProviderContext extends Context {
 }
 
 class Provider {
-  bool _closed = true;
-  bool debug = false;
+  var _closed = true;
+  var debug = false;
   void Function(dynamic error) onError;
   final Client client;
-  final MethodManager _methodManager = new MethodManager();
+  final _methodManager = MethodManager();
   InvokeManager _invokeManager;
   String get id {
     if (client.requestHeaders.containsKey('id')) {
       return client.requestHeaders['id'].toString();
     }
-    throw new Exception('Client unique id not found');
+    throw Exception('Client unique id not found');
   }
 
   set id(String value) {
@@ -40,7 +40,7 @@ class Provider {
   }
 
   Provider(this.client, [String id]) {
-    _invokeManager = new InvokeManager(_execute);
+    _invokeManager = InvokeManager(_execute);
     if (id != null && id.isNotEmpty) this.id = id;
     addMethod(_methodManager.getNames, '~');
   }
@@ -63,12 +63,12 @@ class Provider {
     final int index = call[0];
     final String name = call[1];
     final List args = call[2].toList(growable: true);
-    final Method method = get(name);
+    final method = get(name);
     try {
       if (method == null) {
-        throw new Exception('Can\'t find this method ${name}().');
+        throw Exception('Can\'t find this method ${name}().');
       }
-      final context = new ProviderContext(client, method);
+      final context = ProviderContext(client, method);
       if (!method.missing) {
         var count = args.length;
         var ppl = method.positionalParameterTypes.length;
@@ -95,7 +95,7 @@ class Provider {
           n--;
         }
         n = min(count, n);
-        for (int i = 0; i < n; ++i) {
+        for (var i = 0; i < n; ++i) {
           if (i < ppl) {
             args[i] = Formatter.deserialize(Formatter.serialize(args[i]),
                 type: method.positionalParameterTypes[i]);
@@ -105,22 +105,22 @@ class Provider {
           }
           if (i == ppl && method.hasNamedArguments) {
             if (args[i] is! Map) {
-              throw new ArgumentError(
+              throw ArgumentError(
                   'Invalid argument, expected named parameters, but positional parameter found.');
             }
             var originalNamedArgs = (args[i] as Map);
-            var namedArgs = new Map<Symbol, dynamic>();
+            var namedArgs = <Symbol, dynamic>{};
             for (final entry in originalNamedArgs.entries) {
               var name = entry.key.toString();
               if (method.namedParameterTypes.containsKey(name)) {
                 var value = Formatter.deserialize(
                     Formatter.serialize(entry.value),
                     type: method.namedParameterTypes[name]);
-                namedArgs[new Symbol(name)] = value;
+                namedArgs[Symbol(name)] = value;
               }
             }
             if (method.contextInNamedArguments) {
-              namedArgs[new Symbol('context')] = context;
+              namedArgs[Symbol('context')] = context;
             }
             args[i] = namedArgs;
           }
@@ -139,7 +139,7 @@ class Provider {
 
   void _dispatch(List<List> calls) async {
     final n = calls.length;
-    final results = new List<Future>(n);
+    final results = List<Future>(n);
     for (var i = 0; i < n; i++) {
       results[i] = _process(calls[i]);
     }
@@ -187,7 +187,7 @@ class Provider {
 
 class _Proxy {
   final Caller _caller;
-  String _id;
+  final String _id;
   String _namespace;
   _Proxy(this._caller, this._id, this._namespace) {
     if (_namespace != null && _namespace.isNotEmpty) {
@@ -197,17 +197,18 @@ class _Proxy {
     }
   }
   String _getName(Symbol symbol) {
-    String name = symbol.toString();
+    var name = symbol.toString();
     return name.substring(8, name.length - 2);
   }
 
-  noSuchMethod(Invocation mirror) {
-    String name = _namespace + _getName(mirror.memberName);
+  @override
+  dynamic noSuchMethod(Invocation mirror) {
+    var name = _namespace + _getName(mirror.memberName);
     if (mirror.isGetter) {
-      return new _Proxy(_caller, _id, name);
+      return _Proxy(_caller, _id, name);
     }
     if (mirror.isMethod) {
-      Type type = dynamic;
+      var type = dynamic;
       if (mirror.typeArguments.isNotEmpty) {
         type = mirror.typeArguments.first;
       }
@@ -216,7 +217,7 @@ class _Proxy {
         args.addAll(mirror.positionalArguments);
       }
       if (mirror.namedArguments.isNotEmpty) {
-        var namedArgs = new Map<String, dynamic>();
+        var namedArgs = <String, dynamic>{};
         mirror.namedArguments.forEach((name, value) {
           namedArgs[_getName(name)] = value;
         });
@@ -231,14 +232,14 @@ class _Proxy {
 }
 
 class Caller {
-  int _counter = 0;
+  var _counter = 0;
   final Map<String, List<List>> _calls = {};
   final Map<String, Map<int, Completer>> _results = {};
   final Map<String, Completer<List<List>>> _responders = {};
   final Map<String, bool> _onlines = {};
   final Service service;
-  Duration heartbeat = const Duration(minutes: 2);
-  Duration timeout = const Duration(seconds: 30);
+  var heartbeat = const Duration(minutes: 2);
+  var timeout = const Duration(seconds: 30);
   Caller(this.service) {
     service
       ..addMethod(_close, '!!')
@@ -250,7 +251,7 @@ class Caller {
     if (context.requestHeaders.containsKey('id')) {
       return context.requestHeaders['id'].toString();
     }
-    throw new Exception('Client unique id not found');
+    throw Exception('Client unique id not found');
   }
 
   bool _send(String id, Completer<List<List>> responder) {
@@ -292,11 +293,11 @@ class Caller {
   Future<List<List>> _begin(ServiceContext context) async {
     final id = _stop(context);
     _onlines.putIfAbsent(id, () => true);
-    final responder = new Completer<List<List>>();
+    final responder = Completer<List<List>>();
     if (!_send(id, responder)) {
       _responders[id] = responder;
       if (heartbeat > Duration.zero) {
-        var timeoutTimer = new Timer(heartbeat, () {
+        var timeoutTimer = Timer(heartbeat, () {
           if (!responder.isCompleted) {
             responder.complete([]);
           }
@@ -319,7 +320,7 @@ class Caller {
       if (_results.containsKey(id) && _results[id].containsKey(index)) {
         final result = _results[id].remove(index);
         if (error != null) {
-          result.completeError(new Exception(error));
+          result.completeError(Exception(error));
         } else {
           result.complete(value);
         }
@@ -328,14 +329,14 @@ class Caller {
   }
 
   Future _invoke(String id, String fullname, List args, Type returnType) async {
-    if (args == null) args = [];
+    args ??= [];
     for (var i = 0; i < args.length; i++) {
       if (args[i] is Future) {
         args[i] = await args[i];
       }
     }
     final index = (_counter < 0x7FFFFFFF) ? ++_counter : _counter = 0;
-    final result = new Completer();
+    final result = Completer();
     if (!_calls.containsKey(id)) {
       _calls[id] = [];
     }
@@ -347,11 +348,11 @@ class Caller {
     _results[id][index] = result;
     _response(id);
     if (timeout > Duration.zero) {
-      var timeoutTimer = new Timer(timeout, () {
+      var timeoutTimer = Timer(timeout, () {
         if (!result.isCompleted) {
           _calls[id].remove(call);
           _results[id].remove(index);
-          result.completeError(new TimeoutException('Timeout'));
+          result.completeError(TimeoutException('Timeout'));
         }
       });
       await result.future.then((value) {
@@ -372,7 +373,7 @@ class Caller {
   }
 
   dynamic useService(String id, [String namespace]) {
-    return new _Proxy(this, id, namespace);
+    return _Proxy(this, id, namespace);
   }
 
   bool exists(String id) {

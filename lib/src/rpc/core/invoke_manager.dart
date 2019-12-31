@@ -8,15 +8,16 @@
 |                                                          |
 | InvokeManager for Dart.                                  |
 |                                                          |
-| LastModified: Feb 22, 2019                               |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
 part of hprose.rpc.core;
 
-typedef Future NextInvokeHandler(String name, List args, Context context);
-typedef Future InvokeHandler(
+typedef NextInvokeHandler = Future Function(
+    String name, List args, Context context);
+typedef InvokeHandler = Future Function(
     String name, List args, Context context, NextInvokeHandler next);
 
 class InvokeManager extends HandlerManager<InvokeHandler, NextInvokeHandler> {

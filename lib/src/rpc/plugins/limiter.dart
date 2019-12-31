@@ -8,7 +8,7 @@
 |                                                          |
 | Limiter plugin for Dart.                                 |
 |                                                          |
-| LastModified: Mar 27, 2019                               |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -17,7 +17,7 @@ part of hprose.rpc.plugins;
 
 class RateLimiter {
   double _interval;
-  int _next = DateTime.now().millisecondsSinceEpoch;
+  var _next = DateTime.now().millisecondsSinceEpoch;
   final int permitsPerSecond;
   final double maxPermits;
   final Duration timeout;
@@ -28,15 +28,15 @@ class RateLimiter {
   Future<int> acquire([int tokens = 1]) async {
     final now = DateTime.now().millisecondsSinceEpoch;
     final last = _next;
-    double permits = (now - last) / _interval - tokens;
+    var permits = (now - last) / _interval - tokens;
     if (permits > maxPermits) {
       permits = maxPermits;
     }
     _next = (now - permits * _interval).floor();
-    var delay = new Duration(milliseconds: last - now);
+    var delay = Duration(milliseconds: last - now);
     if (delay <= Duration.zero) return last;
     if (timeout > Duration.zero && delay > timeout) {
-      throw new TimeoutException('Timeout');
+      throw TimeoutException('Timeout');
     }
     await Future.delayed(delay);
     return last;
@@ -56,23 +56,23 @@ class RateLimiter {
 }
 
 class ConcurrentLimiter {
-  int _counter = 0;
-  Queue<Completer<void>> _tasks = new Queue<Completer<void>>();
+  var _counter = 0;
+  final _tasks = Queue<Completer<void>>();
   final int maxConcurrentRequests;
   final Duration timeout;
   ConcurrentLimiter(this.maxConcurrentRequests, [this.timeout = Duration.zero]);
   Future<void> acquire() async {
     if (++_counter <= maxConcurrentRequests) return null;
-    final task = new Completer<void>();
+    final task = Completer<void>();
     _tasks.add(task);
     Timer timer;
     if (timeout > Duration.zero) {
-      timer = new Timer(timeout, () {
+      timer = Timer(timeout, () {
         if (_tasks.remove(task)) {
           --_counter;
         }
         if (!task.isCompleted) {
-          task.completeError(new TimeoutException('Timeout'));
+          task.completeError(TimeoutException('Timeout'));
         }
       });
     }

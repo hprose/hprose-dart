@@ -8,7 +8,7 @@
 |                                                          |
 | Method for Dart.                                         |
 |                                                          |
-| LastModified: Oct 4, 2019                                |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -24,7 +24,7 @@ class Method {
   final bool missing;
   Duration timeout;
   final Map<String, dynamic> options;
-  operator [](String key) => options[key];
+  dynamic operator [](String key) => options[key];
   void operator []=(String key, value) => options[key] = value;
   bool passContext = false;
   bool contextInPositionalArguments = false;
@@ -40,7 +40,7 @@ class Method {
       fullname = _getFunctionName(method);
     }
     if (fullname.isEmpty) {
-      throw new ArgumentError.notNull('fullname');
+      throw ArgumentError.notNull('fullname');
     }
     _parseParameters(method);
     if (!hasOptionalArguments && !hasNamedArguments) {
@@ -56,7 +56,9 @@ class Method {
       contextInNamedArguments = true;
     }
   }
-  noSuchMethod(Invocation invocation) {
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) {
     var name = invocation.memberName.toString();
     name = name.substring(8, name.length - 2);
     if (invocation.isGetter) {
@@ -78,8 +80,8 @@ class Method {
   }
 
   void _parseNamedParameters(List<String> genericsArguments, String str) {
-    int nesting = 0;
-    int p = 0;
+    var nesting = 0;
+    var p = 0;
     String type;
     String name;
     for (var i = 0; i < str.length; i++) {
@@ -127,7 +129,7 @@ class Method {
           genericsArguments, str.substring(p + 1, str.length - 1));
       str = str.substring(0, p - 2);
     }
-    int nesting = 0;
+    var nesting = 0;
     p = 0;
     var types = positionalParameterTypes;
     for (var i = 0; i < str.length; i++) {

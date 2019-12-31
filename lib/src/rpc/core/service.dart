@@ -8,7 +8,7 @@
 |                                                          |
 | hprose Service for Dart.                                 |
 |                                                          |
-| LastModified: Mar 29, 2019                               |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -43,13 +43,13 @@ class Service {
     return _creators.containsKey(name);
   }
 
-  Duration timeout = new Duration(seconds: 30);
+  Duration timeout = Duration(seconds: 30);
   ServiceCodec codec = DefaultServiceCodec.instance;
   int maxRequestLength = 0x7FFFFFFFF;
   InvokeManager _invokeManager;
   IOManager _ioManager;
-  final MethodManager _methodManager = new MethodManager();
-  Map<String, Handler> _handlers = {};
+  final MethodManager _methodManager = MethodManager();
+  final _handlers = <String, Handler>{};
   Handler operator [](String name) => _handlers[name];
   void operator []=(String name, Handler value) => _handlers[name] = value;
   List<String> get names => _methodManager.getNames().toList();
@@ -57,9 +57,9 @@ class Service {
   final Map<String, dynamic> options = {};
   Service() {
     init();
-    _invokeManager = new InvokeManager(execute);
+    _invokeManager = InvokeManager(execute);
     _invokeManager.use(_timeoutHandler);
-    _ioManager = new IOManager(process);
+    _ioManager = IOManager(process);
     _creators
         .forEach((name, creator) => _handlers[name] = creator.create(this));
     addMethod(_methodManager.getNames, '~');
@@ -67,11 +67,11 @@ class Service {
 
   void init() {
     if (!isRegister('mock')) {
-      register<MockHandler>('mock', new MockHandlerCreator());
+      register<MockHandler>('mock', MockHandlerCreator());
     }
   }
 
-  ServiceContext createContext() => new ServiceContext(this);
+  ServiceContext createContext() => ServiceContext(this);
 
   void bind(dynamic server, [String name]) {
     final type = server.runtimeType.toString();
@@ -83,7 +83,7 @@ class Service {
         }
       }
     } else {
-      throw new UnsupportedError('This type server is not supported.');
+      throw UnsupportedError('This type server is not supported.');
     }
   }
 
@@ -112,10 +112,10 @@ class Service {
     if (timeout <= Duration.zero) {
       return await task;
     }
-    var completer = new Completer();
-    var timer = new Timer(timeout, () {
+    var completer = Completer();
+    var timer = Timer(timeout, () {
       if (!completer.isCompleted) {
-        completer.completeError(new TimeoutException('Timeout'));
+        completer.completeError(TimeoutException('Timeout'));
       }
     });
     try {
@@ -146,7 +146,7 @@ class Service {
     } else if (handler is IOHandler) {
       _ioManager.use(handler);
     } else {
-      throw new TypeError();
+      throw TypeError();
     }
   }
 
@@ -156,7 +156,7 @@ class Service {
     } else if (handler is IOHandler) {
       _ioManager.unuse(handler);
     } else {
-      throw new TypeError();
+      throw TypeError();
     }
   }
 

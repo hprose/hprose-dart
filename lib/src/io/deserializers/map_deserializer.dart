@@ -8,18 +8,21 @@
 |                                                          |
 | hprose Map Deserializer for Dart.                        |
 |                                                          |
-| LastModified: Feb 16, 2019                               |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
 part of hprose.io;
 
-T _readMap<T>(Reader reader, T mapCtor(), AbstractDeserializer keyDeserializer,
-    AbstractDeserializer valueDeserializer) {
+Map<K, V> _readMap<K, V>(
+    Reader reader,
+    Map<K, V> Function() mapCtor,
+    AbstractDeserializer<K> keyDeserializer,
+    AbstractDeserializer<V> valueDeserializer) {
   final stream = reader.stream;
   final count = ValueReader.readCount(stream);
-  dynamic map = mapCtor();
+  final map = mapCtor();
   reader.addReference(map);
   for (var i = 0; i < count; ++i) {
     final key = keyDeserializer.deserialize(reader);
@@ -31,15 +34,15 @@ T _readMap<T>(Reader reader, T mapCtor(), AbstractDeserializer keyDeserializer,
 }
 
 class MapDeserializer<K, V> extends BaseDeserializer<Map<K, V>> {
-  static final AbstractDeserializer instance = new MapDeserializer();
+  static final AbstractDeserializer instance = MapDeserializer();
   @override
   Map<K, V> read(Reader reader, int tag) {
     switch (tag) {
       case TagEmpty:
-        return new Map<K, V>();
+        return <K, V>{};
       case TagMap:
-        return _readMap(reader, () => new Map<K, V>(),
-            Deserializer.getInstance(K), Deserializer.getInstance(V));
+        return _readMap(reader, () => <K, V>{}, Deserializer.getInstance<K>(),
+            Deserializer.getInstance<V>());
       case TagObject:
         return ReferenceReader.readDynamicObject(reader);
       default:

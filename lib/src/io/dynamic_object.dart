@@ -8,7 +8,7 @@
 |                                                          |
 | hprose DynamicObject for Dart.                           |
 |                                                          |
-| LastModified: Feb 14, 2019                               |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -20,6 +20,8 @@ class DynamicObject implements Map<String, dynamic> {
   final String _name;
   DynamicObject([this._name = '']);
   String getName() => _name;
+
+  @override
   dynamic noSuchMethod(Invocation invocation) {
     var name = invocation.memberName.toString();
     name = name.substring(8, name.length - 2);
@@ -32,7 +34,7 @@ class DynamicObject implements Map<String, dynamic> {
   }
 
   @override
-  operator [](Object key) {
+  dynamic operator [](Object key) {
     return _items[key];
   }
 
@@ -98,12 +100,12 @@ class DynamicObject implements Map<String, dynamic> {
   }
 
   @override
-  putIfAbsent(String key, Function() ifAbsent) {
+  dynamic putIfAbsent(String key, dynamic Function() ifAbsent) {
     return _items.putIfAbsent(key, ifAbsent);
   }
 
   @override
-  remove(Object key) {
+  dynamic remove(Object key) {
     return _items.remove(key);
   }
 
@@ -113,8 +115,9 @@ class DynamicObject implements Map<String, dynamic> {
   }
 
   @override
-  update(String key, Function(dynamic value) update, {Function() ifAbsent}) {
-    _items.update(key, update, ifAbsent: ifAbsent);
+  dynamic update(String key, Function(dynamic value) update,
+      {Function() ifAbsent}) {
+    return _items.update(key, update, ifAbsent: ifAbsent);
   }
 
   @override

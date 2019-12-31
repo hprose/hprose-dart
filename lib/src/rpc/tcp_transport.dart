@@ -8,7 +8,7 @@
 |                                                          |
 | TcpTransport for Dart.                                   |
 |                                                          |
-| LastModified: Mar 10, 2019                               |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -16,10 +16,10 @@
 part of hprose.rpc;
 
 class TcpTransport implements Transport {
-  int _counter = 0;
-  Map<Socket, Map<int, Completer<Uint8List>>> _results = {};
-  Map<Uri, Socket> _sockets = {};
-  bool noDelay = true;
+  var _counter = 0;
+  final _results = <Socket, Map<int, Completer<Uint8List>>>{};
+  final _sockets = <Uri, Socket>{};
+  var noDelay = true;
   SecurityContext securityContext;
   bool Function(X509Certificate certificate) onBadCertificate = (_) => true;
 
@@ -36,7 +36,7 @@ class TcpTransport implements Transport {
       case 'ssl6':
         break;
       default:
-        throw new Exception('unsupported ${uri.scheme} protocol');
+        throw Exception('unsupported ${uri.scheme} protocol');
     }
     var host;
     if (uri.scheme.endsWith('4')) {
@@ -75,7 +75,7 @@ class TcpTransport implements Transport {
   }
 
   void Function(List<int>) _receive(Uri uri, Socket socket) {
-    final instream = new ByteStream();
+    final instream = ByteStream();
     const headerLength = 12;
     var bodyLength = -1;
     var index = 0;
@@ -87,7 +87,7 @@ class TcpTransport implements Transport {
           instream.mark();
           final header = instream.read(8);
           if (crc32(header) != crc || (header[0] & 0x80) == 0) {
-            _close(uri, socket, new Exception('Invalid response'));
+            _close(uri, socket, Exception('Invalid response'));
             socket.destroy();
             return;
           }
@@ -107,9 +107,9 @@ class TcpTransport implements Transport {
             final result = results.remove(index);
             if (has_error) {
               if (result != null && !result.isCompleted) {
-                result.completeError(new Exception(utf8.decode(response)));
+                result.completeError(Exception(utf8.decode(response)));
               }
-              _close(uri, socket, new SocketException.closed());
+              _close(uri, socket, SocketException.closed());
               socket.destroy();
               return;
             } else if (result != null && !result.isCompleted) {
@@ -132,7 +132,7 @@ class TcpTransport implements Transport {
     socket.listen(_receive(uri, socket), onError: (error) {
       _close(uri, socket, error);
     }, onDone: () {
-      _close(uri, socket, new SocketException.closed());
+      _close(uri, socket, SocketException.closed());
     }, cancelOnError: true);
     _sockets[uri] = socket;
     return socket;
@@ -143,7 +143,7 @@ class TcpTransport implements Transport {
     final clientContext = context as ClientContext;
     final uri = clientContext.uri;
     final index = (_counter < 0x7FFFFFFF) ? ++_counter : _counter = 0;
-    final result = new Completer<Uint8List>();
+    final result = Completer<Uint8List>();
     final socket = await _getSocket(uri, clientContext.timeout);
     if (!_results.containsKey(socket)) {
       _results[socket] = {};
@@ -152,16 +152,16 @@ class TcpTransport implements Transport {
     results[index] = result;
     Timer timer;
     if (clientContext.timeout > Duration.zero) {
-      timer = new Timer(clientContext.timeout, () async {
+      timer = Timer(clientContext.timeout, () async {
         if (!result.isCompleted) {
-          result.completeError(new TimeoutException('Timeout'));
+          result.completeError(TimeoutException('Timeout'));
           await abort();
         }
       });
     }
     final n = request.length;
-    final header = new Uint8List(12);
-    final view = new ByteData.view(header.buffer);
+    final header = Uint8List(12);
+    final view = ByteData.view(header.buffer);
     view.setUint32(4, n | 0x80000000, Endian.big);
     view.setUint32(8, index, Endian.big);
     final crc = crc32(header.sublist(4, 12));
@@ -176,10 +176,10 @@ class TcpTransport implements Transport {
 
   @override
   Future<void> abort() async {
-    Map<Uri, Socket> sockets = new Map.from(_sockets);
+    final sockets = Map<Uri, Socket>.from(_sockets);
     _sockets.clear();
     sockets.forEach((uri, socket) {
-      _close(uri, socket, new SocketException.closed());
+      _close(uri, socket, SocketException.closed());
       socket.close();
     });
   }
@@ -201,6 +201,6 @@ class TcpTransportCreator implements TransportCreator<TcpTransport> {
 
   @override
   TcpTransport create() {
-    return new TcpTransport();
+    return TcpTransport();
   }
 }

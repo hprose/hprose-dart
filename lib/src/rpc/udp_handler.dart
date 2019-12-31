@@ -8,7 +8,7 @@
 |                                                          |
 | UdpHandler for Dart.                                     |
 |                                                          |
-| LastModified: Mar 28, 2019                               |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -41,7 +41,7 @@ class UdpHandler implements Handler<RawDatagramSocket> {
     while (true) {
       final datagram = socket.receive();
       if (datagram == null) return;
-      final istream = new ByteStream.fromUint8List(datagram.data);
+      final istream = ByteStream.fromUint8List(datagram.data);
       final crc = istream.readUInt32BE();
       istream.mark();
       final header = istream.read(4);
@@ -63,8 +63,8 @@ class UdpHandler implements Handler<RawDatagramSocket> {
   void _send(RawDatagramSocket socket, List<int> response, int index,
       InternetAddress address, int port) {
     final n = response.length;
-    final data = new Uint8List(8 + n);
-    final view = new ByteData.view(data.buffer);
+    final data = Uint8List(8 + n);
+    final view = ByteData.view(data.buffer);
     view.setUint16(4, n, Endian.big);
     view.setUint16(6, index, Endian.big);
     final crc = crc32(data.sublist(4, 8));
@@ -100,6 +100,6 @@ class UdpHandlerCreator implements HandlerCreator<UdpHandler> {
 
   @override
   UdpHandler create(core.Service service) {
-    return new UdpHandler(service);
+    return UdpHandler(service);
   }
 }

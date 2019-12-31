@@ -8,7 +8,7 @@
 |                                                          |
 | JsonRpcServiceCodec for Dart.                            |
 |                                                          |
-| LastModified: Mar 14, 2019                               |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -16,7 +16,7 @@
 part of hprose.rpc.codec.jsonrpc;
 
 class JsonRpcServiceCodec implements ServiceCodec {
-  static JsonRpcServiceCodec instance = new JsonRpcServiceCodec();
+  static JsonRpcServiceCodec instance = JsonRpcServiceCodec();
 
   @override
   Uint8List encode(result, ServiceContext context) {
@@ -89,7 +89,7 @@ class JsonRpcServiceCodec implements ServiceCodec {
     if (call['jsonrpc'] != '2.0' ||
         !call.containsKey('method') ||
         !call.containsKey('id')) {
-      throw new Exception('Invalid Request');
+      throw Exception('Invalid Request');
     }
     if (call.containsKey('headers')) {
       context.requestHeaders.addAll(call['headers']);
@@ -98,7 +98,7 @@ class JsonRpcServiceCodec implements ServiceCodec {
     final fullname = call['method'];
     final method = context.service.get(fullname);
     if (method == null) {
-      throw new Exception('Method not found');
+      throw Exception('Method not found');
     }
     context.method = method;
     final args =
@@ -129,7 +129,7 @@ class JsonRpcServiceCodec implements ServiceCodec {
         n--;
       }
       n = min(count, n);
-      for (int i = 0; i < n; ++i) {
+      for (var i = 0; i < n; ++i) {
         if (i < ppl) {
           args[i] = Formatter.deserialize(Formatter.serialize(args[i]),
               type: method.positionalParameterTypes[i]);
@@ -139,21 +139,21 @@ class JsonRpcServiceCodec implements ServiceCodec {
         }
         if (i == ppl && method.hasNamedArguments) {
           if (args[i] is! Map) {
-            throw new Exception('Invalid params');
+            throw Exception('Invalid params');
           }
           var originalNamedArgs = (args[i] as Map);
-          var namedArgs = new Map<Symbol, dynamic>();
+          var namedArgs = <Symbol, dynamic>{};
           for (final entry in originalNamedArgs.entries) {
             var name = entry.key.toString();
             if (method.namedParameterTypes.containsKey(name)) {
               var value = Formatter.deserialize(
                   Formatter.serialize(entry.value),
                   type: method.namedParameterTypes[name]);
-              namedArgs[new Symbol(name)] = value;
+              namedArgs[Symbol(name)] = value;
             }
           }
           if (method.contextInNamedArguments) {
-            namedArgs[new Symbol('context')] = context;
+            namedArgs[Symbol('context')] = context;
           }
           args[i] = namedArgs;
         }
@@ -162,6 +162,6 @@ class JsonRpcServiceCodec implements ServiceCodec {
         args[ppl] = context;
       }
     }
-    return new RequestInfo(fullname, args);
+    return RequestInfo(fullname, args);
   }
 }

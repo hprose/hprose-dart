@@ -8,7 +8,7 @@
 |                                                          |
 | hprose value reader for Dart.                            |
 |                                                          |
-| LastModified: Feb 16, 2019                               |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -111,11 +111,10 @@ class ValueReader {
       tag = result[2];
     }
     if (tag == TagUTC) {
-      return new DateTime.utc(
+      return DateTime.utc(
           1970, 1, 1, hour, minute, second, millisecond, microsecond);
     }
-    return new DateTime(
-        1970, 1, 1, hour, minute, second, millisecond, microsecond);
+    return DateTime(1970, 1, 1, hour, minute, second, millisecond, microsecond);
   }
 
   static DateTime readDateTime(ByteStream stream) {
@@ -137,15 +136,15 @@ class ValueReader {
         tag = result[2];
       }
       if (tag == TagUTC) {
-        return new DateTime.utc(
+        return DateTime.utc(
             year, month, day, hour, minute, second, millisecond, microsecond);
       }
-      return new DateTime(
+      return DateTime(
           year, month, day, hour, minute, second, millisecond, microsecond);
     }
     if (tag == TagUTC) {
-      return new DateTime.utc(year, month, day);
+      return DateTime.utc(year, month, day);
     }
-    return new DateTime(year, month, day);
+    return DateTime(year, month, day);
   }
 }

@@ -8,7 +8,7 @@
 |                                                          |
 | HttpHandler for Dart.                                    |
 |                                                          |
-| LastModified: Oct 4, 2019                                |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -16,30 +16,30 @@
 part of hprose.rpc;
 
 class HttpHandler implements Handler<HttpServer> {
-  static DateTime _lastModified = DateTime.now().toUtc();
-  static Random _random = Random.secure();
-  static String _etag =
+  static final _lastModified = DateTime.now().toUtc();
+  static final _random = Random.secure();
+  static final _etag =
       '"${_random.nextInt(2147483647).toRadixString(16)}:${_random.nextInt(2147483647).toRadixString(16)}"';
 
-  bool p3p = true;
-  bool get = true;
-  bool crossDomain = true;
-  Map<String, String> httpHeaders = {};
-  Map<String, bool> _origins = {};
-  String _crossDomainXmlFile = '';
-  String _crossDomainXmlContent = '';
-  String _clientAccessPolicyXmlFile = '';
-  String _clientAccessPolicyXmlContent = '';
+  var p3p = true;
+  var get = true;
+  var crossDomain = true;
+  var httpHeaders = <String, String>{};
+  final _origins = <String, bool>{};
+  var _crossDomainXmlFile = '';
+  var _crossDomainXmlContent = '';
+  var _clientAccessPolicyXmlFile = '';
+  var _clientAccessPolicyXmlContent = '';
   String get crossDomainXmlFile => _crossDomainXmlFile;
   set crossDomainXmlFile(String value) {
     _crossDomainXmlFile = value;
-    _crossDomainXmlContent = new File(value).readAsStringSync();
+    _crossDomainXmlContent = File(value).readAsStringSync();
   }
 
   String get clientAccessPolicyXmlFile => _clientAccessPolicyXmlFile;
   set clientAccessPolicyXmlFile(String value) {
     _clientAccessPolicyXmlFile = value;
-    _clientAccessPolicyXmlContent = new File(value).readAsStringSync();
+    _clientAccessPolicyXmlContent = File(value).readAsStringSync();
   }
 
   String get crossDomainXmlContent => _crossDomainXmlContent;
@@ -80,7 +80,7 @@ class HttpHandler implements Handler<HttpServer> {
         response.headers.add(HttpHeaders.lastModifiedHeader, _lastModified);
         response.headers.add(HttpHeaders.etagHeader, _etag);
         response.headers.add(HttpHeaders.contentTypeHeader, 'text/xml');
-        response.write(this._crossDomainXmlContent);
+        response.write(_crossDomainXmlContent);
       }
       return true;
     }
@@ -97,7 +97,7 @@ class HttpHandler implements Handler<HttpServer> {
         response.headers.add(HttpHeaders.lastModifiedHeader, _lastModified);
         response.headers.add(HttpHeaders.etagHeader, _etag);
         response.headers.add(HttpHeaders.contentTypeHeader, 'text/xml');
-        response.write(this._clientAccessPolicyXmlContent);
+        response.write(_clientAccessPolicyXmlContent);
       }
       return true;
     }
@@ -108,14 +108,14 @@ class HttpHandler implements Handler<HttpServer> {
     final response = request.response;
     response.statusCode = 200;
     response.headers.add(HttpHeaders.contentTypeHeader, 'text/plain');
-    if (this.p3p) {
+    if (p3p) {
       response.headers.add(
           'P3P',
-          'CP="CAO DSP COR CUR ADM DEV TAI PSA PSD IVAi IVDi ' +
-              'CONi TELo OTPi OUR DELi SAMi OTRi UNRi PUBi IND PHY ONL ' +
+          'CP="CAO DSP COR CUR ADM DEV TAI PSA PSD IVAi IVDi '
+              'CONi TELo OTPi OUR DELi SAMi OTRi UNRi PUBi IND PHY ONL '
               'UNI PUR FIN COM NAV INT DEM CNT STA POL HEA PRE GOV"');
     }
-    if (this.crossDomain) {
+    if (crossDomain) {
       final origin = request.headers['origin']?.first;
       if (origin != null && origin != 'null') {
         if (_origins.isEmpty || _origins[origin]) {
@@ -126,8 +126,8 @@ class HttpHandler implements Handler<HttpServer> {
         response.headers.add('Access-Control-Allow-Origin', '*');
       }
     }
-    if (this.httpHeaders != null) {
-      for (final header in this.httpHeaders.entries) {
+    if (httpHeaders != null) {
+      for (final header in httpHeaders.entries) {
         response.headers.add(header.key, header.value);
       }
     }
@@ -175,8 +175,8 @@ class HttpHandler implements Handler<HttpServer> {
       _end(response);
       return;
     }
-    ByteStream stream =
-        new ByteStream(request.contentLength >= 0 ? request.contentLength : 0);
+    var stream =
+        ByteStream(request.contentLength >= 0 ? request.contentLength : 0);
     await for (var data in request) {
       stream.write(data);
     }

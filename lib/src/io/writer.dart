@@ -8,7 +8,7 @@
 |                                                          |
 | hprose Writer for Dart.                                  |
 |                                                          |
-| LastModified: Feb 14, 2019                               |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -16,8 +16,8 @@
 part of hprose.io;
 
 class _WriterRefer {
-  final Map<dynamic, int> _ref = {};
-  int _last = 0;
+  final _ref = <dynamic, int>{};
+  var _last = 0;
   void addCount(int count) => _last += count;
 
   void setReference(value) => _ref[value] = _last++;
@@ -41,19 +41,19 @@ class _WriterRefer {
 
 class Writer {
   _WriterRefer _refer;
-  final Map<dynamic, int> _ref = {};
-  int _last = 0;
+  final _ref = <dynamic, int>{};
+  var _last = 0;
   final ByteStream stream;
   Writer(this.stream, {bool simple = false}) {
     this.simple = simple;
   }
   bool get simple => _refer == null;
-  set simple(bool value) => _refer = (value ? null : new _WriterRefer());
+  set simple(bool value) => _refer = (value ? null : _WriterRefer());
   void serialize<T>(T value) {
     if (value == null) {
       stream.writeByte(TagNull);
     } else {
-      Serializer.getInstance(T, value).serialize(this, value);
+      Serializer.getInstance<T>(value).serialize(this, value);
     }
   }
 
@@ -61,7 +61,7 @@ class Writer {
     if (value == null) {
       stream.writeByte(TagNull);
     } else {
-      Serializer.getInstance(T, value).write(this, value);
+      Serializer.getInstance<T>(value).write(this, value);
     }
   }
 
@@ -78,7 +78,7 @@ class Writer {
     _last = 0;
   }
 
-  int writeClass(type, void action()) {
+  int writeClass(type, void Function() action) {
     var r = _ref[type];
     if (r == null) {
       action();

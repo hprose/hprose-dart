@@ -8,7 +8,7 @@
 |                                                          |
 | HttpTransport for Dart.                                  |
 |                                                          |
-| LastModified: Oct 4, 2019                                |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -26,7 +26,7 @@ class HttpTransport implements Transport {
   }
 
   HttpClient createHttpClient() {
-    HttpClient httpClient = new HttpClient();
+    var httpClient = HttpClient();
     if (maxConnectionsPerHost > 0) {
       httpClient.maxConnectionsPerHost = maxConnectionsPerHost;
     }
@@ -50,10 +50,10 @@ class HttpTransport implements Transport {
     httpRequest.add(request);
     HttpClientResponse httpResponse;
     if (clientContext.timeout > Duration.zero) {
-      var completer = new Completer<HttpClientResponse>();
-      var timer = new Timer(clientContext.timeout, () async {
+      var completer = Completer<HttpClientResponse>();
+      var timer = Timer(clientContext.timeout, () async {
         if (!completer.isCompleted) {
-          completer.completeError(new TimeoutException('Timeout'));
+          completer.completeError(TimeoutException('Timeout'));
           await abort();
         }
       });
@@ -70,15 +70,14 @@ class HttpTransport implements Transport {
     context['httpStatusText'] = httpResponse.reasonPhrase;
     if (httpResponse.statusCode >= 200 && httpResponse.statusCode < 300) {
       context['httpResponseHeaders'] = httpResponse.headers;
-      ByteStream stream = new ByteStream(
+      var stream = ByteStream(
           httpResponse.contentLength >= 0 ? httpResponse.contentLength : 0);
       await for (var data in httpResponse) {
         stream.write(data);
       }
       return stream.takeBytes();
     }
-    throw new Exception(
-        '${httpResponse.statusCode}:${httpResponse.reasonPhrase}');
+    throw Exception('${httpResponse.statusCode}:${httpResponse.reasonPhrase}');
   }
 
   @override
@@ -94,6 +93,6 @@ class HttpTransportCreator implements TransportCreator<HttpTransport> {
 
   @override
   HttpTransport create() {
-    return new HttpTransport();
+    return HttpTransport();
   }
 }

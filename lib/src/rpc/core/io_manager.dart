@@ -8,15 +8,16 @@
 |                                                          |
 | IOManager for Dart.                                      |
 |                                                          |
-| LastModified: Feb 22, 2019                               |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
 part of hprose.rpc.core;
 
-typedef Future<Uint8List> NextIOHandler(Uint8List request, Context context);
-typedef Future<Uint8List> IOHandler(
+typedef NextIOHandler = Future<Uint8List> Function(
+    Uint8List request, Context context);
+typedef IOHandler = Future<Uint8List> Function(
     Uint8List request, Context context, NextIOHandler next);
 
 class IOManager extends HandlerManager<IOHandler, NextIOHandler> {

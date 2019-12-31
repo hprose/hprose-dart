@@ -8,15 +8,16 @@
 |                                                          |
 | MethodManager for Dart.                                  |
 |                                                          |
-| LastModified: Mar 29, 2019                               |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
 part of hprose.rpc.core;
 
-typedef dynamic MissingMethod1(String fullname, List args);
-typedef dynamic MissingMethod2(String fullname, List args, Context context);
+typedef MissingMethod1 = dynamic Function(String fullname, List args);
+typedef MissingMethod2 = dynamic Function(
+    String fullname, List args, Context context);
 
 class MethodManager {
   Map<String, Method> methods = {};
@@ -34,26 +35,26 @@ class MethodManager {
   }
 
   void addMethod(Function method, [String fullname]) {
-    add(new Method(method, fullname: fullname));
+    add(Method(method, fullname: fullname));
   }
 
   void addMethods(List<Function> methods, [List<String> fullnames]) {
     if (fullnames != null) {
-      for (int i = 0; i < methods.length; ++i) {
-        add(new Method(methods[i], fullname: fullnames[i]));
+      for (var i = 0; i < methods.length; ++i) {
+        add(Method(methods[i], fullname: fullnames[i]));
       }
     } else {
-      for (int i = 0; i < methods.length; ++i) {
-        add(new Method(methods[i]));
+      for (var i = 0; i < methods.length; ++i) {
+        add(Method(methods[i]));
       }
     }
   }
 
   void addMissingMethod<MissingMethod extends Function>(MissingMethod method) {
     if (method is MissingMethod1 || method is MissingMethod2) {
-      methods['*'] = new Method(method, fullname: '*', missing: true);
+      methods['*'] = Method(method, fullname: '*', missing: true);
     } else {
-      throw new ArgumentError('method is not a missing method');
+      throw ArgumentError('method is not a missing method');
     }
   }
 }
