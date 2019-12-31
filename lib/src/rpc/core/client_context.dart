@@ -8,7 +8,7 @@
 |                                                          |
 | ClientContext for Dart.                                  |
 |                                                          |
-| LastModified: Mar 25, 2019                               |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -20,8 +20,6 @@ class ClientContext extends Context {
   Uri uri;
   Type returnType;
   Duration timeout;
-  final Map<String, dynamic> requestHeaders = {};
-  final Map<String, dynamic> responseHeaders = {};
   ClientContext(
       {this.uri,
       this.returnType,

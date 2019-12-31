@@ -8,7 +8,7 @@
 |                                                          |
 | ServiceContext for Dart.                                 |
 |                                                          |
-| LastModified: Mar 28, 2019                               |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -19,8 +19,6 @@ class ServiceContext extends Context {
   final Service service;
   Method method;
   String host;
-  final Map<String, dynamic> requestHeaders = {};
-  final Map<String, dynamic> responseHeaders = {};
   dynamic handler;
   ServiceContext(this.service);
 

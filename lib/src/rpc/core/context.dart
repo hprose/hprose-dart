@@ -8,7 +8,7 @@
 |                                                          |
 | hprose Context for Dart.                                 |
 |                                                          |
-| LastModified: Feb 22, 2019                               |
+| LastModified: Dec 31, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -17,6 +17,8 @@ part of hprose.rpc.core;
 
 class Context {
   final Map<String, dynamic> items = <String, dynamic>{};
+  final Map<String, dynamic> requestHeaders = {};
+  final Map<String, dynamic> responseHeaders = {};
 
   operator [](String key) => items[key];
 
@@ -38,6 +40,8 @@ class Context {
   Context clone() {
     final context = new Context();
     context.items.addAll(items);
+    context.requestHeaders.addAll(requestHeaders);
+    context.responseHeaders.addAll(responseHeaders);
     return context;
   }
 }
