@@ -65,3 +65,7 @@
 ## 3.0.6
 
 - Move requestHeaders & responseHeaders to Context.
+
+## 3.0.7
+
+- Optimized code.
