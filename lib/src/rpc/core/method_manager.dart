@@ -36,7 +36,7 @@ class MethodManager {
   void add(Method method) {
     final fullname = method.fullname;
     _methods[fullname.toLowerCase()] = method;
-    if (_names.contains(fullname)) {
+    if (!_names.contains(fullname)) {
       _names.add(fullname);
     }
   }
