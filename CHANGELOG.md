@@ -73,3 +73,7 @@
 ## 3.0.8
 
 - Fixed MethodManager.
+
+## 3.0.9
+
+- Optimized code.
