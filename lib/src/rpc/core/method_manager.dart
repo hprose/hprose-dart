@@ -20,8 +20,8 @@ typedef MissingMethod2 = dynamic Function(
     String fullname, List args, Context context);
 
 class MethodManager {
-  List<String> _names = [];
-  Map<String, Method> _methods = {};
+  final List<String> _names = [];
+  final Map<String, Method> _methods = {};
   Iterable<String> getNames() => _names;
   Method get(String fullname) {
     fullname = fullname.toLowerCase();
@@ -36,7 +36,7 @@ class MethodManager {
   void add(Method method) {
     final fullname = method.fullname;
     _methods[fullname.toLowerCase()] = method;
-    if (_names.indexOf(fullname) == -1) {
+    if (_names.contains(fullname)) {
       _names.add(fullname);
     }
   }
