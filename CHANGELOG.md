@@ -77,3 +77,7 @@
 ## 3.0.9
 
 - Optimized code.
+
+## 3.0.10
+
+- Fixed add method of MethodManager.
