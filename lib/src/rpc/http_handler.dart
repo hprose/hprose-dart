@@ -8,7 +8,7 @@
 |                                                          |
 | HttpHandler for Dart.                                    |
 |                                                          |
-| LastModified: Dec 31, 2019                               |
+| LastModified: Feb 2, 2020                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -175,37 +175,31 @@ class HttpHandler implements Handler<HttpServer> {
       _end(response);
       return;
     }
-    var stream =
+    if (request.method == 'GET') {
+      if (_clientAccessPolicyXmlContent.isNotEmpty &&
+          _clientAccessPolicyXmlHandler(request)) {
+        _end(response);
+        return;
+      }
+      if (_crossDomainXmlContent.isNotEmpty &&
+          _crossDomainXmlHandler(request)) {
+        _end(response);
+        return;
+      }
+      if (!get) {
+        response.statusCode = HttpStatus.forbidden;
+        response.reasonPhrase = 'Forbidden';
+        _end(response);
+        return;
+      }
+    }
+    final stream =
         ByteStream(request.contentLength >= 0 ? request.contentLength : 0);
     await for (var data in request) {
       stream.write(data);
     }
     final data = stream.takeBytes();
-    Uint8List result;
-    switch (request.method) {
-      case 'GET':
-        if (_clientAccessPolicyXmlContent.isNotEmpty &&
-            _clientAccessPolicyXmlHandler(request)) {
-          _end(response);
-          return;
-        }
-        if (_crossDomainXmlContent.isNotEmpty &&
-            _crossDomainXmlHandler(request)) {
-          _end(response);
-          return;
-        }
-        if (!get) {
-          response.statusCode = HttpStatus.forbidden;
-          response.reasonPhrase = 'Forbidden';
-          _end(response);
-          return;
-        }
-        result = await service.handle(data, context);
-        break;
-      case 'POST':
-        result = await service.handle(data, context);
-        break;
-    }
+    final result = await service.handle(data, context);
     sendHeader(request);
     response.contentLength = result.length;
     response.add(result);
