@@ -8,7 +8,7 @@
 |                                                          |
 | hprose.rpc.core library for Dart.                        |
 |                                                          |
-| LastModified: Mar 9 2019                                 |
+| LastModified: Feb 16, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -22,7 +22,7 @@ import 'dart:typed_data';
 import 'io.dart';
 
 part 'src/rpc/core/context.dart';
-part 'src/rpc/core/handler_manager.dart';
+part 'src/rpc/core/plugin_manager.dart';
 part 'src/rpc/core/io_manager.dart';
 part 'src/rpc/core/invoke_manager.dart';
 part 'src/rpc/core/client_context.dart';

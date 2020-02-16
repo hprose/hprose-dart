@@ -4,23 +4,23 @@
 |                                                          |
 | Official WebSite: https://hprose.com                     |
 |                                                          |
-| handler_manager.dart                                     |
+| plugin_manager.dart                                      |
 |                                                          |
-| HandlerManager for Dart.                                 |
+| PluginManager for Dart.                                  |
 |                                                          |
-| LastModified: Dec 31, 2019                               |
+| LastModified: Feb 16, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
 
 part of hprose.rpc.core;
 
-abstract class HandlerManager<Handler extends Function,
+abstract class PluginManager<Handler extends Function,
     NextHandler extends Function> {
   final _handlers = <Handler>[];
   final NextHandler _defaultHandler;
   NextHandler _firstHandler;
-  HandlerManager(this._defaultHandler) : _firstHandler = _defaultHandler;
+  PluginManager(this._defaultHandler) : _firstHandler = _defaultHandler;
   NextHandler _getNextHandler(Handler handler, NextHandler next);
   void _rebuildHandler() {
     final handlers = _handlers;

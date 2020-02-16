@@ -8,7 +8,7 @@
 |                                                          |
 | IOManager for Dart.                                      |
 |                                                          |
-| LastModified: Dec 31, 2019                               |
+| LastModified: Feb 16, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -20,7 +20,7 @@ typedef NextIOHandler = Future<Uint8List> Function(
 typedef IOHandler = Future<Uint8List> Function(
     Uint8List request, Context context, NextIOHandler next);
 
-class IOManager extends HandlerManager<IOHandler, NextIOHandler> {
+class IOManager extends PluginManager<IOHandler, NextIOHandler> {
   IOManager(NextIOHandler defaultHandler) : super(defaultHandler);
   @override
   NextIOHandler _getNextHandler(IOHandler handler, NextIOHandler next) =>

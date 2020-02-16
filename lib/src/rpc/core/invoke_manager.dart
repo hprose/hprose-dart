@@ -8,7 +8,7 @@
 |                                                          |
 | InvokeManager for Dart.                                  |
 |                                                          |
-| LastModified: Dec 31, 2019                               |
+| LastModified: Feb 16, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -20,7 +20,7 @@ typedef NextInvokeHandler = Future Function(
 typedef InvokeHandler = Future Function(
     String name, List args, Context context, NextInvokeHandler next);
 
-class InvokeManager extends HandlerManager<InvokeHandler, NextInvokeHandler> {
+class InvokeManager extends PluginManager<InvokeHandler, NextInvokeHandler> {
   InvokeManager(NextInvokeHandler defaultHandler) : super(defaultHandler);
   @override
   NextInvokeHandler _getNextHandler(
