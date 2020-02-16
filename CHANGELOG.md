@@ -81,3 +81,7 @@
 ## 3.0.10
 
 - Fixed add method of MethodManager.
+
+## 3.0.11
+
+- Rename HandlerManager to PluginManager.
