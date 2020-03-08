@@ -8,7 +8,7 @@
 |                                                          |
 | Method for Dart.                                         |
 |                                                          |
-| LastModified: Dec 31, 2019                               |
+| LastModified: Mar 8, 2020                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -22,7 +22,6 @@ class Method {
   final List<String> optionalParameterTypes = [];
   final Map<String, String> namedParameterTypes = {};
   final bool missing;
-  Duration timeout;
   final Map<String, dynamic> options;
   dynamic operator [](String key) => options[key];
   void operator []=(String key, value) => options[key] = value;
@@ -32,10 +31,7 @@ class Method {
   bool hasOptionalArguments = false;
   bool hasNamedArguments = false;
   Method(this.method,
-      {this.fullname,
-      this.missing = false,
-      this.timeout = Duration.zero,
-      this.options = const {}}) {
+      {this.fullname, this.missing = false, this.options = const {}}) {
     if (fullname == null || fullname.isEmpty) {
       fullname = _getFunctionName(method);
     }

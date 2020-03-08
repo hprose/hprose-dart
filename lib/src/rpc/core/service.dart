@@ -8,7 +8,7 @@
 |                                                          |
 | hprose Service for Dart.                                 |
 |                                                          |
-| LastModified: Dec 31, 2019                               |
+| LastModified: Mar 8, 2020                                |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -43,7 +43,6 @@ class Service {
     return _creators.containsKey(name);
   }
 
-  Duration timeout = Duration(seconds: 30);
   ServiceCodec codec = DefaultServiceCodec.instance;
   int maxRequestLength = 0x7FFFFFFFF;
   InvokeManager _invokeManager;
@@ -58,7 +57,6 @@ class Service {
   Service() {
     init();
     _invokeManager = InvokeManager(execute);
-    _invokeManager.use(_timeoutHandler);
     _ioManager = IOManager(process);
     _creators
         .forEach((name, creator) => _handlers[name] = creator.create(this));
@@ -100,29 +98,6 @@ class Service {
       result = e;
     }
     return codec.encode(result, context as ServiceContext);
-  }
-
-  Future _timeoutHandler(String fullname, List args, Context context,
-      NextInvokeHandler next) async {
-    final task = next(fullname, args, context);
-    final serviceContext = context as ServiceContext;
-    final timeout = serviceContext.method.timeout > Duration.zero
-        ? serviceContext.method.timeout
-        : serviceContext.service.timeout;
-    if (timeout <= Duration.zero) {
-      return await task;
-    }
-    var completer = Completer();
-    var timer = Timer(timeout, () {
-      if (!completer.isCompleted) {
-        completer.completeError(TimeoutException('Timeout'));
-      }
-    });
-    try {
-      return await Future.any([task, completer.future]);
-    } finally {
-      timer.cancel();
-    }
   }
 
   Future execute(String fullname, List args, Context context) async {

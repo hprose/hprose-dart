@@ -85,3 +85,7 @@
 ## 3.0.11
 
 - Rename HandlerManager to PluginManager.
+
+## 3.0.12
+
+- Using the Timeout plugin instead of the built-in implementation.

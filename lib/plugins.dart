@@ -32,3 +32,4 @@ part 'src/rpc/plugins/cluster.dart';
 part 'src/rpc/plugins/loadbalance.dart';
 part 'src/rpc/plugins/push.dart';
 part 'src/rpc/plugins/reverse.dart';
+part 'src/rpc/plugins/timeout.dart';
