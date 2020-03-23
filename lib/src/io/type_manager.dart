@@ -8,7 +8,7 @@
 |                                                          |
 | hprose TypeManager for Dart.                             |
 |                                                          |
-| LastModified: Dec 31, 2019                               |
+| LastModified: Mar 21, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -31,7 +31,7 @@ class _TypeManager {
     _fromJson[name] = fromJson;
     _types[name] = fields;
     if (fromJson != null) {
-      Deserializer.register<T>(ObjectDeserializer(name));
+      Deserializer.register<T>(ObjectDeserializer<T>(name));
     }
   }
 
