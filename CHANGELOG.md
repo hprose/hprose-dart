@@ -89,3 +89,7 @@
 ## 3.0.12
 
 - Using the Timeout plugin instead of the built-in implementation.
+
+## 3.0.13
+
+- Fixed TypeManager.register.
