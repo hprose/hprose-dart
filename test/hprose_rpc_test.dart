@@ -503,4 +503,22 @@ void main() {
     await provider.close();
     server.close();
   });
+
+  test('forward', () async {
+    final service = Service();
+    service.addMethod(hello);
+    final server = await ServerSocket.bind('127.0.0.1', 8412);
+    service.bind(server);
+
+    final service2 = Service();
+    service2.use(new Forward(["tcp://127.0.0.1:8412"]).ioHandler);
+    final server2 = await HttpServer.bind('127.0.0.1', 8000);
+    service2.bind(server2);
+
+    final client = Client(['http://127.0.0.1:8000/']);
+    final proxy = client.useService();
+    expect(await proxy.hello<String>('world'), equals('hello world'));
+    server2.close();
+    server.close();
+  });
 }
