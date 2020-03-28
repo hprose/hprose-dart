@@ -8,7 +8,7 @@
 |                                                          |
 | ServiceContext for Dart.                                 |
 |                                                          |
-| LastModified: Dec 31, 2019                               |
+| LastModified: Mar 28, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -23,14 +23,18 @@ class ServiceContext extends Context {
   ServiceContext(this.service);
 
   @override
+  void copyTo(Context context) {
+    super.copyTo(context);
+    final serviceContext = context as ServiceContext;
+    serviceContext.method = method;
+    serviceContext.host = host;
+    serviceContext.handler = handler;
+  }
+
+  @override
   Context clone() {
     final context = service.createContext();
-    context.method = method;
-    context.host = host;
-    context.handler = handler;
-    context.items.addAll(items);
-    context.requestHeaders.addAll(requestHeaders);
-    context.responseHeaders.addAll(responseHeaders);
+    copyTo(context);
     return context;
   }
 }

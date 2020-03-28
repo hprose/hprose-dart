@@ -40,6 +40,7 @@ class Provider {
   }
 
   Provider(this.client, [String id]) {
+    Method.registerContextType('ProviderContext');
     _invokeManager = InvokeManager(_execute);
     if (id != null && id.isNotEmpty) this.id = id;
     addMethod(_methodManager.getNames, '~');
@@ -53,9 +54,15 @@ class Provider {
       return Function.apply(method.method, [name, args]);
     }
     if (method.namedParameterTypes.isEmpty) {
+      if (method.contextInPositionalArguments) {
+        args.add(context);
+      }
       return Function.apply(method.method, args);
     }
     final namedArguments = args.removeLast();
+    if (method.contextInNamedArguments) {
+      namedArguments[Symbol('context')] = context;
+    }
     return Function.apply(method.method, args, namedArguments);
   }
 
@@ -87,14 +94,12 @@ class Provider {
         if (method.hasNamedArguments) {
           n = ppl + 1;
         }
-        if (count > n) {
-          args.length = n;
-        }
         if (method.contextInPositionalArguments) {
           ppl--;
           n--;
         }
         n = min(count, n);
+        args.length = n;
         for (var i = 0; i < n; ++i) {
           if (i < ppl) {
             args[i] = Formatter.deserialize(Formatter.serialize(args[i]),
@@ -119,14 +124,8 @@ class Provider {
                 namedArgs[Symbol(name)] = value;
               }
             }
-            if (method.contextInNamedArguments) {
-              namedArgs[Symbol('context')] = context;
-            }
             args[i] = namedArgs;
           }
-        }
-        if (method.contextInPositionalArguments) {
-          args[ppl] = context;
         }
       }
       return [index, await _invokeManager.handler(name, args, context), null];
@@ -202,23 +201,23 @@ class _Proxy {
   }
 
   @override
-  dynamic noSuchMethod(Invocation mirror) {
-    var name = _namespace + _getName(mirror.memberName);
-    if (mirror.isGetter) {
+  dynamic noSuchMethod(Invocation invocation) {
+    var name = _namespace + _getName(invocation.memberName);
+    if (invocation.isGetter) {
       return _Proxy(_caller, _id, name);
     }
-    if (mirror.isMethod) {
+    if (invocation.isMethod) {
       var type = dynamic;
-      if (mirror.typeArguments.isNotEmpty) {
-        type = mirror.typeArguments.first;
+      if (invocation.typeArguments.isNotEmpty) {
+        type = invocation.typeArguments.first;
       }
       var args = [];
-      if (mirror.positionalArguments.isNotEmpty) {
-        args.addAll(mirror.positionalArguments);
+      if (invocation.positionalArguments.isNotEmpty) {
+        args.addAll(invocation.positionalArguments);
       }
-      if (mirror.namedArguments.isNotEmpty) {
+      if (invocation.namedArguments.isNotEmpty) {
         var namedArgs = <String, dynamic>{};
-        mirror.namedArguments.forEach((name, value) {
+        invocation.namedArguments.forEach((name, value) {
           namedArgs[_getName(name)] = value;
         });
         if (namedArgs.isNotEmpty) {
@@ -227,7 +226,19 @@ class _Proxy {
       }
       return _caller._invoke(_id, name, args, type);
     }
-    super.noSuchMethod(mirror);
+    super.noSuchMethod(invocation);
+  }
+}
+
+class CallerContext extends ServiceContext {
+  final Caller caller;
+  dynamic proxy;
+  CallerContext(this.caller, ServiceContext context) : super(context.service) {
+    context.copyTo(this);
+    proxy = caller.useService(caller._getId(this));
+  }
+  invoke<T>(String name, [List args]) {
+    caller.invoke<T>(caller._getId(this), name, args);
   }
 }
 
@@ -241,6 +252,7 @@ class Caller {
   var heartbeat = const Duration(minutes: 2);
   var timeout = const Duration(seconds: 30);
   Caller(this.service) {
+    Method.registerContextType('CallerContext');
     service
       ..addMethod(_close, '!!')
       ..addMethod(_begin, '!')
@@ -386,8 +398,6 @@ class Caller {
 
   Future _handler(
       String name, List args, Context context, NextInvokeHandler next) {
-    context['invoke'] = <T>(String name, [List args]) =>
-        invoke<T>(_getId(context as ServiceContext), name, args);
-    return next(name, args, context);
+    return next(name, args, new CallerContext(this, context as ServiceContext));
   }
 }

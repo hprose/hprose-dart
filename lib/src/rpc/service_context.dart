@@ -8,7 +8,7 @@
 |                                                          |
 | ServiceContext for Dart.                                 |
 |                                                          |
-| LastModified: Mar 28, 2019                               |
+| LastModified: Mar 28, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -23,12 +23,12 @@ class ServiceContext extends core.ServiceContext {
   ServiceContext(Service service) : super(service);
 
   @override
-  Context clone() {
-    final context = super.clone() as ServiceContext;
-    context.remoteAddress = remoteAddress;
-    context.remotePort = remotePort;
-    context.localAddress = localAddress;
-    context.localPort = localPort;
-    return context;
+  void copyTo(Context context) {
+    super.copyTo(context);
+    final serviceContext = context as ServiceContext;
+    serviceContext.remoteAddress = remoteAddress;
+    serviceContext.remotePort = remotePort;
+    serviceContext.localAddress = localAddress;
+    serviceContext.localPort = localPort;
   }
 }

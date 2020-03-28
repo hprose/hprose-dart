@@ -8,7 +8,7 @@
 |                                                          |
 | Method for Dart.                                         |
 |                                                          |
-| LastModified: Mar 20, 2020                               |
+| LastModified: Mar 28, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -16,6 +16,13 @@
 part of hprose.rpc.core;
 
 class Method {
+  static final List<String> _contextTypes = ['Context', 'ServiceContext'];
+  static registerContextType(String contextType) {
+    if (!_contextTypes.contains(contextType)) {
+      _contextTypes.add(contextType);
+    }
+  }
+
   final Function method;
   String name;
   final List<String> positionalParameterTypes = [];
@@ -41,13 +48,11 @@ class Method {
     _parseParameters(method);
     if (!hasOptionalArguments && !hasNamedArguments) {
       if (positionalParameterTypes.isNotEmpty &&
-          (positionalParameterTypes.last == 'Context' ||
-              positionalParameterTypes.last == 'ServiceContext')) {
+          _contextTypes.contains(positionalParameterTypes.last)) {
         passContext = true;
         contextInPositionalArguments = true;
       }
-    } else if (namedParameterTypes['context'] == 'Context' ||
-        namedParameterTypes['context'] == 'ServiceContext') {
+    } else if (_contextTypes.contains(namedParameterTypes['context'])) {
       passContext = true;
       contextInNamedArguments = true;
     }

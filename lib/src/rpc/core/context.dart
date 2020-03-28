@@ -8,7 +8,7 @@
 |                                                          |
 | hprose Context for Dart.                                 |
 |                                                          |
-| LastModified: Dec 31, 2019                               |
+| LastModified: Mar 28, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -38,11 +38,15 @@ class Context {
     }
   }
 
-  Context clone() {
-    final context = Context();
+  void copyTo(Context context) {
     context.items.addAll(items);
     context.requestHeaders.addAll(requestHeaders);
     context.responseHeaders.addAll(responseHeaders);
+  }
+
+  Context clone() {
+    final context = Context();
+    copyTo(context);
     return context;
   }
 }

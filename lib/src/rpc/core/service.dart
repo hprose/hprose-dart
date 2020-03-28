@@ -109,9 +109,15 @@ class Service {
       return Function.apply(method.method, [name, args]);
     }
     if (method.namedParameterTypes.isEmpty) {
+      if (method.contextInPositionalArguments) {
+        args.add(context);
+      }
       return Function.apply(method.method, args);
     }
     final namedArguments = args.removeLast();
+    if (method.contextInNamedArguments) {
+      namedArguments[Symbol('context')] = context;
+    }
     return Function.apply(method.method, args, namedArguments);
   }
 

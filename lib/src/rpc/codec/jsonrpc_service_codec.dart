@@ -121,14 +121,12 @@ class JsonRpcServiceCodec implements ServiceCodec {
       if (method.hasNamedArguments) {
         n = ppl + 1;
       }
-      if (count > n) {
-        args.length = n;
-      }
       if (method.contextInPositionalArguments) {
         ppl--;
         n--;
       }
       n = min(count, n);
+      args.length = n;
       for (var i = 0; i < n; ++i) {
         if (i < ppl) {
           args[i] = Formatter.deserialize(Formatter.serialize(args[i]),
@@ -152,14 +150,8 @@ class JsonRpcServiceCodec implements ServiceCodec {
               namedArgs[Symbol(key)] = value;
             }
           }
-          if (method.contextInNamedArguments) {
-            namedArgs[Symbol('context')] = context;
-          }
           args[i] = namedArgs;
         }
-      }
-      if (method.contextInPositionalArguments) {
-        args[ppl] = context;
       }
     }
     return RequestInfo(name, args);

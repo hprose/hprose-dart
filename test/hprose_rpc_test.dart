@@ -472,6 +472,38 @@ void main() {
     server.close();
   });
 
+  test('reverse RPC 2', () async {
+    String missing(String name, List args) {
+      return name + args.toString();
+    }
+
+    Future<String> hello(String name, CallerContext context) async {
+      return await context.proxy.hi<String>(name);
+    }
+
+    final service = new Caller(new Service()).service;
+    service.addMethod(hello, 'hello');
+    service.use(log.ioHandler);
+    final server = new MockServer('127.0.0.1');
+    service.bind(server);
+
+    final client = new Client(['mock://127.0.0.1']);
+    final provider = new Provider(client, '1');
+    provider.addMissingMethod(missing);
+    provider.listen();
+
+    final proxy = client.useService();
+    final result1 = proxy.hello<String>('world1');
+    final result2 = proxy.hello<String>('world2');
+    final result3 = proxy.hello<String>('world3');
+
+    expect(await result1, equals('hi[world1]'));
+    expect(await result2, equals('hi[world2]'));
+    expect(await result3, equals('hi[world3]'));
+    await provider.close();
+    server.close();
+  });
+
   test('reverse JsonRpc', () async {
     final service = Service();
     service.codec = JsonRpcServiceCodec.instance;

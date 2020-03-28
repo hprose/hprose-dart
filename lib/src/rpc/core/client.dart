@@ -41,27 +41,27 @@ class _Proxy {
   }
 
   @override
-  dynamic noSuchMethod(Invocation mirror) {
-    var name = _namespace + _getName(mirror.memberName);
-    if (mirror.isGetter) {
+  dynamic noSuchMethod(Invocation invocation) {
+    var name = _namespace + _getName(invocation.memberName);
+    if (invocation.isGetter) {
       return _Proxy(_client, name);
     }
-    if (mirror.isMethod) {
+    if (invocation.isMethod) {
       var type = dynamic;
-      if (mirror.typeArguments.isNotEmpty) {
-        type = mirror.typeArguments.first;
+      if (invocation.typeArguments.isNotEmpty) {
+        type = invocation.typeArguments.first;
       }
       ClientContext context;
       var args = [];
-      if (mirror.positionalArguments.isNotEmpty) {
-        args.addAll(mirror.positionalArguments);
+      if (invocation.positionalArguments.isNotEmpty) {
+        args.addAll(invocation.positionalArguments);
         if (args.last is Context) {
           context = args.removeLast();
         }
       }
-      if (mirror.namedArguments.isNotEmpty) {
+      if (invocation.namedArguments.isNotEmpty) {
         var namedArgs = <String, dynamic>{};
-        mirror.namedArguments.forEach((name, value) {
+        invocation.namedArguments.forEach((name, value) {
           namedArgs[_getName(name)] = value;
         });
         if (namedArgs.containsKey('context') &&
@@ -76,7 +76,7 @@ class _Proxy {
       context.returnType = type;
       return _client.invoke(name, args, context);
     }
-    super.noSuchMethod(mirror);
+    super.noSuchMethod(invocation);
   }
 }
 

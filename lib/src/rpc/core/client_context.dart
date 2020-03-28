@@ -8,7 +8,7 @@
 |                                                          |
 | ClientContext for Dart.                                  |
 |                                                          |
-| LastModified: Mar 28, 2019                               |
+| LastModified: Mar 28, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -42,15 +42,19 @@ class ClientContext extends Context {
   }
 
   @override
+  void copyTo(Context context) {
+    super.copyTo(context);
+    final clientContext = context as ClientContext;
+    clientContext.client = client;
+    clientContext.uri = uri;
+    clientContext.returnType = returnType;
+    clientContext.timeout = timeout;
+  }
+
+  @override
   Context clone() {
     final context = ClientContext();
-    context.client = client;
-    context.uri = uri;
-    context.returnType = returnType;
-    context.timeout = timeout;
-    context.items.addAll(items);
-    context.requestHeaders.addAll(requestHeaders);
-    context.responseHeaders.addAll(responseHeaders);
+    copyTo(context);
     return context;
   }
 }

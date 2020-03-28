@@ -98,11 +98,11 @@ class DefaultServiceCodec extends ServiceCodec {
     if (method.hasNamedArguments) {
       n = ppl + 1;
     }
-    var args = List<dynamic>.filled(n, null, growable: true);
     if (method.contextInPositionalArguments) {
       ppl--;
       n--;
     }
+    var args = List<dynamic>.filled(n, null, growable: true);
     n = min(count, n);
     for (var i = 0; i < n; ++i) {
       if (i < ppl) {
@@ -132,14 +132,8 @@ class DefaultServiceCodec extends ServiceCodec {
           }
         }
         stream.readByte();
-        if (method.contextInNamedArguments) {
-          namedArgs[Symbol('context')] = context;
-        }
         args[i] = namedArgs;
       }
-    }
-    if (method.contextInPositionalArguments) {
-      args[ppl] = context;
     }
     return args;
   }
