@@ -41,6 +41,14 @@ class Producer {
   List<String> idlist(String topic) => _broker.idlist(topic);
 }
 
+class BrokerContext extends ServiceContext {
+  final Producer producer;
+  BrokerContext(this.producer, ServiceContext context)
+      : super(context.service) {
+    context.copyTo(this);
+  }
+}
+
 class Broker {
   final _messages = <String, Map<String, List<Message>>>{};
   final _responders = <String, Completer<Map<String, List<Message>>>>{};
@@ -57,6 +65,7 @@ class Broker {
       TypeManager.register<Message>((json) => Message.FromJson(json),
           {'data': dynamic, 'from': String}, '@');
     }
+    Method.registerContextType('BrokerContext');
     service
       ..addMethod(_subscribe, '+')
       ..addMethod(_unsubscribe, '-')
@@ -306,9 +315,7 @@ class Broker {
         if (args.length == 2) args.add(from);
         break;
     }
-    var producer = Producer(this, from);
-    context['producer'] = producer;
-    return next(name, args, context);
+    return next(name, args, BrokerContext(Producer(this, from), context));
   }
 }
 
