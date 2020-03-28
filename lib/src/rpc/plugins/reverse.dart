@@ -398,6 +398,6 @@ class Caller {
 
   Future _handler(
       String name, List args, Context context, NextInvokeHandler next) {
-    return next(name, args, new CallerContext(this, context as ServiceContext));
+    return next(name, args, CallerContext(this, context as ServiceContext));
   }
 }

@@ -19,19 +19,19 @@ class Forward {
   Client _client;
   Duration timeout;
   Forward([List<String> uris]) {
-    _client = new Client(uris);
+    _client = Client(uris);
   }
 
   Future<Uint8List> ioHandler(
       Uint8List request, Context context, NextIOHandler next) {
-    final clientContext = new ClientContext(timeout: timeout);
+    final clientContext = ClientContext(timeout: timeout);
     clientContext.init(_client);
     return _client.request(request, clientContext);
   }
 
   Future invokeHandler(
       String name, List args, Context context, NextInvokeHandler next) {
-    final clientContext = new ClientContext(timeout: timeout);
+    final clientContext = ClientContext(timeout: timeout);
     return _client.invoke(name, args, clientContext);
   }
 
