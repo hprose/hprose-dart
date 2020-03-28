@@ -98,3 +98,7 @@
 
 - Add Forward plugin.
 - Improved reverse rpc plugin.
+
+## 3.0.15
+
+- Optimized code.
