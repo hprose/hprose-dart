@@ -8,7 +8,7 @@
 |                                                          |
 | Log plugin for Dart.                                     |
 |                                                          |
-| LastModified: Dec 31, 2019                               |
+| LastModified: Mar 28, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -40,9 +40,7 @@ class Log {
     if (!enabled) return next(name, args, context);
     var a = '';
     try {
-      a = json.encode((args.isNotEmpty && args.last is Context)
-          ? args.sublist(0, args.length - 1)
-          : args);
+      a = json.encode(args);
     } catch (e) {
       print(e);
     }
