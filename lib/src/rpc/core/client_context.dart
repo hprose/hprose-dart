@@ -8,7 +8,7 @@
 |                                                          |
 | ClientContext for Dart.                                  |
 |                                                          |
-| LastModified: Dec 31, 2019                               |
+| LastModified: Mar 28, 2019                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -33,7 +33,7 @@ class ClientContext extends Context {
       this.items.addAll(items);
     }
   }
-  void init(Client client, Type type) {
+  void init(Client client, [Type type]) {
     this.client = client;
     if (client.uris.isNotEmpty) uri = client.uris.first;
     returnType ??= type;
