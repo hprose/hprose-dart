@@ -93,11 +93,11 @@ class ConcurrentLimiter {
     }
   }
 
-  Future handler(
-      String name, List args, Context context, NextInvokeHandler next) async {
+  Future<Uint8List> handler(
+      Uint8List request, Context context, NextIOHandler next) async {
     await acquire();
     try {
-      return await next(name, args, context);
+      return await next(request, context);
     } finally {
       release();
     }
