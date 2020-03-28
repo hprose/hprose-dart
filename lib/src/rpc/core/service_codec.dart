@@ -8,7 +8,7 @@
 |                                                          |
 | ServiceCodec for Dart.                                   |
 |                                                          |
-| LastModified: Dec 31, 2019                               |
+| LastModified: Mar 28, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -59,11 +59,11 @@ class DefaultServiceCodec extends ServiceCodec {
     return stream.takeBytes();
   }
 
-  Method _decodeMethod(String fullname, ServiceContext context) {
+  Method _decodeMethod(String name, ServiceContext context) {
     final service = context.service;
-    final method = service.get(fullname);
+    final method = service.get(name);
     if (method == null) {
-      throw Exception('Can\'t find this method ${fullname}().');
+      throw Exception('Can\'t find this method ${name}().');
     }
     context.method = method;
     return method;
@@ -165,10 +165,10 @@ class DefaultServiceCodec extends ServiceCodec {
         if (context.requestHeaders.containsKey('simple')) {
           reader.simple = true;
         }
-        final fullname = reader.deserialize<String>();
+        final name = reader.deserialize<String>();
         final args =
-            _decodeArguments(_decodeMethod(fullname, context), reader, context);
-        return RequestInfo(fullname, args);
+            _decodeArguments(_decodeMethod(name, context), reader, context);
+        return RequestInfo(name, args);
       case TagEnd:
         _decodeMethod('~', context);
         return RequestInfo('~', []);

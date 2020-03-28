@@ -8,7 +8,7 @@
 |                                                          |
 | JsonRpcServiceCodec for Dart.                            |
 |                                                          |
-| LastModified: Dec 31, 2019                               |
+| LastModified: Mar 28, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -95,8 +95,8 @@ class JsonRpcServiceCodec implements ServiceCodec {
       context.requestHeaders.addAll(call['headers']);
     }
     context['jsonrpc.id'] = call['id'];
-    final fullname = call['method'];
-    final method = context.service.get(fullname);
+    final name = call['method'];
+    final method = context.service.get(name);
     if (method == null) {
       throw Exception('Method not found');
     }
@@ -144,12 +144,12 @@ class JsonRpcServiceCodec implements ServiceCodec {
           var originalNamedArgs = (args[i] as Map);
           var namedArgs = <Symbol, dynamic>{};
           for (final entry in originalNamedArgs.entries) {
-            var name = entry.key.toString();
-            if (method.namedParameterTypes.containsKey(name)) {
+            var key = entry.key.toString();
+            if (method.namedParameterTypes.containsKey(key)) {
               var value = Formatter.deserialize(
                   Formatter.serialize(entry.value),
-                  type: method.namedParameterTypes[name]);
-              namedArgs[Symbol(name)] = value;
+                  type: method.namedParameterTypes[key]);
+              namedArgs[Symbol(key)] = value;
             }
           }
           if (method.contextInNamedArguments) {
@@ -162,6 +162,6 @@ class JsonRpcServiceCodec implements ServiceCodec {
         args[ppl] = context;
       }
     }
-    return RequestInfo(fullname, args);
+    return RequestInfo(name, args);
   }
 }

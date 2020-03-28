@@ -8,7 +8,7 @@
 |                                                          |
 | hprose Client for Dart.                                  |
 |                                                          |
-| LastModified: Dec 31, 2019                               |
+| LastModified: Mar 28, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -156,8 +156,7 @@ class Client {
     }
   }
 
-  Future<T> invoke<T>(String fullname,
-      [List args, ClientContext context]) async {
+  Future<T> invoke<T>(String name, [List args, ClientContext context]) async {
     context ??= ClientContext();
     context.init(this, T);
     args ??= [];
@@ -166,11 +165,11 @@ class Client {
         args[i] = await args[i];
       }
     }
-    return await _invokeManager.handler(fullname, args, context);
+    return await _invokeManager.handler(name, args, context);
   }
 
-  Future call(String fullname, List args, Context context) async {
-    var request = codec.encode(fullname, args, context);
+  Future call(String name, List args, Context context) async {
+    var request = codec.encode(name, args, context);
     var response = await this.request(request, context);
     return codec.decode(response, context);
   }

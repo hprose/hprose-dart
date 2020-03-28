@@ -8,7 +8,7 @@
 |                                                          |
 | Reverse plugin for Dart.                                 |
 |                                                          |
-| LastModified: Dec 31, 2019                               |
+| LastModified: Mar 28, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -174,13 +174,13 @@ class Provider {
 
   void use(InvokeHandler handler) => _invokeManager.use(handler);
   void unuse(InvokeHandler handler) => _invokeManager.unuse(handler);
-  Method get(String fullname) => _methodManager.get(fullname);
+  Method get(String name) => _methodManager.get(name);
   void add(Method method) => _methodManager.add(method);
-  void remove(String fullname) => _methodManager.remove(fullname);
-  void addMethod(Function method, [String fullname]) =>
-      _methodManager.addMethod(method, fullname);
-  void addMethods(List<Function> methods, [List<String> fullnames]) =>
-      _methodManager.addMethods(methods, fullnames);
+  void remove(String name) => _methodManager.remove(name);
+  void addMethod(Function method, [String name]) =>
+      _methodManager.addMethod(method, name);
+  void addMethods(List<Function> methods, [List<String> names]) =>
+      _methodManager.addMethods(methods, names);
   void addMissingMethod<MissingMethod extends Function>(MissingMethod method) =>
       _methodManager.addMissingMethod(method);
 }
@@ -328,7 +328,7 @@ class Caller {
     }
   }
 
-  Future _invoke(String id, String fullname, List args, Type returnType) async {
+  Future _invoke(String id, String name, List args, Type returnType) async {
     args ??= [];
     for (var i = 0; i < args.length; i++) {
       if (args[i] is Future) {
@@ -340,7 +340,7 @@ class Caller {
     if (!_calls.containsKey(id)) {
       _calls[id] = [];
     }
-    final call = [index, fullname, args];
+    final call = [index, name, args];
     _calls[id].add(call);
     if (!_results.containsKey(id)) {
       _results[id] = {};
@@ -368,8 +368,8 @@ class Caller {
     }
   }
 
-  Future<T> invoke<T>(String id, String fullname, [List args]) async {
-    return (await _invoke(id, fullname, args, T)) as T;
+  Future<T> invoke<T>(String id, String name, [List args]) async {
+    return (await _invoke(id, name, args, T)) as T;
   }
 
   dynamic useService(String id, [String namespace]) {
@@ -386,8 +386,8 @@ class Caller {
 
   Future _handler(
       String name, List args, Context context, NextInvokeHandler next) {
-    context['invoke'] = <T>(String fullname, [List args]) =>
-        invoke<T>(_getId(context as ServiceContext), fullname, args);
+    context['invoke'] = <T>(String name, [List args]) =>
+        invoke<T>(_getId(context as ServiceContext), name, args);
     return next(name, args, context);
   }
 }

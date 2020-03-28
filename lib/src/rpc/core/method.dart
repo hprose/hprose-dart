@@ -8,7 +8,7 @@
 |                                                          |
 | Method for Dart.                                         |
 |                                                          |
-| LastModified: Mar 8, 2020                                |
+| LastModified: Mar 20, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -17,7 +17,7 @@ part of hprose.rpc.core;
 
 class Method {
   final Function method;
-  String fullname;
+  String name;
   final List<String> positionalParameterTypes = [];
   final List<String> optionalParameterTypes = [];
   final Map<String, String> namedParameterTypes = {};
@@ -31,12 +31,12 @@ class Method {
   bool hasOptionalArguments = false;
   bool hasNamedArguments = false;
   Method(this.method,
-      {this.fullname, this.missing = false, this.options = const {}}) {
-    if (fullname == null || fullname.isEmpty) {
-      fullname = _getFunctionName(method);
+      {this.name, this.missing = false, this.options = const {}}) {
+    if (name == null || name.isEmpty) {
+      name = _getFunctionName(method);
     }
-    if (fullname.isEmpty) {
-      throw ArgumentError.notNull('fullname');
+    if (name.isEmpty) {
+      throw ArgumentError.notNull('name');
     }
     _parseParameters(method);
     if (!hasOptionalArguments && !hasNamedArguments) {

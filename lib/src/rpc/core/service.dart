@@ -8,7 +8,7 @@
 |                                                          |
 | hprose Service for Dart.                                 |
 |                                                          |
-| LastModified: Mar 8, 2020                                |
+| LastModified: Mar 28, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -100,13 +100,13 @@ class Service {
     return codec.encode(result, context as ServiceContext);
   }
 
-  Future execute(String fullname, List args, Context context) async {
+  Future execute(String name, List args, Context context) async {
     final method = (context as ServiceContext).method;
     if (method.missing) {
       if (method.passContext) {
-        return Function.apply(method.method, [fullname, args, context]);
+        return Function.apply(method.method, [name, args, context]);
       }
-      return Function.apply(method.method, [fullname, args]);
+      return Function.apply(method.method, [name, args]);
     }
     if (method.namedParameterTypes.isEmpty) {
       return Function.apply(method.method, args);
@@ -135,13 +135,13 @@ class Service {
     }
   }
 
-  Method get(String fullname) => _methodManager.get(fullname);
+  Method get(String name) => _methodManager.get(name);
   void add(Method method) => _methodManager.add(method);
-  void remove(String fullname) => _methodManager.remove(fullname);
-  void addMethod(Function method, [String fullname]) =>
-      _methodManager.addMethod(method, fullname);
-  void addMethods(List<Function> methods, [List<String> fullnames]) =>
-      _methodManager.addMethods(methods, fullnames);
+  void remove(String name) => _methodManager.remove(name);
+  void addMethod(Function method, [String name]) =>
+      _methodManager.addMethod(method, name);
+  void addMethods(List<Function> methods, [List<String> names]) =>
+      _methodManager.addMethods(methods, names);
   void addMissingMethod<MissingMethod extends Function>(MissingMethod method) =>
       _methodManager.addMissingMethod(method);
 }
