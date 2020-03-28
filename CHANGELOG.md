@@ -102,3 +102,5 @@
 ## 3.0.15
 
 - Optimized code.
+- Fixed log plugin.
+- Fixed push plugin.
