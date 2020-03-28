@@ -8,7 +8,7 @@
 |                                                          |
 | Cluster plugin for Dart.                                 |
 |                                                          |
-| LastModified: Dec 31, 2019                               |
+| LastModified: Mar 28, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -118,9 +118,9 @@ class Cluster {
     }
   }
 
-  static Future forking(
-      String name, List args, Context context, NextInvokeHandler next) {
-    final completer = Completer();
+  static Future<Uint8List> forking(
+      Uint8List request, Context context, NextIOHandler next) {
+    final completer = Completer<Uint8List>();
     final clientContext = context as ClientContext;
     final uris = clientContext.client.uris;
     final n = uris.length;
@@ -128,7 +128,7 @@ class Cluster {
     for (var i = 0; i < n; ++i) {
       final forkingContext = clientContext.clone() as ClientContext;
       forkingContext.uri = uris[i];
-      next(name, args, forkingContext).then((value) {
+      next(request, forkingContext).then((value) {
         completer.complete(value);
       }, onError: (error, stackTrace) {
         if (--count == 0) {
