@@ -69,7 +69,7 @@ class DefaultServiceCodec extends ServiceCodec {
     return method;
   }
 
-  List _decodeArguments(Method method, Reader reader, ServiceContext context) {
+  List _decodeArguments(Method method, Reader reader) {
     final stream = reader.stream;
     var tag = stream.readByte();
     if (method.missing) {
@@ -160,8 +160,7 @@ class DefaultServiceCodec extends ServiceCodec {
           reader.simple = true;
         }
         final name = reader.deserialize<String>();
-        final args =
-            _decodeArguments(_decodeMethod(name, context), reader, context);
+        final args = _decodeArguments(_decodeMethod(name, context), reader);
         return RequestInfo(name, args);
       case TagEnd:
         _decodeMethod('~', context);
