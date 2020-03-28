@@ -93,3 +93,8 @@
 ## 3.0.13
 
 - Fixed TypeManager.register.
+
+## 3.0.14
+
+- Add Forward plugin.
+- Improved reverse rpc plugin.
