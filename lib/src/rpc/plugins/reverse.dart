@@ -237,8 +237,8 @@ class CallerContext extends ServiceContext {
     context.copyTo(this);
     proxy = caller.useService(caller._getId(this));
   }
-  invoke<T>(String name, [List args]) {
-    caller.invoke<T>(caller._getId(this), name, args);
+  Future<T> invoke<T>(String name, [List args]) {
+    return caller.invoke<T>(caller._getId(this), name, args);
   }
 }
 
