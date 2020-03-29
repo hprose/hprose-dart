@@ -104,3 +104,10 @@
 - Optimized code.
 - Fixed log plugin.
 - Fixed push plugin.
+
+## 3.0.16
+
+- Add hprose headers forward support.
+- Add http headers forward support.
+- Fixed CallerContext.invoke.
+- Optimized code.
