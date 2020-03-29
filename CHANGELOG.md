@@ -111,3 +111,7 @@
 - Add http headers forward support.
 - Fixed CallerContext.invoke.
 - Optimized code.
+
+## 3.0.17
+
+- Remove http headers forward support.
