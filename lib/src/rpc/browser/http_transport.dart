@@ -8,7 +8,7 @@
 |                                                          |
 | HttpTransport for Dart.                                  |
 |                                                          |
-| LastModified: Dec 31, 2019                               |
+| LastModified: Mar 29, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -20,25 +20,32 @@ typedef OnProgress = void Function(ProgressEvent e);
 class HttpTransport implements Transport {
   var _counter = 0;
   final _requests = <int, HttpRequest>{};
-  var httpRequestHeaders = <String, String>{};
+  var httpRequestHeaders = <String, Object>{};
   OnProgress onProgress;
-  Map<String, String> _getRequestHeaders(
-      Map<String, dynamic> httpRequestHeaders) {
-    final headers = <String, String>{};
-    for (final name in this.httpRequestHeaders.keys) {
-      headers[name] = this.httpRequestHeaders[name];
-    }
-    if (httpRequestHeaders != null && httpRequestHeaders.isNotEmpty) {
-      for (final name in httpRequestHeaders.keys) {
-        final value = httpRequestHeaders[name];
-        if (value is List) {
-          headers[name] = value.join(', ');
-        } else {
-          headers[name] = value.toString();
-        }
+  void _setRequestHeader(
+      HttpRequest httpRequest, Map<String, Object> httpRequestHeaders) {
+    httpRequestHeaders?.forEach((String name, Object values) {
+      if (values is List) {
+        httpRequest.setRequestHeader(name, values.join(', '));
+      } else {
+        httpRequest.setRequestHeader(name, values.toString());
       }
-    }
-    return headers;
+    });
+  }
+
+  Map<String, Object> _getResponseHeader(Map<String, String> responseHeaders) {
+    var httpResponseHeaders = <String, Object>{};
+    responseHeaders?.forEach((String name, String values) {
+      if (values.contains(',')) {
+        httpResponseHeaders[name] = values
+            .split(',')
+            .map((String v) => v.trim())
+            .toList(growable: true);
+      } else {
+        httpResponseHeaders[name] = values;
+      }
+    });
+    return httpResponseHeaders;
   }
 
   @override
@@ -47,13 +54,11 @@ class HttpTransport implements Transport {
     final index = (_counter < 0x7FFFFFFF) ? ++_counter : _counter = 0;
     final httpRequest = HttpRequest();
     _requests[index] = httpRequest;
-    var httpRequestHeaders = _getRequestHeaders(context['httpRequestHeaders']);
     httpRequest.open('POST', clientContext.uri.toString());
     httpRequest.withCredentials = true;
     httpRequest.responseType = 'arraybuffer';
-    httpRequestHeaders.forEach((header, value) {
-      httpRequest.setRequestHeader(header, value);
-    });
+    _setRequestHeader(httpRequest, httpRequestHeaders);
+    _setRequestHeader(httpRequest, context['httpRequestHeaders']);
     if (onProgress != null) {
       httpRequest.onProgress.listen(onProgress);
       httpRequest.upload.onProgress.listen(onProgress);
@@ -63,7 +68,8 @@ class HttpTransport implements Transport {
       context['httpStatusCode'] = httpRequest.status;
       context['httpStatusText'] = httpRequest.statusText;
       if (httpRequest.status >= 200 && httpRequest.status < 300) {
-        context['httpResponseHeaders'] = httpRequest.responseHeaders;
+        context['httpResponseHeaders'] =
+            _getResponseHeader(httpRequest.responseHeaders);
         result.complete(Uint8List.view(httpRequest.response));
       } else {
         result.completeError(

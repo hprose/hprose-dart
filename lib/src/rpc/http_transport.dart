@@ -8,7 +8,7 @@
 |                                                          |
 | HttpTransport for Dart.                                  |
 |                                                          |
-| LastModified: Dec 31, 2019                               |
+| LastModified: Mar 29, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -17,9 +17,9 @@ part of hprose.rpc;
 
 class HttpTransport implements Transport {
   HttpClient httpClient;
-  Map<String, Object> httpRequestHeaders = {};
   bool keepAlive = true;
   int maxConnectionsPerHost = 0;
+  var httpRequestHeaders = <String, Object>{};
 
   HttpTransport() {
     httpClient = createHttpClient();
@@ -69,7 +69,15 @@ class HttpTransport implements Transport {
     context['httpStatusCode'] = httpResponse.statusCode;
     context['httpStatusText'] = httpResponse.reasonPhrase;
     if (httpResponse.statusCode >= 200 && httpResponse.statusCode < 300) {
-      context['httpResponseHeaders'] = httpResponse.headers;
+      var httpResponseHeaders = <String, Object>{};
+      httpResponse.headers.forEach((String name, List<String> values) {
+        if (values.length == 1) {
+          httpResponseHeaders[name] = values[0];
+        } else {
+          httpResponseHeaders[name] = values;
+        }
+      });
+      context['httpResponseHeaders'] = httpResponseHeaders;
       var stream = ByteStream(
           httpResponse.contentLength >= 0 ? httpResponse.contentLength : 0);
       await for (var data in httpResponse) {

@@ -8,7 +8,7 @@
 |                                                          |
 | Forward plugin for Dart.                                 |
 |                                                          |
-| LastModified: Mar 28, 2020                               |
+| LastModified: Mar 29, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -22,17 +22,42 @@ class Forward {
     _client = Client(uris);
   }
 
+  void _forwardHttpResponseHeaders(
+      Context context, ClientContext clientContext) {
+    if (clientContext.containsKey('httpResponseHeaders')) {
+      context['httpResponseHeaders'] = clientContext['httpResponseHeaders'];
+    }
+    if (clientContext.containsKey('httpStatusCode')) {
+      context['httpStatusCode'] = clientContext['httpStatusCode'];
+    }
+  }
+
+  void _forwardHttpRequestHeaders(
+      Context context, ClientContext clientContext) {
+    if (context.containsKey('httpRequestHeaders')) {
+      clientContext['httpRequestHeaders'] = context['httpRequestHeaders'];
+    }
+  }
+
   Future<Uint8List> ioHandler(
-      Uint8List request, Context context, NextIOHandler next) {
+      Uint8List request, Context context, NextIOHandler next) async {
     final clientContext = ClientContext(timeout: timeout);
     clientContext.init(_client);
-    return _client.request(request, clientContext);
+    _forwardHttpRequestHeaders(context, clientContext);
+    final response = await _client.request(request, clientContext);
+    _forwardHttpResponseHeaders(context, clientContext);
+    return response;
   }
 
   Future invokeHandler(
-      String name, List args, Context context, NextInvokeHandler next) {
+      String name, List args, Context context, NextInvokeHandler next) async {
     final clientContext = ClientContext(timeout: timeout);
-    return _client.invoke(name, args, clientContext);
+    _forwardHttpRequestHeaders(context, clientContext);
+    clientContext.requestHeaders.addAll(context.requestHeaders);
+    final result = await _client.invoke(name, args, clientContext);
+    context.responseHeaders.addAll(clientContext.responseHeaders);
+    _forwardHttpResponseHeaders(context, clientContext);
+    return result;
   }
 
   void use<Handler>(Handler handler) {

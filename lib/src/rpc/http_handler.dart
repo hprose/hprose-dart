@@ -8,7 +8,7 @@
 |                                                          |
 | HttpHandler for Dart.                                    |
 |                                                          |
-| LastModified: Feb 2, 2020                                |
+| LastModified: Feb 28, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -24,7 +24,7 @@ class HttpHandler implements Handler<HttpServer> {
   var p3p = true;
   var get = true;
   var crossDomain = true;
-  var httpHeaders = <String, String>{};
+  var httpHeaders = <String, Object>{};
   final _origins = <String, bool>{};
   var _crossDomainXmlFile = '';
   var _crossDomainXmlContent = '';
@@ -104,9 +104,13 @@ class HttpHandler implements Handler<HttpServer> {
     return false;
   }
 
-  void sendHeader(HttpRequest request) {
+  void sendHeader(HttpRequest request, ServiceContext context) {
     final response = request.response;
-    response.statusCode = 200;
+    if (context.containsKey('httpStatusCode')) {
+      response.statusCode = context['httpStatusCode'];
+    } else {
+      response.statusCode = 200;
+    }
     response.headers.add(HttpHeaders.contentTypeHeader, 'text/plain');
     if (p3p) {
       response.headers.add(
@@ -127,9 +131,11 @@ class HttpHandler implements Handler<HttpServer> {
       }
     }
     if (httpHeaders != null) {
-      for (final header in httpHeaders.entries) {
-        response.headers.add(header.key, header.value);
-      }
+      httpHeaders.forEach(response.headers.add);
+    }
+    if (context.containsKey('httpResponseHeaders')) {
+      (context['httpResponseHeaders'] as Map<String, Object>)
+          ?.forEach(response.headers.add);
     }
   }
 
@@ -150,11 +156,24 @@ class HttpHandler implements Handler<HttpServer> {
     await response.close();
   }
 
+  Map<String, Object> getHttpRequestHeaders(HttpRequest request) {
+    final httpRequestHeaders = <String, Object>{};
+    request.headers.forEach((String name, List<String> values) {
+      if (values.length == 1) {
+        httpRequestHeaders[name] = values[0];
+      } else {
+        httpRequestHeaders[name] = values;
+      }
+    });
+    return httpRequestHeaders;
+  }
+
   ServiceContext getContext(HttpRequest request) {
     final response = request.response;
     final context = service.createContext() as ServiceContext;
     context['request'] = request;
     context['response'] = response;
+    context['httpRequestHeaders'] = getHttpRequestHeaders(request);
     context.remoteAddress = request.connectionInfo.remoteAddress;
     context.remotePort = request.connectionInfo.remotePort;
     context.localPort = request.connectionInfo.localPort;
@@ -200,7 +219,7 @@ class HttpHandler implements Handler<HttpServer> {
     }
     final data = stream.takeBytes();
     final result = await service.handle(data, context);
-    sendHeader(request);
+    sendHeader(request, context);
     response.contentLength = result.length;
     response.add(result);
     _end(response);
