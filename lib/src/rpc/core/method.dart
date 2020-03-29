@@ -17,7 +17,7 @@ part of hprose.rpc.core;
 
 class Method {
   static final List<String> _contextTypes = ['Context', 'ServiceContext'];
-  static registerContextType(String contextType) {
+  static void registerContextType(String contextType) {
     if (!_contextTypes.contains(contextType)) {
       _contextTypes.add(contextType);
     }
