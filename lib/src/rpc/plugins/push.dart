@@ -8,7 +8,7 @@
 |                                                          |
 | Push plugin for Dart.                                    |
 |                                                          |
-| LastModified: Dec 31, 2019                               |
+| LastModified: May 21, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -110,32 +110,32 @@ class Broker {
     if (!responder.isCompleted) {
       responder.complete(result);
     }
-    if (heartbeat > Duration.zero) {
-      _doHeartbeat(id);
-    }
+    _doHeartbeat(id);
     return true;
   }
 
   void _doHeartbeat(String id) {
-    var timer = Completer<bool>();
-    if (_timers.containsKey(id) && !_timers[id].isCompleted) {
-      _timers[id].complete(false);
-    }
-    _timers[id] = timer;
-    var heartbeatTimer = Timer(heartbeat, () {
-      if (!timer.isCompleted) {
-        timer.complete(true);
+    if (heartbeat > Duration.zero) {
+      var timer = Completer<bool>();
+      if (_timers.containsKey(id) && !_timers[id].isCompleted) {
+        _timers[id].complete(false);
       }
-    });
-    timer.future.then((value) {
-      heartbeatTimer.cancel();
-      if (value && _messages.containsKey(id)) {
-        final topics = _messages[id];
-        for (final topic in topics.keys) {
-          _offline(topics, id, topic, service.createContext());
+      _timers[id] = timer;
+      var heartbeatTimer = Timer(heartbeat, () {
+        if (!timer.isCompleted) {
+          timer.complete(true);
         }
-      }
-    });
+      });
+      timer.future.then((value) {
+        heartbeatTimer.cancel();
+        if (value && _messages.containsKey(id)) {
+          final topics = _messages[id];
+          for (final topic in topics.keys) {
+            _offline(topics, id, topic, service.createContext());
+          }
+        }
+      });
+    }
   }
 
   String _getId(ServiceContext context) {
@@ -211,6 +211,7 @@ class Broker {
         var timeoutTimer = Timer(timeout, () {
           if (!responder.isCompleted) {
             responder.complete({});
+            _doHeartbeat(id);
           }
         });
         await responder.future.then((value) {
@@ -322,6 +323,7 @@ class Broker {
 class Prosumer {
   final Map<String, void Function(Message message)> _callbacks = {};
   final Client client;
+  var retryInterval = Duration(seconds: 1);
   void Function(dynamic error) onError;
   void Function(String topic) onSubscribe;
   void Function(String topic) onUnsubscribe;
@@ -385,8 +387,13 @@ class Prosumer {
         if (topics == null) return;
         _dispatch(topics);
       } catch (e) {
-        if (onError != null) {
-          onError(e);
+        if (e is! TimeoutException) {
+          if (retryInterval > Duration.zero) {
+            await Future.delayed(retryInterval);
+          }
+          if (onError != null) {
+            onError(e);
+          }
         }
       }
     }

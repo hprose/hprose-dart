@@ -8,7 +8,7 @@
 |                                                          |
 | Reverse plugin for Dart.                                 |
 |                                                          |
-| LastModified: Mar 28, 2020                               |
+| LastModified: May 21, 2020                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -24,6 +24,7 @@ class ProviderContext extends Context {
 class Provider {
   var _closed = true;
   var debug = false;
+  var retryInterval = Duration(seconds: 1);
   void Function(dynamic error) onError;
   final Client client;
   final _methodManager = MethodManager();
@@ -145,8 +146,13 @@ class Provider {
     try {
       await client.invoke('=', [await Future.wait(results)]);
     } catch (e) {
-      if (onError != null) {
-        onError(e);
+      if (e is! TimeoutException) {
+        if (retryInterval > Duration.zero) {
+          await Future.delayed(retryInterval);
+        }
+        if (onError != null) {
+          onError(e);
+        }
       }
     }
   }
@@ -159,8 +165,13 @@ class Provider {
         if (calls == null) return;
         _dispatch(calls);
       } catch (e) {
-        if (onError != null) {
-          onError(e);
+        if (e is! TimeoutException) {
+          if (retryInterval > Duration.zero) {
+            await Future.delayed(retryInterval);
+          }
+          if (onError != null) {
+            onError(e);
+          }
         }
       }
     } while (!_closed);

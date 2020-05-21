@@ -115,3 +115,8 @@
 ## 3.0.17
 
 - Remove http headers forward support.
+
+## 3.0.18
+
+- Add retryInterval property.
+- Fixed heartbeat when timeout on service.
