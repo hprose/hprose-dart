@@ -339,7 +339,7 @@ class Caller {
       online.complete(true);
     }
     online = Completer<bool>();
-    _onlines[id] =online;
+    _onlines[id] = online;
     try {
       final responder = Completer<List<List>>();
       if (!_send(id, responder)) {

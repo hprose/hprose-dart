@@ -395,7 +395,7 @@ class Prosumer {
         err = null;
         for (var topic in _callbacks.keys) {
           try {
-             await client.invoke<bool>('+', [topic]);
+            await client.invoke<bool>('+', [topic]);
           } catch (e) {
             err = e;
             break;
