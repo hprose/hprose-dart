@@ -8,7 +8,7 @@
 |                                                          |
 | Push plugin for Dart.                                    |
 |                                                          |
-| LastModified: May 21, 2020                               |
+| LastModified: Jun 06, 2021                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -79,25 +79,19 @@ class Broker {
   }
   bool _send(String id, Completer<Map<String, List<Message>>> responder) {
     if (!_messages.containsKey(id)) {
-      if (!responder.isCompleted) {
-        responder.complete(null);
-      }
+      responder.complete(null);
       return true;
     }
     final topics = _messages[id];
     if (topics.isEmpty) {
-      if (!responder.isCompleted) {
-        responder.complete(null);
-      }
+      responder.complete(null);
       return true;
     }
     final result = <String, List<Message>>{};
-    var count = 0;
     for (final topic in topics.entries) {
       final name = topic.key;
       final messages = topic.value;
       if (messages == null || messages.isNotEmpty) {
-        ++count;
         result[name] = messages;
         if (messages == null) {
           topics.remove(name);
@@ -106,36 +100,33 @@ class Broker {
         }
       }
     }
-    if (count == 0) return false;
-    if (!responder.isCompleted) {
-      responder.complete(result);
-    }
+    if (result.isEmpty) return false;
+    responder.complete(result);
     _doHeartbeat(id);
     return true;
   }
 
   void _doHeartbeat(String id) {
-    if (heartbeat > Duration.zero) {
-      var timer = Completer<bool>();
-      if (_timers.containsKey(id) && !_timers[id].isCompleted) {
-        _timers[id].complete(false);
-      }
-      _timers[id] = timer;
-      var heartbeatTimer = Timer(heartbeat, () {
-        if (!timer.isCompleted) {
-          timer.complete(true);
-        }
-      });
-      timer.future.then((value) {
-        heartbeatTimer.cancel();
-        if (value && _messages.containsKey(id)) {
-          final topics = _messages[id];
-          for (final topic in topics.keys) {
-            _offline(topics, id, topic, service.createContext());
-          }
-        }
-      });
+    if (heartbeat <= Duration.zero) return;
+    var timer = Completer<bool>();
+    if (_timers.containsKey(id) && !_timers[id].isCompleted) {
+      _timers[id].complete(false);
     }
+    _timers[id] = timer;
+    var heartbeatTimer = Timer(heartbeat, () {
+      if (!timer.isCompleted) {
+        timer.complete(true);
+      }
+    });
+    timer.future.then((value) {
+      heartbeatTimer.cancel();
+      if (value && _messages.containsKey(id)) {
+        final topics = _messages[id];
+        for (final topic in topics.keys) {
+          _offline(topics, id, topic, service.createContext());
+        }
+      }
+    });
   }
 
   String _getId(ServiceContext context) {
@@ -161,18 +152,20 @@ class Broker {
   }
 
   void _response(String id) {
-    if (_responders.containsKey(id)) {
-      final responder = _responders[id];
-      if (_send(id, responder)) {
-        _responders.remove(id);
+    final responder = _responders.remove(id);
+    if (responder != null) {
+      if (!_send(id, responder)) {
+        if (_responders.putIfAbsent(id, () => responder) != responder) {
+          responder.complete(null);
+        }
       }
     }
   }
 
   bool _offline(Map<String, List<Message>> topics, String id, String topic,
       ServiceContext context) {
-    if (topics.containsKey(topic)) {
-      final messages = topics.remove(topic);
+    final messages = topics.remove(topic);
+    if (messages != null) {
       if (onUnsubscribe != null) {
         onUnsubscribe(id, topic, messages, context);
       }
@@ -192,11 +185,9 @@ class Broker {
 
   Future<Map<String, List<Message>>> _message(ServiceContext context) async {
     final id = _getId(context);
-    if (_responders.containsKey(id)) {
-      final responder = _responders.remove(id);
-      if (!responder.isCompleted) {
-        responder.complete(null);
-      }
+    var responder = _responders.remove(id);
+    if (responder != null) {
+      responder.complete(null);
     }
     if (_timers.containsKey(id)) {
       final timer = _timers.remove(id);
@@ -204,15 +195,16 @@ class Broker {
         timer.complete(false);
       }
     }
-    final responder = Completer<Map<String, List<Message>>>();
+    responder = Completer<Map<String, List<Message>>>();
     if (!_send(id, responder)) {
       _responders[id] = responder;
       if (timeout > Duration.zero) {
         var timeoutTimer = Timer(timeout, () {
-          if (!responder.isCompleted) {
+          if (_responders[id] == responder) {
+            _responders.remove(id);
             responder.complete({});
-            _doHeartbeat(id);
           }
+          _doHeartbeat(id);
         });
         await responder.future.then((value) {
           timeoutTimer.cancel();
@@ -382,17 +374,31 @@ class Prosumer {
 
   void _message() async {
     while (true) {
+      var err;
       try {
         final topics = await client.invoke<Map<String, List<Message>>>('<');
         if (topics == null) return;
         _dispatch(topics);
+        continue;
       } catch (e) {
-        if (e is! TimeoutException) {
+        err = e;
+      }
+      while (err != null) {
+        if (err is! TimeoutException) {
           if (retryInterval > Duration.zero) {
             await Future.delayed(retryInterval);
           }
           if (onError != null) {
             onError(e);
+          }
+        }
+        err = null;
+        for (var topic in _callbacks.keys) {
+          try {
+             await client.invoke<bool>('+', [topic]);
+          } catch (e) {
+            err = e;
+            break;
           }
         }
       }
