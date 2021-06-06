@@ -120,3 +120,8 @@
 
 - Add retryInterval property.
 - Fixed heartbeat when timeout on service.
+
+## 3.0.19
+
+- Fixed push plugin.
+- Fixed reverse plugin.
