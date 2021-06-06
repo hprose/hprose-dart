@@ -8,7 +8,7 @@
 |                                                          |
 | Reverse plugin for Dart.                                 |
 |                                                          |
-| LastModified: May 21, 2020                               |
+| LastModified: Jun 06, 2021                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -139,27 +139,30 @@ class Provider {
 
   void _dispatch(List<List> calls) async {
     final n = calls.length;
-    final results = List<Future>(n);
-    for (var i = 0; i < n; i++) {
-      results[i] = _process(calls[i]);
-    }
-    try {
-      await client.invoke('=', [await Future.wait(results)]);
-    } catch (e) {
-      if (e is! TimeoutException) {
-        if (retryInterval > Duration.zero) {
-          await Future.delayed(retryInterval);
-        }
-        if (onError != null) {
-          onError(e);
+    final results = List<Future<List<dynamic>>>.generate(
+        n, (i) => _process(calls[i]),
+        growable: false);
+    while (true) {
+      try {
+        await client.invoke('=', [await Future.wait(results)]);
+        return;
+      } catch (e) {
+        if (e is! TimeoutException) {
+          if (retryInterval > Duration.zero) {
+            await Future.delayed(retryInterval);
+          }
+          if (onError != null) {
+            onError(e);
+          }
         }
       }
     }
   }
 
   Future<void> listen() async {
+    if (!_closed) return;
     _closed = false;
-    do {
+    while (!_closed) {
       try {
         final calls = await client.invoke<List<List>>('!');
         if (calls == null) return;
@@ -174,7 +177,7 @@ class Provider {
           }
         }
       }
-    } while (!_closed);
+    }
   }
 
   Future<void> close() async {
@@ -258,10 +261,11 @@ class Caller {
   final Map<String, List<List>> _calls = {};
   final Map<String, Map<int, Completer>> _results = {};
   final Map<String, Completer<List<List>>> _responders = {};
-  final Map<String, bool> _onlines = {};
+  final Map<String, Completer<bool>> _onlines = {};
   final Service service;
-  var heartbeat = const Duration(minutes: 2);
+  var idleTimeout = const Duration(minutes: 2);
   var timeout = const Duration(seconds: 30);
+  var heartbeat = const Duration(seconds: 3);
   Caller(this.service) {
     Method.registerContextType('CallerContext');
     service
@@ -278,31 +282,30 @@ class Caller {
   }
 
   bool _send(String id, Completer<List<List>> responder) {
-    if (_calls.containsKey(id)) {
-      final calls = _calls[id];
-      if (calls.isEmpty) {
-        return false;
-      }
-      _calls[id] = [];
-      responder.complete(calls);
-      return true;
+    final calls = _calls.remove(id);
+    if (calls == null || calls.isEmpty) {
+      return false;
     }
-    return false;
+    _calls[id] = [];
+    responder.complete(calls);
+    return true;
   }
 
   void _response(String id) {
-    if (_responders.containsKey(id)) {
-      final responder = _responders[id];
-      if (_send(id, responder)) {
-        _responders.remove(id);
+    final responder = _responders.remove(id);
+    if (responder != null) {
+      if (!_send(id, responder)) {
+        if (_responders.putIfAbsent(id, () => responder) != responder) {
+          responder.complete(null);
+        }
       }
     }
   }
 
   String _stop(ServiceContext context) {
     final id = _getId(context);
-    if (_responders.containsKey(id)) {
-      final responder = _responders.remove(id);
+    final responder = _responders.remove(id);
+    if (responder != null) {
       responder.complete(null);
     }
     return id;
@@ -313,24 +316,50 @@ class Caller {
     _onlines.remove(id);
   }
 
+  void doHeartbeat(String id, Completer<bool> online) {
+    if (heartbeat > Duration.zero) {
+      var timeoutTimer = Timer(heartbeat, () {
+        if (!online.isCompleted) {
+          online.complete(false);
+        }
+      });
+      online.future.then((value) {
+        timeoutTimer.cancel();
+        if (!value) {
+          _onlines.remove(id);
+        }
+      });
+    }
+  }
+
   Future<List<List>> _begin(ServiceContext context) async {
     final id = _stop(context);
-    _onlines.putIfAbsent(id, () => true);
-    final responder = Completer<List<List>>();
-    if (!_send(id, responder)) {
-      _responders[id] = responder;
-      if (heartbeat > Duration.zero) {
-        var timeoutTimer = Timer(heartbeat, () {
-          if (!responder.isCompleted) {
-            responder.complete([]);
-          }
-        });
-        await responder.future.then((value) {
-          timeoutTimer.cancel();
-        });
-      }
+    var online = _onlines.remove(id);
+    if (online != null) {
+      online.complete(true);
     }
-    return responder.future;
+    online = Completer<bool>();
+    _onlines[id] =online;
+    try {
+      final responder = Completer<List<List>>();
+      if (!_send(id, responder)) {
+        _responders[id] = responder;
+        if (idleTimeout > Duration.zero) {
+          var timeoutTimer = Timer(idleTimeout, () {
+            if (_responders[id] == responder) {
+              _responders.remove(id);
+              responder.complete([]);
+            }
+          });
+          await responder.future.then((value) {
+            timeoutTimer.cancel();
+          });
+        }
+      }
+      return await responder.future;
+    } finally {
+      doHeartbeat(id, online);
+    }
   }
 
   void _end(List<List> results, ServiceContext context) {
