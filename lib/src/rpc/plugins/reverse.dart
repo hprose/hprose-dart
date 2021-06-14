@@ -316,7 +316,7 @@ class Caller {
     _onlines.remove(id);
   }
 
-  void doHeartbeat(String id, Completer<bool> online) {
+  void _doHeartbeat(String id, Completer<bool> online) {
     if (heartbeat > Duration.zero) {
       var timeoutTimer = Timer(heartbeat, () {
         if (!online.isCompleted) {
@@ -358,7 +358,7 @@ class Caller {
       }
       return await responder.future;
     } finally {
-      doHeartbeat(id, online);
+      _doHeartbeat(id, online);
     }
   }
 
