@@ -8,7 +8,7 @@
 |                                                          |
 | Push plugin for Dart.                                    |
 |                                                          |
-| LastModified: Jun 06, 2021                               |
+| LastModified: Jun 24, 2021                               |
 | Author: Ma Bingyao <andot@hprose.com>                    |
 |                                                          |
 \*________________________________________________________*/
@@ -54,7 +54,6 @@ class Broker {
   final _responders = <String, Completer<Map<String, List<Message>>>>{};
   final _timers = <String, Completer<bool>>{};
   Service service;
-  int messageQueueMaxLength = 10;
   Duration timeout = const Duration(minutes: 2);
   Duration heartbeat = const Duration(seconds: 10);
   void Function(String id, String topic, ServiceContext context) onSubscribe;
@@ -217,11 +216,9 @@ class Broker {
   bool unicast(dynamic data, String topic, String id, [String from = '']) {
     if (_messages.containsKey(id) && _messages[id].containsKey(topic)) {
       final messages = _messages[id][topic];
-      if (messages.length < messageQueueMaxLength) {
-        messages.add(Message(data, from));
-        _response(id);
-        return true;
-      }
+      messages.add(Message(data, from));
+      _response(id);
+      return true;
     }
     return false;
   }
@@ -240,13 +237,9 @@ class Broker {
     for (final id in _messages.keys) {
       if (_messages[id].containsKey(topic)) {
         final messages = _messages[id][topic];
-        if (messages.length < messageQueueMaxLength) {
-          messages.add(Message(data, from));
-          _response(id);
-          result[id] = true;
-        } else {
-          result[id] = false;
-        }
+        messages.add(Message(data, from));
+        _response(id);
+        result[id] = true;
       }
     }
     return result;
